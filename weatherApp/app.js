@@ -26,7 +26,7 @@ window.addEventListener('load', () => {
 				const {temperature, summary, icon } = data.currently;
 				// SET DOM ELEMENTS FROM API
 				temperatureDegree.textContent = temperature;
-				temperatureDescription.textContent = summary;
+				temperatureDescription.textContent = data.hourly.summary;
 				locationTimezone.textContent = data.timezone;
 
 			//F to C
@@ -39,7 +39,7 @@ window.addEventListener('load', () => {
 				temperatureSection.addEventListener('click',() => {
 				if(temperatureSpan.textContent === "F"){
 					temperatureSpan.textContent = "C";
-					temperatureDegree.textContent= Math.floor(celsius) ;
+					temperatureDegree.textContent= Math.round(celsius*100)/100;
 				}else{
 					temperatureDegree.textContent = temperature;
 					temperatureSpan.textContent = "F";

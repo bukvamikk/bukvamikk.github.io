@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css?family=Quicksand');
+
+
 *{
 	margin: :0;
 	padding: 0;
@@ -11,17 +14,18 @@ body{
 	flex-direction: column;
 	align-items: center;
 	background: linear-gradient(rgb(47,150,163),rgb(48,62,143));
-	font-family: sans-serif;
+	font-family: 'Quicksand', sans-serif;
 	color:white;
 } 
  
 .location,
 .temperature{
-	height: 30vh;
+	height: 20vh;
 	width: 50%;
 	display: flex;
 	justify-content: space-around;
-	align-items: center;   
+	align-items: center;  
+	flex-direction: column; 
 }
 
 .temperature{
