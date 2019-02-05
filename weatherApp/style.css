@@ -8,14 +8,15 @@
 }
 
 body{
+	padding-top: 30px;
 	height: 100vh;
 	display: flex;
-	justify-content: center;
+	justify-content: start;
 	flex-direction: column;
 	align-items: center;
 	background: linear-gradient(rgb(47,150,163),rgb(48,62,143));
-	font-family: 'Quicksand', sans-serif;
-	color:white;
+	font-family: 'Quicksand', sans-serif
+;	color:white;
 } 
  
 .location,
