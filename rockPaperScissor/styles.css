@@ -86,7 +86,7 @@ header h1 {
 
 .choice img:hover {
     height: 90px;
-    border:3px solid grey;
+    
 }
 
 #action-message {
@@ -95,13 +95,16 @@ header h1 {
 }
 
 .green-glow{
-
+    display: inline-grid;
+    border: 3px solid #43ff43;
 }
 
 .red-glow{
-
+	display: inline-grid;
+    border: 3px solid #FA3D03;
 }
 
 .gray-glow{
-
+	display: inline-grid;
+    border: 3px solid #A9A9A9;
 }
