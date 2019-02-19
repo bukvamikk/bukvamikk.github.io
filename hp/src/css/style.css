@@ -1,0 +1,8 @@
+#quoteDisplay{
+  min-height: 120px;
+}
+.main-bg{
+  background-image: url(../img/bg.jpg);
+  background-repeat:repeat-x;
+  background-size: cover;
+}
