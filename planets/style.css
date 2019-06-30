@@ -1,0 +1,272 @@
+:root {
+  --mars-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/332937/mars.jpg);
+  --mars-tilt: rotate(25.2deg);
+  --mars-day: 24.6;
+  --mars-color: #c07158;
+}
+
+@keyframes planetRotate {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+body {
+  background: #000000;
+  color: #fff;
+  height: 100%;
+  width: 100vw;
+  margin: 10px 0 40px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 190px);
+  grid-template-rows: repeat(auto-fill, 400px);
+  grid-gap: 40px;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  font-family: "Major Mono Display";
+  text-transform: lowercase;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+.card--mercury .planet_atmosphere {
+  box-shadow: inset 10px 0px 12px -2px rgba(255, 255, 255, 0.2), inset -70px 0px 50px 0px black, -5px 0px 10px -4px var(--mercury-color);
+}
+.card--mercury .planet_surface {
+  background-image: var(--mercury-image);
+  transform: var(--mercury-tilt) scale(1.2);
+  animation: planetRotate calc(var(--mercury-day)*.1s) linear infinite;
+}
+.card--mercury .card_planet::before {
+  transform: var(--mercury-tilt) scale(1.2);
+  border-color: var(--mercury-color);
+  color: var(--mercury-color);
+}
+.card--mercury .tilt_icon {
+  transform: var(--mercury-tilt);
+  color: var(--mercury-color);
+}
+.card--venus .planet_atmosphere {
+  box-shadow: inset 10px 0px 12px -2px rgba(255, 255, 255, 0.2), inset -70px 0px 50px 0px black, -5px 0px 10px -4px var(--venus-color);
+}
+.card--venus .planet_surface {
+  background-image: var(--venus-image);
+  transform: var(--venus-tilt) scale(1.2);
+  animation: planetRotate calc(var(--venus-day)*.1s) linear infinite;
+}
+.card--venus .card_planet::before {
+  transform: var(--venus-tilt) scale(1.2);
+  border-color: var(--venus-color);
+  color: var(--venus-color);
+}
+.card--venus .tilt_icon {
+  transform: var(--venus-tilt);
+  color: var(--venus-color);
+}
+.card--earth .planet_atmosphere {
+  box-shadow: inset 10px 0px 12px -2px rgba(255, 255, 255, 0.2), inset -70px 0px 50px 0px black, -5px 0px 10px -4px var(--earth-color);
+}
+.card--earth .planet_surface {
+  background-image: var(--earth-image);
+  transform: var(--earth-tilt) scale(1.2);
+  animation: planetRotate calc(var(--earth-day)*.1s) linear infinite;
+}
+.card--earth .card_planet::before {
+  transform: var(--earth-tilt) scale(1.2);
+  border-color: var(--earth-color);
+  color: var(--earth-color);
+}
+.card--earth .tilt_icon {
+  transform: var(--earth-tilt);
+  color: var(--earth-color);
+}
+.card--mars .planet_atmosphere {
+  box-shadow: inset 10px 0px 12px -2px rgba(255, 255, 255, 0.2), inset -70px 0px 50px 0px black, -5px 0px 10px -4px var(--mars-color);
+}
+.card--mars .planet_surface {
+  background-image: var(--mars-image);
+  transform: var(--mars-tilt) scale(1.2);
+  animation: planetRotate calc(var(--mars-day)*.1s) linear infinite;
+}
+.card--mars .card_planet::before {
+  transform: var(--mars-tilt) scale(1.2);
+  border-color: var(--mars-color);
+  color: var(--mars-color);
+}
+.card--mars .tilt_icon {
+  transform: var(--mars-tilt);
+  color: var(--mars-color);
+}
+.card--jupiter .planet_atmosphere {
+  box-shadow: inset 10px 0px 12px -2px rgba(255, 255, 255, 0.2), inset -70px 0px 50px 0px black, -5px 0px 10px -4px var(--jupiter-color);
+}
+.card--jupiter .planet_surface {
+  background-image: var(--jupiter-image);
+  transform: var(--jupiter-tilt) scale(1.2);
+  animation: planetRotate calc(var(--jupiter-day)*.1s) linear infinite;
+}
+.card--jupiter .card_planet::before {
+  transform: var(--jupiter-tilt) scale(1.2);
+  border-color: var(--jupiter-color);
+  color: var(--jupiter-color);
+}
+.card--jupiter .tilt_icon {
+  transform: var(--jupiter-tilt);
+  color: var(--jupiter-color);
+}
+.card--saturn .planet_atmosphere {
+  box-shadow: inset 10px 0px 12px -2px rgba(255, 255, 255, 0.2), inset -70px 0px 50px 0px black, -5px 0px 10px -4px var(--saturn-color);
+}
+.card--saturn .planet_surface {
+  background-image: var(--saturn-image);
+  transform: var(--saturn-tilt) scale(1.2);
+  animation: planetRotate calc(var(--saturn-day)*.1s) linear infinite;
+}
+.card--saturn .card_planet::before {
+  transform: var(--saturn-tilt) scale(1.2);
+  border-color: var(--saturn-color);
+  color: var(--saturn-color);
+}
+.card--saturn .tilt_icon {
+  transform: var(--saturn-tilt);
+  color: var(--saturn-color);
+}
+.card--uranus .planet_atmosphere {
+  box-shadow: inset 10px 0px 12px -2px rgba(255, 255, 255, 0.2), inset -70px 0px 50px 0px black, -5px 0px 10px -4px var(--uranus-color);
+}
+.card--uranus .planet_surface {
+  background-image: var(--uranus-image);
+  transform: var(--uranus-tilt) scale(1.2);
+  animation: planetRotate calc(var(--uranus-day)*.1s) linear infinite;
+}
+.card--uranus .card_planet::before {
+  transform: var(--uranus-tilt) scale(1.2);
+  border-color: var(--uranus-color);
+  color: var(--uranus-color);
+}
+.card--uranus .tilt_icon {
+  transform: var(--uranus-tilt);
+  color: var(--uranus-color);
+}
+.card--neptune .planet_atmosphere {
+  box-shadow: inset 10px 0px 12px -2px rgba(255, 255, 255, 0.2), inset -70px 0px 50px 0px black, -5px 0px 10px -4px var(--neptune-color);
+}
+.card--neptune .planet_surface {
+  background-image: var(--neptune-image);
+  transform: var(--neptune-tilt) scale(1.2);
+  animation: planetRotate calc(var(--neptune-day)*.1s) linear infinite;
+}
+.card--neptune .card_planet::before {
+  transform: var(--neptune-tilt) scale(1.2);
+  border-color: var(--neptune-color);
+  color: var(--neptune-color);
+}
+.card--neptune .tilt_icon {
+  transform: var(--neptune-tilt);
+  color: var(--neptune-color);
+}
+.card--pluto .planet_atmosphere {
+  box-shadow: inset 10px 0px 12px -2px rgba(255, 255, 255, 0.2), inset -70px 0px 50px 0px black, -5px 0px 10px -4px var(--pluto-color);
+}
+.card--pluto .planet_surface {
+  background-image: var(--pluto-image);
+  transform: var(--pluto-tilt) scale(1.2);
+  animation: planetRotate calc(var(--pluto-day)*.1s) linear infinite;
+}
+.card--pluto .card_planet::before {
+  transform: var(--pluto-tilt) scale(1.2);
+  border-color: var(--pluto-color);
+  color: var(--pluto-color);
+}
+.card--pluto .tilt_icon {
+  transform: var(--pluto-tilt);
+  color: var(--pluto-color);
+}
+.card--sun .planet_atmosphere {
+  box-shadow: inset 10px 0px 12px -2px rgba(255, 255, 255, 0.2), inset -70px 0px 50px 0px black, -5px 0px 10px -4px var(--sun-color);
+}
+.card--sun .planet_surface {
+  background-image: var(--sun-image);
+  transform: var(--sun-tilt) scale(1.2);
+  animation: planetRotate calc(var(--sun-day)*.1s) linear infinite;
+}
+.card--sun .card_planet::before {
+  transform: var(--sun-tilt) scale(1.2);
+  border-color: var(--sun-color);
+  color: var(--sun-color);
+}
+.card--sun .tilt_icon {
+  transform: var(--sun-tilt);
+  color: var(--sun-color);
+}
+
+.card_planet::before {
+  content: "";
+  position: absolute;
+  height: 190px;
+  z-index: -2;
+  left: 50%;
+  top: 0%;
+  border-left: 1px dashed rgba(255, 255, 255, 0.25);
+}
+
+.planet_atmosphere {
+  height: 190px;
+  width: 190px;
+  position: relative;
+  background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 65%);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.planet_surface {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: -1;
+  background-size: cover;
+}
+
+.card--sun .planet_atmosphere {
+  box-shadow: 0px 0px 10px 0px var(--sun-color), 0px 0px 1000px -2px var(--sun-color);
+}
+
+.card_info {
+  width: 100%;
+}
+
+.info_title {
+  text-align: center;
+  font-size: 28px;
+}
+.info_form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.info_item {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+.info_item .tilt_icon {
+  margin: 0 5px;
+}
+.info_label {
+  font-size: 11px;
+}
+.info_line {
+  flex: 1;
+  margin: 0 5px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+}
+
+/*# sourceMappingURL=style.css.map */
