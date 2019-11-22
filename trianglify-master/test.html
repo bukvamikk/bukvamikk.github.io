@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trianglify BM</title>
+  <style>
+    html,
+    body {
+      margin: 0 0;
+      padding: 0 0;
+      text-align: center;
+      font-size: 1em;
+      font-family: sans-serif;
+      background-color:#333;
+    }
+
+    .options {
+      background-color: #ffffffb8;
+      text-align: right;
+      color: #444;
+      padding: 10px;
+      width: 210px;
+      height: 435px;
+      position: absolute;
+      top: 40px;
+      left: 40px;
+      border-radius: 10px;
+      -webkit-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.21);
+      -moz-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.21);
+      box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.21);
+    }
+
+    .sized {
+      margin: 5px;
+      padding: 5px;
+      width: 100px;
+      text-align: center;
+    }
+
+    .sized-button {
+      margin: 5px;
+      width: 130px;
+      text-align: center;
+      border-radius: 6px;
+      background-color: #fa4614;
+      color: #fff;
+      border: 0;
+      padding: 10px;
+    }
+  </style>
+  <script src="/lib/jscolor.js"></script>
+</head>
+
+<body>
+  <div class="options">
+    <div style="text-align: center;">
+      <a class="logo " href="https://bankmonitor.hu" title="Bankmonitor.hu">
+        <img class="bm-logo" width="160" height="23" alt="Bankmonitor.hu"
+          src="https://bankmonitor.hu/wp-content/themes/bankmonitor/img/logo.svg">
+      </a></div>
+    <p style="text-align: center;"><strong>Trianglify</strong> generátor v1.0</p>
+    1. szín: <input id="color1" type="text" class="jscolor sized" value="#fa4614"></input> <br>
+    2. szín: <input id="color2" type="text" class="jscolor sized" value="#f17007"></input> <br>
+    3. szín: <input id="color3" type="text" class="jscolor sized" value="#fcb000"></input> <br>
+    <hr style="width:80%; ">
+    Szélesség: <input id="svgWidth" type="number" value="1920" class="sized"></input> <br>
+    Magasság: <input id="svgHeight" type="number" value="1080" class="sized"></input> <br>
+    Sűrűség: <input id="cellSize" type="number" value="100" class="sized"></input> <br>
+    <hr style="width:80%; ">
+    <div style="text-align: center;">
+      <button onClick="showTriangles();" id="generate" class="sized-button">
+      </button>
+      <button value="Refresh Page" onClick="clearBody()" id="delete" class="sized-button">Generál</button>
+      <button onclick="saveSvg()" class="sized-button">SVG mentése</button>
+    </div>
+  </div>
+  <div id="myList"></div>
+  <script src="/lib/trianglify.min.js"></script>
+  <script>
+    let del = document.getElementById('delete');
+    del.style.display = 'none'; //or
+    function showTriangles() {
+      let cellSize = document.getElementById('cellSize').value;
+      let color1 = document.getElementById('color1').value;
+      let color2 = document.getElementById('color2').value;
+      let color3 = document.getElementById('color3').value;
+      let svgHeight = document.getElementById('svgHeight').value;
+      let svgWidth = document.getElementById('svgWidth').value;
+      let pattern = Trianglify({
+        height: Number(svgHeight),
+        width: Number(svgWidth),
+        x_colors: [color1, color2, color3],
+        cell_size: Number(cellSize)
+      });
+      var generate = document.getElementById('generate');
+      generate.style.display = 'none'; //or
+      let del = document.getElementById('delete');
+      del.style.display = 'inline-block'; //or
+      document.getElementById("myList").appendChild(pattern.svg());
+    }
+    function clearBody() {
+      document.getElementById("myList").removeChild(myList.firstChild);
+      let del = document.getElementById('delete');
+      del.style.display = 'none'; //or
+      var generate = document.getElementById('generate');
+      generate.style.display = 'inline-block'; //or
+      showTriangles();
+    }
+    //save svg
+    function saveSvg() {
+      let e = document.createElement("script");
+      e.setAttribute(
+        "src",
+        "/lib/svg-crowbar.js"
+      );
+      e.setAttribute("class", "svg-crowbar");
+      document.body.appendChild(e);
+    }
+    showTriangles();
+  </script>
+</body>
+
+</html>
