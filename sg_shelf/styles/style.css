@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css?family=Quicksand&display=swap');
+
+html,
+body {
+  height: 100%;
+  margin: 0 0;
+  padding: 0 0;
+  background: rgb(231,231,231);
+  background: linear-gradient(146deg, rgba(231,231,231,1) 0%, rgba(255,254,248,1) 100%);
+}
+
+
+.polc {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 1300px;
+  z-index: 2;
+}
+
+.targy-3{
+  position: relative;
+  z-index: 2;
+}
+
+/* Tárgy-tartók */
+.fp-targy-1-tarto,
+.fp-targy-2-tarto,
+.fp-targy-3-tarto {
+  border: dashed 1px #dcdcdc;
+  height: 250px;
+  width: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 2;
+
+}
+
+.kp-targy-1-tarto,
+.kp-targy-2-tarto,
+.kp-targy-3-tarto {
+  border: dashed 1px #dcdcdc;
+  height: 250px;
+  width: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 2;
+}
+
+.ap-targy-1-tarto,
+.ap-targy-2-tarto,
+.ap-targy-3-tarto {
+  border: dashed 1px #dcdcdc;
+  height: 250px;
+  width: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 2;
+}
+
+/* Polcok */
+.felso-polc,
+.kozepso-polc,
+.also-polc {
+  width: 1300px;
+  height: 20px;
+  background: rgb(163, 93, 40);
+  background: linear-gradient(
+    0deg,
+    rgba(163, 93, 40, 1) 0%,
+    rgba(205, 137, 91, 1) 100%
+  );
+  -webkit-box-shadow: 0px 15px 8px -5px rgba(0, 0, 0, 0.13);
+  -moz-box-shadow: 0px 15px 8px -5px rgba(0, 0, 0, 0.13);
+  box-shadow: 0px 15px 8px -5px rgba(0, 0, 0, 0.13);
+  border-radius: 5px;
+  z-index: 2;
+}
+
+.felso-polc,
+.kozepso-polc {
+  margin-bottom: 25px;
+}
+
+/* Oldal animációk */
+
+.panel-jobbrol {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 50vw;
+  transform: translateX(100%);
+  transition: .3s ease-out;
+  z-index: 1;
+}
+
+.panel-balrol {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 50vw;
+  transform: translateX(-200%);
+  transition: .3s ease-out;
+  z-index: 1;
+}
+
+.panel {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.3em;
+  line-height: 130%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #000000e3;
+  color: #eee;
+  overflow: auto;
+  padding: 2em;
+  z-index: 1;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+}
+.panel img{
+  height: 80vh;
+  border-radius: 10px;
+  border: 1px solid #fff;
+}

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="styles/style.css">
+    <script src="scripts/jquery-3.4.1.min.js"></script>
+
+    <title>Polc demó</title>
+</head>
+
+<script>
+    $(document).ready(function () {
+
+        $('.fp-targy-3-tarto').click(function () {
+            $('.panel-jobbrol').css('transform', 'translateX(0%)');
+            $('.panel-balrol').css('transform', 'translateX(-100%)');
+            $('.targy-3').css('z-index', '10');
+        });
+
+
+        $('.panel-jobbrol, .panel-balrol').click(function () {
+            $('.panel-jobbrol').css('transform', 'translateX(100%)');
+            $('.panel-balrol').css('transform', 'translateX(-200%)');
+        });
+    });
+</script>
+
+<body>
+    <div class="polc">
+        <div class="container">
+            <div class="fp-targy-1-tarto">
+            </div>
+            <div class="fp-targy-2-tarto">
+            </div>
+            <div class="fp-targy-3-tarto">
+                <img src="/pictures/owl.png" class="targy-3">
+            </div>
+        </div>
+
+        <div class="felso-polc">
+        </div>
+
+        <div class="container">
+            <div class="kp-targy-1-tarto">
+            </div>
+            <div class="kp-targy-2-tarto">
+                <img src="/pictures/owl.png">
+            </div>
+            <div class="kp-targy-3-tarto">
+            </div>
+        </div>
+
+        <div class="kozepso-polc">
+        </div>
+
+        <div class="container">
+            <div class="ap-targy-1-tarto">
+                <img src="/pictures/owl.png">
+            </div>
+            <div class="ap-targy-2-tarto">
+            </div>
+            <div class="ap-targy-3-tarto">
+            </div>
+        </div>
+
+
+        <div class="also-polc">
+        </div>
+
+    </div>
+
+
+
+    <div class="panel-jobbrol">
+        <div class="panel">
+            <p>He says the restraining bolt has short circuited his recording system. He suggests that if you remove the
+                bolt, he might be able to play back the entire recording. H'm? Oh, yeah, well, I guess you're too small
+                to run away on me if I take this off! Okay. There you go. Well, wait a minute. Where'd she go? Bring her
+                back! Play back the entire message. What message? The one you're carrying inside your rusty innards!
+                Luke? Luke! Come to dinner! All right, I'll be right there, Aunt Beru. I'm sorry, sir, but he appears to
+                have picked up a slight flutter. Well, see what you can do with him. I'll be right back. Just you
+                reconsider playing that message for him. No, I don't think he likes you at all. No, I don't like you
+                either.</p>
+
+            <p>I hope the old man got that tractor beam out if commission, or this is going to be a real short trip.
+                Okay, hit it! We're coming up on the sentry ships. Hold 'em off! Angle the deflector shields while I
+                charge up the main guns! I can't believe he's gone. There wasn't anything you could have done. Come on,
+                buddy, we're not out of this yet! You in, kid? Okay, stay sharp!</p>
+
+
+            <p><iframe width="560" height="315" src="https://www.youtube.com/embed/Q9HVhqXI8PY" frameborder="0"
+                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe></p>
+        </div>
+    </div>
+
+    <div class="panel-balrol">
+        <div class="panel">
+
+            <img src="pictures/owl-big.jpg">
+
+
+        </div>
+
+    </div>
+
+
+
+</body>
+
+</html>
