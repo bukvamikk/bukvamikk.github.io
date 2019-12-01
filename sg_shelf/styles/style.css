@@ -4,30 +4,27 @@ html,
 body {
   height: 100%;
   margin: 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 0 0;
   background: rgb(231,231,231);
   background: linear-gradient(146deg, rgba(231,231,231,1) 0%, rgba(255,254,248,1) 100%);
 }
 
 
-.polc {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-}
 .container {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   width: 1300px;
-  z-index: 2;
+  
 }
 
 .targy-3{
   position: relative;
   z-index: 2;
+  
 }
 
 /* Tárgy-tartók */
@@ -40,7 +37,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  z-index: 2;
+  
 
 }
 
@@ -53,7 +50,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  z-index: 2;
+  
 }
 
 .ap-targy-1-tarto,
@@ -65,7 +62,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  z-index: 2;
+  
 }
 
 /* Polcok */
@@ -75,6 +72,7 @@ body {
   width: 1300px;
   height: 20px;
   background: rgb(163, 93, 40);
+  z-index: 10;
   background: linear-gradient(
     0deg,
     rgba(163, 93, 40, 1) 0%,
@@ -84,7 +82,6 @@ body {
   -moz-box-shadow: 0px 15px 8px -5px rgba(0, 0, 0, 0.13);
   box-shadow: 0px 15px 8px -5px rgba(0, 0, 0, 0.13);
   border-radius: 5px;
-  z-index: 2;
 }
 
 .felso-polc,
@@ -99,10 +96,12 @@ body {
   top: 0;
   bottom: 0;
   right: 0;
-  width: 50vw;
   transform: translateX(100%);
   transition: .3s ease-out;
-  z-index: 1;
+  z-index: 3;
+  width: 2000px;
+  height: 1080px;
+  background-image: url(/pictures/jobb.svg);
 }
 
 .panel-balrol {
@@ -110,13 +109,16 @@ body {
   top: 0;
   bottom: 0;
   right: 0;
-  width: 50vw;
   transform: translateX(-200%);
   transition: .3s ease-out;
-  z-index: 1;
+  z-index: 3;
+  width: 2000px;
+  height: 1080px;
+  background-image: url(/pictures/bal.svg);
 }
 
 .panel {
+  max-width: 860px;
   font-family: 'Quicksand', sans-serif;
   font-size: 1.3em;
   line-height: 130%;
@@ -125,15 +127,12 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  background: #000000e3;
   color: #eee;
   overflow: auto;
   padding: 2em;
-  z-index: 1;
   display: flex;
   flex-flow: column;
   justify-content: center;
-  align-items: center;
 }
 .panel img{
   height: 80vh;
