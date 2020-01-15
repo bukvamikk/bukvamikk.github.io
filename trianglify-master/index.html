@@ -23,7 +23,7 @@
       color: #444;
       padding: 10px;
       width: 210px;
-      height: 435px;
+      height: 540px;
       position: absolute;
       top: 40px;
       left: 40px;
@@ -65,6 +65,8 @@
     1. szín: <input id="color1" type="text" class="jscolor sized" value="#fa4614"></input> <br>
     2. szín: <input id="color2" type="text" class="jscolor sized" value="#f17007"></input> <br>
     3. szín: <input id="color3" type="text" class="jscolor sized" value="#fcb000"></input> <br>
+    4. szín: <input id="color4" type="text" class="jscolor sized" value="#f17007"></input> <br>
+    5. szín: <input id="color5" type="text" class="jscolor sized" value="#fcb000"></input> <br>
     <hr style="width:80%; ">
     Szélesség: <input id="svgWidth" type="number" value="1920" class="sized"></input> <br>
     Magasság: <input id="svgHeight" type="number" value="1080" class="sized"></input> <br>
@@ -87,12 +89,14 @@
       let color1 = document.getElementById('color1').value;
       let color2 = document.getElementById('color2').value;
       let color3 = document.getElementById('color3').value;
+      let color4 = document.getElementById('color4').value;
+      let color5 = document.getElementById('color5').value;
       let svgHeight = document.getElementById('svgHeight').value;
       let svgWidth = document.getElementById('svgWidth').value;
       let pattern = Trianglify({
         height: Number(svgHeight),
         width: Number(svgWidth),
-        x_colors: [color1, color2, color3],
+        x_colors: [color1, color2, color3, color4, color5],
         cell_size: Number(cellSize)
       });
       var generate = document.getElementById('generate');
