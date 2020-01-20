@@ -3,13 +3,18 @@
 html,
 body {
   height: 100%;
+  width: 100%;
   margin: 0 0;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0 0;
-  background: rgb(231,231,231);
-  background: linear-gradient(146deg, rgba(231,231,231,1) 0%, rgba(255,254,248,1) 100%);
+  background:#fff;
+}
+
+.hold-my-container {
+  margin: 0 auto;
+  width: 100%;
 }
 
 
@@ -17,7 +22,7 @@ body {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  width: 1300px;
+  width: 100%;
   
 }
 
@@ -31,9 +36,9 @@ body {
 .fp-targy-1-tarto,
 .fp-targy-2-tarto,
 .fp-targy-3-tarto {
-  border: dashed 1px #dcdcdc;
-  height: 250px;
-  width: 350px;
+  /*border: dashed 1px #dcdcdc;*/
+      height: 26vh;
+    width: 30vh;
   display: flex;
   justify-content: center;
   align-items: flex-end;
@@ -44,9 +49,9 @@ body {
 .kp-targy-1-tarto,
 .kp-targy-2-tarto,
 .kp-targy-3-tarto {
-  border: dashed 1px #dcdcdc;
-  height: 250px;
-  width: 350px;
+  /*border: dashed 1px #dcdcdc;*/
+      height: 26vh;
+    width: 30vh;
   display: flex;
   justify-content: center;
   align-items: flex-end;
@@ -56,9 +61,9 @@ body {
 .ap-targy-1-tarto,
 .ap-targy-2-tarto,
 .ap-targy-3-tarto {
-  border: dashed 1px #dcdcdc;
-  height: 250px;
-  width: 350px;
+  /*border: dashed 1px #dcdcdc;*/
+      height: 26vh;
+    width: 30vh;
   display: flex;
   justify-content: center;
   align-items: flex-end;
@@ -69,8 +74,9 @@ body {
 .felso-polc,
 .kozepso-polc,
 .also-polc {
-  width: 1300px;
-  height: 20px;
+  width: 70%;
+  margin: 0 auto;
+  height: 2vh;
   background: rgb(163, 93, 40);
   z-index: 10;
   background: linear-gradient(
@@ -88,6 +94,18 @@ body {
 .kozepso-polc {
   margin-bottom: 25px;
 }
+.fp-targy-1,
+.fp-targy-2,
+.fp-targy-3,
+.kp-targy-1,
+.kp-targy-2,
+.kp-targy-3,  
+.ap-targy-1,
+.ap-targy-2,
+.ap-targy-3
+{
+  height: 100%;
+}
 
 /* Oldal animációk */
 
@@ -99,9 +117,10 @@ body {
   transform: translateX(100%);
   transition: .3s ease-out;
   z-index: 3;
-  width: 2000px;
-  height: 1080px;
-  background-image: url(https://bukvamikk.github.io/sg_shelf/pictures/jobb.svg);
+  width:50vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.87);
+ 
 }
 
 .panel-balrol {
@@ -112,9 +131,9 @@ body {
   transform: translateX(-200%);
   transition: .3s ease-out;
   z-index: 3;
-  width: 2000px;
-  height: 1080px;
-  background-image: url(https://bukvamikk.github.io/sg_shelf/pictures/bal.svg);
+  width:50vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.87);
 }
 
 .panel {

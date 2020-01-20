@@ -15,30 +15,30 @@
     $(document).ready(function () {
 
         $('.fp-targy-3-tarto').click(function () {
-            $('.panel-jobbrol').css('transform', 'translateX(45%)');
+            $('.panel-jobbrol').css('transform', 'translateX(0%)');
             $('.panel-jobbrol').css('z-index', '4');
-            $('.panel-balrol').css('transform', 'translateX(-48.5%)');
-            $('.targy-3').css('z-index','5');
+            $('.panel-balrol').css('transform', 'translateX(-100%)');
+            $('.fp-targy-3').css('z-index','5');
         });
 
 
         $('.panel-jobbrol, .panel-balrol').click(function () {
             $('.panel-jobbrol').css('transform', 'translateX(100%)');
             $('.panel-balrol').css('transform', 'translateX(-200%)');
-            $('.targy-3').css('z-index','2');
+            $('.fp-targy-3').css('z-index','2');
         });
     });
 </script>
 
 <body>
-    <div style="margin: 0 auto;">
+    <div class="hold-my-container">
         <div class="container">
             <div class="fp-targy-1-tarto">
             </div>
             <div class="fp-targy-2-tarto">
             </div>
             <div class="fp-targy-3-tarto">
-                <img src="pictures/owl.png" class="targy-3">
+                <img src="pictures/owl.png" class="fp-targy-3">
             </div>
         </div>
 
@@ -49,7 +49,7 @@
             <div class="kp-targy-1-tarto">
             </div>
             <div class="kp-targy-2-tarto">
-                <img src="pictures/owl.png">
+                <img src="pictures/owl.png" class="kp-targy-2">
             </div>
             <div class="kp-targy-3-tarto">
             </div>
@@ -60,7 +60,7 @@
 
         <div class="container">
             <div class="ap-targy-1-tarto">
-                <img src="pictures/owl.png">
+                <img src="pictures/owl.png" class="ap-targy-1">
             </div>
             <div class="ap-targy-2-tarto">
             </div>
