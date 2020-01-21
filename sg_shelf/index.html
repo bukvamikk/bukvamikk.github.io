@@ -15,16 +15,20 @@
     $(document).ready(function () {
 
         $('.fp-targy-3-tarto').click(function () {
-            $('.panel-jobbrol').css('transform', 'translateX(0%)');
+            $('.panel-jobbrol').css('transform', 'translateY(0%)');
+            $('.panel-jobbrol').css('transition', 'transform 0.6s cubic-bezier(0.77, 0, 0.175, 1)');
             $('.panel-jobbrol').css('z-index', '4');
             $('.panel-balrol').css('transform', 'translateX(-100%)');
+            $('.panel-balrol').css('transition', 'transform 0.6s cubic-bezier(0.77, 0, 0.175, 1)');
             $('.fp-targy-3').css('z-index','5');
         });
 
 
         $('.panel-jobbrol, .panel-balrol').click(function () {
-            $('.panel-jobbrol').css('transform', 'translateX(100%)');
+            $('.panel-jobbrol').css('transform', 'translateY(100%)');
+            $('.panel-jobbrol').css('transition', 'transform 0.6s cubic-bezier(0.77, 0, 0.175, 1)');
             $('.panel-balrol').css('transform', 'translateX(-200%)');
+            $('.panel-balrol').css('transition', 'transform 0.6s cubic-bezier(0.77, 0, 0.175, 1)');
             $('.fp-targy-3').css('z-index','2');
         });
     });
@@ -77,6 +81,7 @@
 
     <div class="panel-jobbrol">
         <div class="panel">
+            <div class="content-holder">
             <p>He says the restraining bolt has short circuited his recording system. He suggests that if you remove the
                 bolt, he might be able to play back the entire recording. H'm? Oh, yeah, well, I guess you're too small
                 to run away on me if I take this off! Okay. There you go. Well, wait a minute. Where'd she go? Bring her
@@ -85,12 +90,16 @@
                 have picked up a slight flutter. Well, see what you can do with him. I'll be right back. Just you
                 reconsider playing that message for him. No, I don't think he likes you at all. No, I don't like you
                 either.</p>
+            </div>
         </div>
     </div>
 
   
     <div class="panel-balrol">
         <div class="panel">
+            <div class="content-holder">
+                <style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed/PTrclVjU8g8' frameborder='0' allowfullscreen></iframe></div>
+                </div>
         </div>
     </div>
 </body>

@@ -74,7 +74,7 @@ body {
 .felso-polc,
 .kozepso-polc,
 .also-polc {
-  width: 70%;
+  width: 75%;
   margin: 0 auto;
   height: 2vh;
   background: rgb(163, 93, 40);
@@ -114,7 +114,7 @@ body {
   top: 0;
   bottom: 0;
   right: 0;
-  transform: translateX(100%);
+  transform: translateY(100%);
   transition: .3s ease-out;
   z-index: 3;
   width:50vw;
@@ -137,10 +137,10 @@ body {
 }
 
 .panel {
-  max-width: 860px;
+  max-width: 100%;
   font-family: 'Quicksand', sans-serif;
-  font-size: 1.3em;
-  line-height: 130%;
+  font-size:1.9vh;
+  line-height: 163%;
   position: absolute;
   top: 0;
   bottom: 0;
@@ -152,6 +152,12 @@ body {
   display: flex;
   flex-flow: column;
   justify-content: center;
+  margin: 0 auto;
+}
+.content-holder{
+  background-color: #080c0b;
+    padding: 2.3%;
+    border-radius: 25px;
 }
 .panel img{
   height: 80vh;
