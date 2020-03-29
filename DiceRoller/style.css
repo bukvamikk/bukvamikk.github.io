@@ -1,0 +1,93 @@
+body {
+  background-color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.dices {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  color: #fff;
+  min-height: 200px;
+  padding-bottom: 20px;
+}
+
+.dice {
+  text-align: center;
+  width: 90px;
+  padding: 5px;
+  background-color: #000;
+}
+
+.increase-decrease button {
+  background-color: #422b2c;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  color: #fff;
+  margin: 3px;
+  outline: none;
+  border: none;
+  font-size: 115%;
+  cursor: pointer;
+}
+
+.dice-sum {
+  font-size: 130%;
+  color: #ec2127;
+}
+.counter {
+  display: inline;
+  font-size: 110%;
+  color: #ffb0b2;
+}
+
+.rolls {
+  color: #4e4e4e;
+  font-size: 80%;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+}
+
+.total-holder {
+  display: flex;
+  justify-content: center;
+}
+
+.rollMe {
+  background-color: #000;
+  color: #fff;
+  margin: 3px;
+  outline: none;
+  border: 1px solid #ec2127;
+  padding: 5px 20px 5px 20px;
+  font-size: 115%;
+  cursor: pointer;
+}
+
+.all-roll-sum {
+  color: #ec2127;
+}
+
+.history {
+  color: #505050;
+  display: flex;
+  justify-content: center;
+  max-width: 360px;
+  margin: 0 auto;
+  font-size: 75%;
+  margin-top: 30px;
+}
+
+.logo {
+  padding-bottom: 20px;
+  width: 100%;
+  max-width: 600px;
+}
+.holder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 20px;
+}

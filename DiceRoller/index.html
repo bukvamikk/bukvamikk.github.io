@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <title>Đ&Đ Dice Roller</title>
+</head>
+
+<body>
+    <div class="holder">
+        <img class="logo" src="img/dnd-logo.png">
+        <div class="dices" id="dices">
+            <div class="dice">
+                <div class="increase-decrease" data-dice="d4">
+                    <button class="increase">+</button><button class="decrease">-</button>
+                </div>
+                <img src="img/d4.gif">
+
+                <div class="">
+                    <span class="counter" data-counter="d4">0</span> <strong>D4</strong>
+                </div>
+                <div class="rolls d4"></div>
+                <span class="dice-sum d4"></span>
+            </div>
+            <div class="dice">
+                <div class="increase-decrease" data-dice="d6">
+                    <button class="increase">+</button><button class="decrease">-</button>
+                </div>
+                <img src="img/d6.gif">
+
+                <div class="">
+                    <span class="counter" data-counter="d6">0</span> <strong>D6</strong>
+                </div>
+                <div class="rolls d6"></div>
+                <span class="dice-sum d6"></span>
+
+            </div>
+            <div class="dice">
+                <div class="increase-decrease" data-dice="d8">
+                    <button class="increase">+</button><button class="decrease">-</button>
+                </div>
+                <img src="img/d8.gif">
+
+                <div class="">
+                    <span class="counter" data-counter="d8">0</span> <strong>D8</strong>
+                </div>
+                <div class="rolls d8"></div>
+                <span class="dice-sum d8"></span>
+            </div>
+            <div class="dice">
+                <div class="increase-decrease" data-dice="d10">
+                    <button class="increase">+</button><button class="decrease">-</button>
+                </div>
+                <img src="img/d10.gif">
+
+                <div class="">
+                    <span class="counter" data-counter="d10">0</span> <strong>D10</strong>
+                </div>
+                <div class="rolls d10"></div>
+                <span class="dice-sum d10"></span>
+            </div>
+            <div class="dice">
+                <div class="increase-decrease" data-dice="d12">
+                    <button class="increase">+</button><button class="decrease">-</button>
+                </div>
+                <img src="img/d12.gif">
+
+                <div class="">
+                    <span class="counter" data-counter="d12">0</span> <strong>D12</strong>
+                </div>
+                <div class="rolls d12"></div>
+                <span class="dice-sum d12"></span>
+            </div>
+            <div class="dice">
+                <div class="increase-decrease" data-dice="d20">
+                    <button class="increase">+</button><button class="decrease">-</button>
+                </div>
+                <img src="img/d20.gif">
+
+                <div class="">
+                    <span class="counter" data-counter="d20">0</span> <strong>D20</strong>
+                </div>
+                <div class="rolls d20"></div>
+                <span class="dice-sum d20"></span>
+            </div>
+        </div>
+        <div class="total-holder">
+            <button class="rollMe">Rock & ROLL</button>
+            <div class="all-roll-sum"></div>
+        </div>
+        <div class="history"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
