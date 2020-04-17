@@ -61,4 +61,4 @@ $('.tooltipster').tooltipster({
     theme: 'tooltipster-borderless',
     height: 320,
 });
-$("#earthDateChooser").datepicker({ minDate: new Date(2012, 7, 6), maxDate: new Date(2019, 9, 28), dateFormat: 'yy-m-d', changeYear: true });
+$("#earthDateChooser").datepicker({ minDate: new Date(2012, 7, 6), maxDate: new Date(2019, 9, 28), dateFormat: 'yy-m-d', changeMonth: true, changeYear: true });
