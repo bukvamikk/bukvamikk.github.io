@@ -285,10 +285,6 @@
             }
             const map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
-
-
-
-
             // JSON betöltés
             const shipMarkers = getJSONMarkers();
 
@@ -312,9 +308,6 @@
                     <strong>Next Open Port Date:</strong> ${ship.nextOpenPortDate}<br>
                     <strong>Reference PDF:</strong> <a href="${ship.referencePdfs}" target="_blank">Click here</a><br>
                     <strong>Location:</strong> ${ship.location}`,
-
-
-
                     maxWidth: 360
                 });
 
