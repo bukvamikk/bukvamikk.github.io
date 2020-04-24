@@ -287,14 +287,14 @@
             const map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
             // JSON betöltés
-            const hotelMarkers = getJSONMarkers();
+            const shipMarkers = getJSONMarkers();
 
             // Initialize Google Markers
-            for (hotel of hotelMarkers) {
+            for (ship of shipMarkers) {
                 let marker = new google.maps.Marker({
                     map: map,
-                    position: new google.maps.LatLng(hotel.location[0], hotel.location[1]),
-                    title: hotel.name
+                    position: new google.maps.LatLng(ship.location[0], ship.location[1]),
+                    title: ship.name
                 })
             }
         }
