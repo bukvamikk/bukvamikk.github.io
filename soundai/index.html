@@ -22,6 +22,12 @@
             padding: 10px;
             font-size: 16px;
         }
+        select {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -31,6 +37,14 @@
 <body>
     <h1>Text to Speech</h1>
     <textarea id="textInput" placeholder="Enter text here..."></textarea>
+    <select id="languageSelect">
+        <option value="en-US">English (US)</option>
+        <option value="en-GB">English (UK)</option>
+        <!-- Add options for other languages -->
+    </select>
+    <select id="voiceSelect">
+        <!-- Options will be populated dynamically based on selected language -->
+    </select>
     <button onclick="readText()">Read Text</button>
 
     <script src="script.js"></script>
