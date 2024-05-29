@@ -49,6 +49,7 @@
   <script>
     const apiKey = "1w5nqOhG24pi4OaU8Hgd6XobxHVzbJyU0SrasNSI"; // Replace with your actual NASA API key
     const apodBaseUrl = "https://api.nasa.gov/planetary/apod";
+    const apodContainer = document.getElementById("apod-container");
 
     async function fetchApodData(date) {
       const url = new URL(apodBaseUrl);
@@ -60,10 +61,9 @@
         const data = await response.json();
         console.log(data); // View data in console for debugging
 
-        const apodContainer = document.getElementById("apod-container");
+        
         apodContainer.innerHTML = ""; // Clear previous content
         apodContainer.classList.remove("loading"); // Hide loading animation
-
         const titleElem = document.createElement("h2");
         titleElem.textContent = data.title;
         apodContainer.appendChild(titleElem);
