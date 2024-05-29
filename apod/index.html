@@ -17,24 +17,52 @@
     h1, p {
       margin-bottom: 10px;
     }
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px; /* Adjust height as needed */
+    }
+    .loading::after {
+      content: "";
+      display: block;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 5px solid #ccc;
+      border-top-color: #ddd;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
-  <h1>NASA's Astronomy Picture of the Day</h1>
-  <div id="apod-container"></div>
+  <h1>NASA's Astronomy Picture of the Day (Pick a Date)</h1>
+  <input type="date" id="date-picker">
+  <div id="apod-container">
+    <div class="loading"></div> </div>
 
   <script>
-    const apiKey = "1w5nqOhG24pi4OaU8Hgd6XobxHVzbJyU0SrasNSI"; // Replace with your actual NASA API key
-    const apodUrl = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}`;
+    const apiKey = "YOUR_API_KEY"; // Replace with your actual NASA API key
+    const apodBaseUrl = "https://api.nasa.gov/planetary/apod";
 
-    async function fetchApodData() {
+    async function fetchApodData(date) {
+      const url = new URL(apodBaseUrl);
+      url.searchParams.append("api_key", apiKey);
+      url.searchParams.append("date", date);
+
       try {
-        const response = await fetch(apodUrl);
+        const response = await fetch(url);
         const data = await response.json();
         console.log(data); // View data in console for debugging
 
         const apodContainer = document.getElementById("apod-container");
-        apodContainer.innerHTML = ""; // Clear any previous content
+        apodContainer.innerHTML = ""; // Clear previous content
+        apodContainer.classList.remove("loading"); // Hide loading animation
 
         const titleElem = document.createElement("h2");
         titleElem.textContent = data.title;
@@ -60,10 +88,19 @@
       } catch (error) {
         console.error("Error fetching APOD data:", error);
         apodContainer.textContent = "Error: Could not retrieve APOD data.";
+        apodContainer.classList.remove("loading"); // Hide loading animation even on error
       }
     }
 
-    fetchApodData();
+    const datePicker = document.getElementById("date-picker");
+    datePicker.addEventListener("change", (event) => {
+      const selectedDate = event.target.value;
+      apodContainer.classList.add("loading"); // Show loading animation
+      fetchApodData(selectedDate);
+    });
+
+    // Fetch APOD data for today on page load
+    fetchApodData(""); // Empty date fetches today's APOD
   </script>
 </body>
 </html>
