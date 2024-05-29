@@ -6,10 +6,11 @@
   <title>NASA's Astronomy Picture of the Day</title>
   <style>
     /* Add some basic styling here (optional) */
-body {
-  font-family: monospace, sans-serif; /* Retro font combination */
-  background-color: #fffef2; /* Light beige background */
-  color: #333333; /* Dark brown text */
+    body {
+  font-family: sans-serif; /* Clean and modern font */
+  margin: 0; /* Remove default margin for full-screen feel (optional) */
+  background-color: #f7f7f7; /* Light gray background */
+  color: #333; /* Dark gray for text */
 }
 
 h1 {
@@ -19,17 +20,20 @@ h1 {
 }
 
 #date-picker {
-  background-color: #f2f2f2; /* Light gray for datepicker */
-  border: 1px solid #ccc; /* Light border */
-  padding: 5px;
+  display: inline-block; /* Inline layout for date picker */
+  padding: 10px 15px;
+  border: 1px solid #ddd; /* Light border */
   border-radius: 5px; /* Rounded corners */
+  margin-bottom: 20px;
 }
 
 #apod-container {
-  border: 1px solid #ddd; /* Light border for content area */
-  padding: 15px;
-  margin-top: 20px;
-  border-radius: 10px; /* More rounded corners for content area */
+  background-color: #fff; /* White background for content area */
+  padding: 20px;
+  border-radius: 10px; /* Rounded corners for content area */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  margin: 0 auto; /* Center content horizontally */
+  max-width: 800px; /* Limit content width for better responsiveness */
 }
 
 .loading {
@@ -37,39 +41,23 @@ h1 {
 }
 
 .loading::after {
-  border-color: #999; /* Brown border for loading animation */
+  border-color: #ccc; /* Gray border for loading animation */
 }
 
 img {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  width: 100%; /* Image takes full width of content area */
   border-radius: 5px; /* Rounded corners for images */
 }
 
 p {
-  line-height: 1.5; /* Increase line spacing for better readability */
+  line-height: 1.5; /* Increase line spacing for readability */
+  margin-bottom: 10px;
 }
-    .loading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 200px; /* Adjust height as needed */
-    }
-    .loading::after {
-      content: "";
-      display: block;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 5px solid #ccc;
-      border-top-color: #ddd;
-      animation: spin 1s linear infinite;
-    }
 
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
+
+
   </style>
 </head>
 <body>
