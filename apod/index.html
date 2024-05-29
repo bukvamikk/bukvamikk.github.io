@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NASA's Astronomy Picture of the Day</title>
+  <style>
+    /* Add some basic styling here (optional) */
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+    img {
+      width: 100%;
+      max-width: 600px;
+    }
+    h1, p {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>NASA's Astronomy Picture of the Day</h1>
+  <div id="apod-container"></div>
+
+  <script>
+    const apiKey = "1w5nqOhG24pi4OaU8Hgd6XobxHVzbJyU0SrasNSI"; // Replace with your actual NASA API key
+    const apodUrl = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}`;
+
+    async function fetchApodData() {
+      try {
+        const response = await fetch(apodUrl);
+        const data = await response.json();
+        console.log(data); // View data in console for debugging
+
+        const apodContainer = document.getElementById("apod-container");
+        apodContainer.innerHTML = ""; // Clear any previous content
+
+        const titleElem = document.createElement("h2");
+        titleElem.textContent = data.title;
+        apodContainer.appendChild(titleElem);
+
+        let imageElem;
+        if (data.media_type === "image") {
+          imageElem = document.createElement("img");
+          imageElem.src = data.url;
+        } else if (data.media_type === "video") {
+          // Handle video content if desired (more complex)
+        } else {
+          console.warn("Unsupported media type:", data.media_type);
+        }
+
+        if (imageElem) {
+          apodContainer.appendChild(imageElem);
+
+          const explanationElem = document.createElement("p");
+          explanationElem.innerHTML = data.explanation;
+          apodContainer.appendChild(explanationElem);
+        }
+      } catch (error) {
+        console.error("Error fetching APOD data:", error);
+        apodContainer.textContent = "Error: Could not retrieve APOD data.";
+      }
+    }
+
+    fetchApodData();
+  </script>
+</body>
+</html>
