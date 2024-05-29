@@ -6,17 +6,49 @@
   <title>NASA's Astronomy Picture of the Day</title>
   <style>
     /* Add some basic styling here (optional) */
-    body {
-      font-family: sans-serif;
-      margin: 20px;
-    }
-    img {
-      width: 100%;
-      max-width: 600px;
-    }
-    h1, p {
-      margin-bottom: 10px;
-    }
+body {
+  font-family: monospace, sans-serif; /* Retro font combination */
+  background-color: #fffef2; /* Light beige background */
+  color: #333333; /* Dark brown text */
+}
+
+h1 {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 2em; /* Increase heading size */
+}
+
+#date-picker {
+  background-color: #f2f2f2; /* Light gray for datepicker */
+  border: 1px solid #ccc; /* Light border */
+  padding: 5px;
+  border-radius: 5px; /* Rounded corners */
+}
+
+#apod-container {
+  border: 1px solid #ddd; /* Light border for content area */
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 10px; /* More rounded corners for content area */
+}
+
+.loading {
+  display: none; /* Hide loading animation initially */
+}
+
+.loading::after {
+  border-color: #999; /* Brown border for loading animation */
+}
+
+img {
+  display: block;
+  margin-bottom: 10px;
+  border-radius: 5px; /* Rounded corners for images */
+}
+
+p {
+  line-height: 1.5; /* Increase line spacing for better readability */
+}
     .loading {
       display: flex;
       justify-content: center;
