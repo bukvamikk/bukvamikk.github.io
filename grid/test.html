@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget grid examples</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 32px;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+        }
+
+        .controls {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .row {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            width: 100%;
+            max-width: 2400px;
+        }
+
+        .widget {
+            flex: 1 1 0;
+            min-width: 240px;
+            max-width: 40%;
+            max-height: 400px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+        }
+
+        .widget h3 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .widget p {
+            margin: 0;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="controls">
+        <button id="minus">-</button>
+        <div id="label">Widgets: 6</div>
+        <button id="plus">+</button>
+    </div>
+
+    <div id="grid" class="grid"></div>
+
+    <script>
+        let count = 1;
+
+        const dummyContent = [
+            { title: "A New Hope", content: "Luke Skywalker joins the Rebel Alliance to fight the evil Empire." },
+            { title: "The Empire Strikes Back", content: "Darth Vader pursues the Rebels and reveals shocking truths." },
+            { title: "Return of the Jedi", content: "The Rebels launch a final attack against the Empire." },
+            { title: "The Phantom Menace", content: "Young Anakin Skywalker is discovered and begins his Jedi training." },
+            { title: "Attack of the Clones", content: "Anakin and Padmé face political intrigue and growing conflict." },
+            { title: "Revenge of the Sith", content: "Anakin succumbs to the dark side and the Empire rises." },
+            { title: "The Force Awakens", content: "New heroes rise as the First Order threatens the galaxy." },
+            { title: "The Last Jedi", content: "The Resistance fights for survival against overwhelming odds." },
+            { title: "The Rise of Skywalker", content: "The final battle between the Resistance and the Sith unfolds." }
+        ];
+
+        function getRows(count) {
+            if (count === 1) return [1];
+            if (count === 2) return [2];
+            if (count === 3) return [3];
+            if (count === 4) return [2, 2];
+            if (count === 5) return [2, 2, 1];
+
+            const rows = [];
+            let remaining = count;
+
+            while (remaining > 0) {
+                if (remaining >= 3) {
+                    rows.push(3);
+                    remaining -= 3;
+                } else if (remaining === 2) {
+                    rows.push(2);
+                    remaining -= 2;
+                } else {
+                    rows.push(1);
+                    remaining -= 1;
+                }
+            }
+
+            return rows;
+        }
+
+        function render() {
+            const grid = document.getElementById('grid');
+            const label = document.getElementById('label');
+            grid.innerHTML = '';
+            label.textContent = 'Widgets: ' + count;
+
+            const rows = getRows(count);
+            let widgetNumber = 0;
+
+            rows.forEach(rowCount => {
+                const row = document.createElement('div');
+                row.className = 'row';
+
+                for (let i = 0; i < rowCount; i++) {
+                    const widget = document.createElement('div');
+                    widget.className = 'widget';
+
+                    const dummy = dummyContent[widgetNumber % dummyContent.length];
+                    const title = document.createElement('h3');
+                    title.textContent = dummy.title;
+
+                    const content = document.createElement('p');
+                    content.textContent = (dummy.content + " Lorem ipsum dolor sit amet, consectetur adipiscing elit. ").repeat(50); 
+
+                    widget.appendChild(title);
+                    widget.appendChild(content);
+
+                    row.appendChild(widget);
+                    widgetNumber++;
+                }
+
+                grid.appendChild(row);
+            });
+        }
+
+        document.getElementById('minus').addEventListener('click', () => {
+            count = Math.max(1, count - 1);
+            render();
+        });
+
+        document.getElementById('plus').addEventListener('click', () => {
+            count += 1;
+            render();
+        });
+
+        render();
+    </script>
+
+</body>
+
+</html>
