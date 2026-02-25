@@ -3,67 +3,125 @@
 
 <head>
     <meta charset="UTF-8">
+    <title>Material Dashboard Widgets</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Widget grid examples</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script type="importmap">
+{
+"imports": {
+"@material/web/": "https://esm.run/@material/web/"
+}
+}
+</script>
+    <script type="module">
+        import '@material/web/all.js';
+        import { styles as typescaleStyles } from '@material/web/typography/md-typescale-styles.js';
+
+        document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+        rel="stylesheet">
+
     <style>
         body {
             margin: 0;
             padding: 32px;
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
+            font-family: "Open Sans", sans-serif;
+            background: #f5f5f5;
         }
 
         .controls {
             display: flex;
             gap: 16px;
             margin-bottom: 32px;
-        }
-
-        button {
-            padding: 8px 16px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .grid {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
             align-items: center;
         }
 
-        .row {
-            display: flex;
+        /* GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(280px, 1fr));
+            grid-auto-rows: 400px;
             gap: 24px;
-            justify-content: center;
-            width: 100%;
-            max-width: 2400px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
+        @media (max-width: 1200px) {
+            .grid {
+                grid-template-columns: repeat(2, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* MATERIAL CARD WRAPPER */
         .widget {
-            flex: 1 1 0;
-            min-width: 240px;
-            max-width: 40%;
-            max-height: 400px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            overflow: auto;
-            padding: 16px;
             display: flex;
             flex-direction: column;
-            font-size: 14px;
+            min-width: 280px;
+            transition: grid-row 0.3s ease, grid-column 0.3s ease;
+            background-color: #fff;
+            border-radius: 16px;
         }
 
-        .widget h3 {
-            margin: 0 0 8px 0;
-            font-size: 28px;
-            font-weight: bold;
+        .double-height {
+            grid-row: span 2;
         }
 
-        .widget p {
-            margin: 0;
-            line-height: 1.6;
+        .double-width {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 900px) {
+            .double-width {
+                grid-column: auto !important;
+            }
+        }
+
+        /* Centering logic */
+        @media (min-width: 1201px) {
+            .center-when-alone:not(.double-width) {
+                grid-column: 2;
+            }
+
+            .center-when-alone.double-width {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (min-width: 901px) and (max-width: 1200px) {
+            .center-when-alone:not(.double-width) {
+                grid-column: 1;
+            }
+
+            .center-when-alone.double-width {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .center-when-alone {
+                grid-column: auto;
+            }
+        }
+
+        /* Dragging visuals */
+        .dragging {
+            opacity: 0.8;
+            transform: scale(1.02);
+        }
+
+        .drag-over {
+            outline: 2px dashed #6200ee;
         }
     </style>
 </head>
@@ -71,15 +129,25 @@
 <body>
 
     <div class="controls">
-        <button id="minus">-</button>
-        <div id="label">Widgets: 6</div>
-        <button id="plus">+</button>
+        <md-filled-button id="minus">Remove</md-filled-button>
+        <md-filled-button id="plus">Add</md-filled-button>
+        <md-outlined-button id="reset">Reset layout</md-outlined-button>
+        <div id="label">Widgets: 1</div>
     </div>
 
     <div id="grid" class="grid"></div>
 
     <script>
-        let count = 1;
+        const initialWidgets = [
+            {
+                title: "A New Hope",
+                content: "Luke Skywalker joins the Rebel Alliance to fight the evil Empire.",
+                doubleWidth: false,
+                doubleHeight: false
+            }
+        ];
+
+        let widgetsData = [...initialWidgets];
 
         const dummyContent = [
             { title: "A New Hope", content: "Luke Skywalker joins the Rebel Alliance to fight the evil Empire." },
@@ -87,80 +155,115 @@
             { title: "Return of the Jedi", content: "The Rebels launch a final attack against the Empire." },
             { title: "The Phantom Menace", content: "Young Anakin Skywalker is discovered and begins his Jedi training." },
             { title: "Attack of the Clones", content: "Anakin and Padmé face political intrigue and growing conflict." },
-            { title: "Revenge of the Sith", content: "Anakin succumbs to the dark side and the Empire rises." },
-            { title: "The Force Awakens", content: "New heroes rise as the First Order threatens the galaxy." },
-            { title: "The Last Jedi", content: "The Resistance fights for survival against overwhelming odds." },
-            { title: "The Rise of Skywalker", content: "The final battle between the Resistance and the Sith unfolds." }
+            { title: "Revenge of the Sith", content: "Anakin succumbs to the dark side and the Empire rises." }
         ];
 
-        function getRows(count) {
-            if (count === 1) return [1];
-            if (count === 2) return [2];
-            if (count === 3) return [3];
-            if (count === 4) return [2, 2];
-            if (count === 5) return [2, 2, 1];
-
-            const rows = [];
-            let remaining = count;
-
-            while (remaining > 0) {
-                if (remaining >= 3) {
-                    rows.push(3);
-                    remaining -= 3;
-                } else if (remaining === 2) {
-                    rows.push(2);
-                    remaining -= 2;
-                } else {
-                    rows.push(1);
-                    remaining -= 1;
-                }
-            }
-
-            return rows;
-        }
+        let dragSourceIndex = null;
 
         function render() {
             const grid = document.getElementById('grid');
             const label = document.getElementById('label');
+
             grid.innerHTML = '';
-            label.textContent = 'Widgets: ' + count;
+            label.textContent = 'Widgets: ' + widgetsData.length;
 
-            const rows = getRows(count);
-            let widgetNumber = 0;
+            widgetsData.forEach((data, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'widget';
+                wrapper.setAttribute('draggable', 'true');
+                wrapper.dataset.index = index;
 
-            rows.forEach(rowCount => {
-                const row = document.createElement('div');
-                row.className = 'row';
+                if (data.doubleWidth) wrapper.classList.add("double-width");
+                if (data.doubleHeight) wrapper.classList.add("double-height");
 
-                for (let i = 0; i < rowCount; i++) {
-                    const widget = document.createElement('div');
-                    widget.className = 'widget';
-
-                    const dummy = dummyContent[widgetNumber % dummyContent.length];
-                    const title = document.createElement('h3');
-                    title.textContent = dummy.title;
-
-                    const content = document.createElement('p');
-                    content.textContent = (dummy.content + " Lorem ipsum dolor sit amet, consectetur adipiscing elit. ").repeat(50);
-
-                    widget.appendChild(title);
-                    widget.appendChild(content);
-
-                    row.appendChild(widget);
-                    widgetNumber++;
+                if (widgetsData.length === 1) {
+                    wrapper.classList.add("center-when-alone");
                 }
 
-                grid.appendChild(row);
+                const card = document.createElement('md-elevated-card');
+                card.style.height = "100%";
+                card.style.display = "flex";
+                card.style.flexDirection = "column";
+
+                card.innerHTML = `
+                    <div style="padding: 16px; border-bottom: 1px solid rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0; font-size:18px;">${data.title}</h3>
+                    <div style="display:flex; gap:8px;">
+                    <md-outlined-button class="height-btn">Height</md-outlined-button>
+                    <md-outlined-button class="width-btn">Width</md-outlined-button>
+                    <md-icon-button class="remove-btn"><span class="material-icons">close</span></md-icon-button>
+                    </div>
+                    </div>
+                    <div style="padding:16px; overflow:auto; flex:1;">
+                    ${(data.content).repeat(50)}
+                    </div>
+                    `;
+
+                wrapper.appendChild(card);
+
+                card.querySelector(".height-btn").addEventListener("click", () => {
+                    data.doubleHeight = !data.doubleHeight;
+                    render();
+                });
+
+                card.querySelector(".width-btn").addEventListener("click", () => {
+                    data.doubleWidth = !data.doubleWidth;
+                    render();
+                });
+
+                card.querySelector(".remove-btn").addEventListener("click", () => {
+                    widgetsData.splice(index, 1);
+                    render();
+                });
+
+                wrapper.addEventListener('dragstart', () => {
+                    dragSourceIndex = index;
+                    wrapper.classList.add('dragging');
+                });
+
+                wrapper.addEventListener('dragend', () => {
+                    wrapper.classList.remove('dragging');
+                    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+                });
+
+                wrapper.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    wrapper.classList.add('drag-over');
+                });
+
+                wrapper.addEventListener('dragleave', () => {
+                    wrapper.classList.remove('drag-over');
+                });
+
+                wrapper.addEventListener('drop', () => {
+                    wrapper.classList.remove('drag-over');
+                    const targetIndex = index;
+                    if (dragSourceIndex === targetIndex) return;
+
+                    const moved = widgetsData.splice(dragSourceIndex, 1)[0];
+                    widgetsData.splice(targetIndex, 0, moved);
+
+                    dragSourceIndex = null;
+                    render();
+                });
+
+                grid.appendChild(wrapper);
             });
         }
 
         document.getElementById('minus').addEventListener('click', () => {
-            count = Math.max(1, count - 1);
+            if (widgetsData.length > 1) widgetsData.pop();
             render();
         });
 
         document.getElementById('plus').addEventListener('click', () => {
-            count += 1;
+            const next = dummyContent[widgetsData.length % dummyContent.length];
+            widgetsData.push({ ...next, doubleWidth: false, doubleHeight: false });
+            render();
+        });
+
+        document.getElementById('reset').addEventListener('click', () => {
+            widgetsData = JSON.parse(JSON.stringify(initialWidgets));
             render();
         });
 
