@@ -31,7 +31,7 @@
             margin: 0;
             padding: 32px;
             font-family: "Open Sans", sans-serif;
-            background: #f5f5f5;
+            background: #dcd7d7;
         }
 
         .controls {
@@ -95,12 +95,16 @@
 
             .center-when-alone.double-width {
                 grid-column: 1 / -1;
+                max-width: 800px;
+                margin: 0 auto;
             }
         }
 
         @media (min-width: 901px) and (max-width: 1200px) {
             .center-when-alone:not(.double-width) {
                 grid-column: 1;
+                
+                max-width: 800px;
             }
 
             .center-when-alone.double-width {
