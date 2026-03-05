@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search UX & IA Research Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Warm Neutrals with SaaS Blue/Amber Accents (Stone-50 bg, Stone-800 text, Sky-600 primary, Amber-500 highlight) -->
+    <!-- Application Structure Plan: A Dashboard-style architecture was chosen. It begins with 'Key Concepts' to align the user's mental model, moves into an interactive 'Tool Deep Dive' with a sidebar selector for detailed specific analysis (preventing information overload), and concludes with a 'Comparative Matrix' for scanning across the industry. This mimics how a UX researcher would present findings: Concepts first, individual tool breakdowns, then a holistic comparison. -->
+    <!-- Visualization & Content Choices: 
+         1. Key Concepts: HTML/Tailwind interactive cards -> Goal: Inform -> Justification: Breaks down foundational theory before showing data. 
+         2. Radar Chart (Chart.js): Tool UX Vector vs Industry Avg -> Goal: Compare -> Justification: Shows strengths (e.g., Filtering vs Visuals) at a glance without text bloat. 
+         3. Comparison Table: HTML table with hover states -> Goal: Organize/Compare -> Justification: Best for side-by-side categorical data analysis. 
+         4. NO SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #FAFAF9; /* stone-50 */
+            color: #292524; /* stone-800 */
+        }
+        
+        /* Required Chart Container Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        /* Custom Scrollbar for the table */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f5f5f4; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e; 
+        }
+
+        /* Interactive tab styling */
+        .tab-active {
+            background-color: #e0f2fe; /* sky-100 */
+            border-left: 4px solid #0284c7; /* sky-600 */
+            font-weight: 600;
+            color: #0369a1; /* sky-700 */
+        }
+        .tab-inactive {
+            border-left: 4px solid transparent;
+        }
+        .tab-inactive:hover {
+            background-color: #f5f5f4; /* stone-100 */
+            border-left: 4px solid #d6d3d1; /* stone-300 */
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-sky-200 selection:text-sky-900">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        
+        <!-- Header Section -->
+        <header class="mb-12 border-b border-stone-200 pb-8">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-3xl bg-sky-100 text-sky-700 p-2 rounded-lg leading-none">&#x1F50D;</span>
+                <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-stone-900">Enterprise Search UX Analysis</h1>
+            </div>
+            <p class="text-lg text-stone-600 max-w-3xl">
+                An interactive Information Architecture (IA) and Interaction Design (IxD) breakdown of how industry leaders structure, rank, and display search results to prevent cognitive overload.
+            </p>
+        </header>
+
+        <!-- Key Concepts Section -->
+        <section class="mb-16">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-stone-800 mb-2">Fundamental Structural Patterns</h2>
+                <p class="text-stone-600">Before diving into specific tools, we identified three core structural pillars that dictate modern SaaS search experiences. Click to explore each concept.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Concept 1 -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-stone-200 cursor-pointer hover:shadow-md transition-shadow group" onclick="toggleConcept('concept-1')">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-lg font-semibold text-sky-700 group-hover:text-sky-600">1. Hierarchy & Flow</h3>
+                        <span class="text-stone-400 text-xl" id="icon-concept-1">&#x25BC;</span>
+                    </div>
+                    <div id="concept-1" class="text-stone-600 text-sm hidden">
+                        <p class="mb-2"><strong>Global Search (Command Bar):</strong> Usually invoked via Ctrl+K/Cmd+K. Focuses on speed, recent items, and global navigation without leaving the current view.</p>
+                        <p><strong>Scoped Search:</strong> In-context search within a project/folder, focusing heavily on granular faceted filtering and list refinement.</p>
+                    </div>
+                </div>
+
+                <!-- Concept 2 -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-stone-200 cursor-pointer hover:shadow-md transition-shadow group" onclick="toggleConcept('concept-2')">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-lg font-semibold text-amber-600 group-hover:text-amber-500">2. Clustering vs. Lists</h3>
+                        <span class="text-stone-400 text-xl" id="icon-concept-2">&#x25BC;</span>
+                    </div>
+                    <div id="concept-2" class="text-stone-600 text-sm hidden">
+                        <p class="mb-2"><strong>Clustering:</strong> Grouping results by status, board, or type. Helps maintain the user's spatial mental map (e.g., Monday.com).</p>
+                        <p><strong>Flat Lists:</strong> Ranked top-to-bottom lists. Often paired with a Split-Screen Detail View so users don't lose their place in the list when viewing an item (e.g., Jira).</p>
+                    </div>
+                </div>
+
+                <!-- Concept 3 -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-stone-200 cursor-pointer hover:shadow-md transition-shadow group" onclick="toggleConcept('concept-3')">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-lg font-semibold text-emerald-600 group-hover:text-emerald-500">3. Faceted Navigation</h3>
+                        <span class="text-stone-400 text-xl" id="icon-concept-3">&#x25BC;</span>
+                    </div>
+                    <div id="concept-3" class="text-stone-600 text-sm hidden">
+                        <p>The placement of filters heavily impacts IxD. <strong>Sidebars</strong> allow for deeper, multi-select hierarchies. <strong>Top Bars</strong> save horizontal screen real estate for data but limit complex compound querying. <strong>Natural Language</strong> filters are emerging to bypass manual clicking.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Deep Dive Dashboard Section -->
+        <section class="mb-16 bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+            <div class="p-6 md:p-8 border-b border-stone-100 bg-stone-50">
+                <h2 class="text-2xl font-bold text-stone-800 mb-2">Competitor Deep Dive</h2>
+                <p class="text-stone-600">Select a platform from the sidebar to analyze its specific Information Architecture and view a comparative UX index against the industry average.</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row">
+                <!-- Sidebar Menu -->
+                <aside class="w-full md:w-64 border-r border-stone-200 bg-stone-50 flex-shrink-0">
+                    <nav class="flex flex-row md:flex-col overflow-x-auto md:overflow-hidden p-4 gap-1" id="tool-nav">
+                        <!-- Populated by JS -->
+                    </nav>
+                </aside>
+
+                <!-- Main Content Area -->
+                <main class="flex-1 p-6 md:p-8" id="tool-content">
+                    
+                    <div class="flex flex-col xl:flex-row gap-8">
+                        <!-- Text Data -->
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-3xl font-bold text-stone-900" id="detail-name">Tool Name</h3>
+                                <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider" id="detail-category">Category</span>
+                            </div>
+
+                            <div class="space-y-5">
+                                <div>
+                                    <h4 class="text-sm font-bold text-stone-400 uppercase tracking-wider mb-1">Visual Hierarchy & Layout</h4>
+                                    <p class="text-stone-800 bg-stone-50 p-3 rounded-lg border border-stone-100" id="detail-layout">...</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-stone-400 uppercase tracking-wider mb-1">Clustering & Categorization</h4>
+                                    <p class="text-stone-800 bg-stone-50 p-3 rounded-lg border border-stone-100" id="detail-clustering">...</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-stone-400 uppercase tracking-wider mb-1">Ranking Logic</h4>
+                                    <p class="text-stone-800 bg-stone-50 p-3 rounded-lg border border-stone-100" id="detail-ranking">...</p>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <h4 class="text-sm font-bold text-stone-400 uppercase tracking-wider mb-1">Filtering</h4>
+                                        <p class="text-stone-800" id="detail-filtering">...</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-stone-400 uppercase tracking-wider mb-1">Metadata Priorities</h4>
+                                        <p class="text-stone-800" id="detail-metadata">...</p>
+                                    </div>
+                                </div>
+                                <div class="mt-6 border-t border-sky-100 pt-4">
+                                    <h4 class="text-sm font-bold text-sky-600 flex items-center gap-2 mb-2">
+                                        <span>&#x2B50;</span> Unique UX Innovation
+                                    </h4>
+                                    <p class="text-stone-800 italic" id="detail-innovation">...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chart Area -->
+                        <div class="w-full xl:w-2/5 flex flex-col items-center justify-center bg-white rounded-xl border border-stone-100 p-4 shadow-sm">
+                            <h4 class="text-center text-sm font-bold text-stone-500 mb-4 uppercase tracking-wider">UX Vector Analysis</h4>
+                            <div class="chart-container">
+                                <canvas id="radarChart"></canvas>
+                            </div>
+                            <p class="text-xs text-stone-400 mt-4 text-center">Score 1-10 vs Industry Average</p>
+                        </div>
+                    </div>
+
+                </main>
+            </div>
+        </section>
+
+        <!-- Comparative Matrix Section -->
+        <section>
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-stone-800 mb-2">Architectural Comparison Matrix</h2>
+                <p class="text-stone-600">A high-level view of how each platform addresses the core dimensions of search information architecture.</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left border-collapse min-w-[800px]">
+                        <thead>
+                            <tr class="bg-stone-50 text-stone-500 text-xs uppercase tracking-wider border-b border-stone-200">
+                                <th class="p-4 font-semibold">Platform</th>
+                                <th class="p-4 font-semibold">Default Layout</th>
+                                <th class="p-4 font-semibold">Primary Grouping</th>
+                                <th class="p-4 font-semibold">Filter Placement</th>
+                                <th class="p-4 font-semibold">Key Metadata</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrix-body" class="text-sm text-stone-700 divide-y divide-stone-100">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // --- 1. Data Storage ---
+        // Synthesized research data based on industry UX standards for these platforms
+        const researchData = {
+            jira: {
+                id: 'jira',
+                name: 'Jira',
+                category: 'Issue Tracking',
+                layout: 'List view primarily. Employs a highly effective split-screen detail view (drawer) so users can preview tickets without navigating away from the search results.',
+                clustering: 'Flat lists clustered dynamically by "Recent" first, then by Project. Lacks heavy visual grouping, relying on text lists.',
+                ranking: 'Heavily weighted towards Last Modified and Relevance to the user\'s current sprint/project. Less emphasis on social trending.',
+                filtering: 'Sidebar faceted search for advanced queries. Natural Language processing is evolving via JQL (Jira Query Language) inputs.',
+                metadata: 'Issue Key (e.g., PROJ-123), Status Lozenge, Assignee Avatar, Breadcrumbs (Project > Epic).',
+                innovation: 'JQL (Jira Query Language) auto-complete acting as an advanced, programmable search syntax directly in the search bar.',
+                scores: [9, 7, 5, 8, 8] // [Filtering Power, Layout Efficiency, Visual Clustering, Speed, Metadata Richness]
+            },
+            clickup: {
+                id: 'clickup',
+                name: 'ClickUp',
+                category: 'Work Management',
+                layout: 'Command Center modal takes precedence. Results are categorized into tabs (Tasks, Docs, Chats) rather than one overwhelming list.',
+                clustering: 'Categorized strictly by Item Type (Task, Doc, Dashboard). Uses "Suggested" based on recent history before typing begins.',
+                ranking: 'Relevance and exact text match. Prioritizes items the user has recently created or interacted with.',
+                filtering: 'Top-bar pill filters within the command center. Rapid toggle for "Search only in my tasks".',
+                metadata: 'Location breadcrumbs (Space > Folder > List), Due Date, Priority Flags.',
+                innovation: 'Universal Command Center (Cmd+K) seamlessly blends finding items with executing actions (e.g., searching for "bug" vs typing "/bug" to create one).',
+                scores: [7, 8, 6, 9, 7]
+            },
+            monday: {
+                id: 'monday',
+                name: 'Monday.com',
+                category: 'Work OS',
+                layout: 'Maintains the "Board" aesthetic even in search. Often displays results within the context of their color-coded groups.',
+                clustering: 'Groups results by Workspace, Board, and specific Item Groups. Highly visual clustering that mirrors the user\'s mental model.',
+                ranking: 'Relevance combined with status priority. Searches across all columns simultaneously.',
+                filtering: 'Top-bar "Search Everything" with drop-down refiners for Date, Person, and Tag. Less sidebar reliance.',
+                metadata: 'Color-coded Status columns, Person columns (avatars), timeline bars.',
+                innovation: 'Maintaining visual spatial layout (color-coded board groups) inside the global search results, reducing disorientation.',
+                scores: [6, 8, 9, 7, 8]
+            },
+            asana: {
+                id: 'asana',
+                name: 'Asana',
+                category: 'Project Management',
+                layout: 'List view with a split-screen right pane detail view. Very clean typography, emphasizing whitespace to prevent overload.',
+                clustering: 'Segments by Tasks, Messages, and Portfolios. Shows "Recently Viewed" upon clicking the search bar.',
+                ranking: 'Relevance, but heavily allows sorting by Due Date, Assignee, or Last Modified post-search.',
+                filtering: 'Advanced search opens a dedicated page with heavy Sidebar faceted filtering (Custom fields, tags, dependencies).',
+                metadata: 'Assignee Avatar (very prominent), Project tags, Due dates.',
+                innovation: 'Ability to turn any complex faceted search query into a "Saved Report" view on the sidebar.',
+                scores: [8, 9, 6, 8, 7]
+            },
+            bynder: {
+                id: 'bynder',
+                name: 'Bynder',
+                category: 'Digital Asset Management',
+                layout: 'Gallery/Grid view by default due to visual nature of assets. Detail views are modal lightboxes.',
+                clustering: 'Clustered by Brand Guidelines, Collections, or generic Asset Types. Heavy reliance on user-defined taxonomies.',
+                ranking: 'AI-driven relevance, matching image content, OCR text within images, and custom metadata fields.',
+                filtering: 'Extensive Sidebar faceted navigation. Filtering by color, orientation, and file type is prominent.',
+                metadata: 'Large visual thumbnails, File Type icon, Resolution, AI-generated tags.',
+                innovation: 'AI-driven visual tagging and OCR search, allowing users to search for "blue car" without manual metadata entry.',
+                scores: [9, 6, 8, 6, 9]
+            },
+            ziflow: {
+                id: 'ziflow',
+                name: 'Ziflow',
+                category: 'Creative Workflow',
+                layout: 'List view with thumbnail previews. Focuses heavily on the state of the asset in the review process.',
+                clustering: 'Grouped by Review Status (In Progress, Approved, Late).',
+                ranking: 'Time-sensitive ranking. Items needing action (Late/Pending Review) surface higher than completed items.',
+                filtering: 'Workflow-specific filtering (Stage, Decision, Reviewer). Sidebar based.',
+                metadata: 'Version number (v1, v2), Progress wheel (Review status), Folder path.',
+                innovation: 'Version-aware search. Search results clearly denote which iteration of a file matches the query to prevent acting on old versions.',
+                scores: [8, 7, 7, 7, 8]
+            }
+        };
+
+        const industryAverages = [7.8, 7.5, 6.8, 7.5, 7.8]; // Used for Radar Chart Baseline
+        const radarLabels = ['Filtering Depth', 'Layout Efficiency', 'Visual Clustering', 'Speed to Action', 'Metadata Richness'];
+
+        // --- 2. State Management ---
+        let currentToolId = 'jira';
+        let radarChartInstance = null;
+
+        // --- 3. Interaction & Rendering Logic ---
+
+        // Toggle Key Concepts Text
+        function toggleConcept(id) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.innerHTML = '&#x25B2;'; // Up arrow
+            } else {
+                el.classList.add('hidden');
+                icon.innerHTML = '&#x25BC;'; // Down arrow
+            }
+        }
+
+        // Initialize Sidebar Navigation
+        function renderSidebar() {
+            const nav = document.getElementById('tool-nav');
+            nav.innerHTML = '';
+            Object.values(researchData).forEach(tool => {
+                const btn = document.createElement('button');
+                btn.className = `text-left px-4 py-3 rounded-lg md:rounded-r-none md:rounded-l-lg transition-colors whitespace-nowrap md:whitespace-normal ${tool.id === currentToolId ? 'tab-active' : 'tab-inactive text-stone-600'}`;
+                btn.innerHTML = `<span class="font-medium">${tool.name}</span>`;
+                btn.onclick = () => selectTool(tool.id);
+                nav.appendChild(btn);
+            });
+        }
+
+        // Handle Tool Selection
+        function selectTool(id) {
+            currentToolId = id;
+            renderSidebar(); // Update active state
+            renderToolDetails();
+            updateChart();
+        }
+
+        // Render Data into Main Area
+        function renderToolDetails() {
+            const tool = researchData[currentToolId];
+            document.getElementById('detail-name').innerText = tool.name;
+            document.getElementById('detail-category').innerText = tool.category;
+            document.getElementById('detail-layout').innerText = tool.layout;
+            document.getElementById('detail-clustering').innerText = tool.clustering;
+            document.getElementById('detail-ranking').innerText = tool.ranking;
+            document.getElementById('detail-filtering').innerText = tool.filtering;
+            document.getElementById('detail-metadata').innerText = tool.metadata;
+            document.getElementById('detail-innovation').innerText = tool.innovation;
+        }
+
+        // Initialize and Update Chart.js Radar Chart
+        function initChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            const tool = researchData[currentToolId];
+
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: radarLabels,
+                    datasets: [
+                        {
+                            label: tool.name,
+                            data: tool.scores,
+                            backgroundColor: 'rgba(2, 132, 199, 0.2)', // sky-600 with opacity
+                            borderColor: 'rgba(2, 132, 199, 1)',
+                            pointBackgroundColor: 'rgba(2, 132, 199, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(2, 132, 199, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Industry Average',
+                            data: industryAverages,
+                            backgroundColor: 'rgba(214, 211, 209, 0.2)', // stone-300 with opacity
+                            borderColor: 'rgba(168, 162, 158, 1)', // stone-400
+                            pointBackgroundColor: 'rgba(168, 162, 158, 1)',
+                            pointBorderColor: '#fff',
+                            borderWidth: 1,
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // CRITICAL for chart-container to work properly
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0,0,0,0.05)' },
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            pointLabels: {
+                                font: { family: '-apple-system, sans-serif', size: 11 },
+                                color: '#57534e' // stone-600
+                            },
+                            ticks: {
+                                display: false,
+                                min: 0,
+                                max: 10,
+                                stepSize: 2
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                color: '#57534e',
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(41, 37, 36, 0.9)', // stone-800
+                            titleFont: { size: 13 },
+                            bodyFont: { size: 13 },
+                            padding: 10,
+                            cornerRadius: 8,
+                            displayColors: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            if (radarChartInstance) {
+                const tool = researchData[currentToolId];
+                radarChartInstance.data.datasets[0].label = tool.name;
+                radarChartInstance.data.datasets[0].data = tool.scores;
+                radarChartInstance.update();
+            }
+        }
+
+        // Render Comparative Matrix Table
+        function renderMatrix() {
+            const tbody = document.getElementById('matrix-body');
+            tbody.innerHTML = '';
+            
+            Object.values(researchData).forEach(tool => {
+                // Simplify text for table
+                const shortLayout = tool.layout.split('.')[0];
+                const shortGrouping = tool.clustering.split('.')[0];
+                const shortFilter = tool.filtering.split('.')[0];
+                
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-sky-50 transition-colors cursor-pointer group';
+                tr.onclick = () => {
+                    selectTool(tool.id);
+                    document.getElementById('tool-content').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                };
+                
+                tr.innerHTML = `
+                    <td class="p-4 font-semibold text-stone-900 flex items-center gap-2">
+                        ${tool.name}
+                        <span class="text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs">&#x2192;</span>
+                    </td>
+                    <td class="p-4">${shortLayout}</td>
+                    <td class="p-4">${shortGrouping}</td>
+                    <td class="p-4">${shortFilter}</td>
+                    <td class="p-4 text-xs">
+                        <span class="inline-block bg-stone-100 text-stone-600 px-2 py-1 rounded truncate max-w-[150px]" title="${tool.metadata}">
+                            ${tool.metadata.split(',')[0]}...
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- 4. Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+            renderToolDetails();
+            initChart();
+            renderMatrix();
+        });
+
+    </script>
+</body>
+</html>
