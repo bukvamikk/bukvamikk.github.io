@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sisi Search Logic</title>
+    <style>
+        :root { --primary: #2563eb; --bg: #f3f4f6; --text: #111827; --border: #e5e7eb; --success: #16a34a; --danger: #dc2626; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 40px 20px; }
+        
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        /* Search Field */
+        .search-container { position: relative; margin-bottom: 25px; }
+        .search-input { width: 100%; padding: 14px 14px 14px 45px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 16px; box-sizing: border-box; background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.05); outline: none; }
+        .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
+
+        /* Controls */
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        select { padding: 8px 12px; border-radius: 6px; border: 1px solid #d1d5db; background: white; font-size: 13px; cursor: pointer; }
+
+        /* Sectioning */
+        .section-header { font-size: 11px; font-weight: 800; color: #6b7280; text-transform: uppercase; letter-spacing: 0.1em; margin: 30px 0 10px 5px; }
+        .table-card { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th { text-align: left; background: #f8fafc; padding: 12px; border-bottom: 2px solid var(--border); color: #475569; font-weight: 700; }
+        td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+        
+        .name-cell { font-weight: 700; color: var(--primary); font-size: 13px; margin-bottom: 4px; }
+        .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+        .exact { background: #dcfce7; color: #166534; }
+        .prefix { background: #dbeafe; color: #1e40af; }
+        .partial { background: #fef3c7; color: #92400e; }
+        .fuzzy { background: #f3e8ff; color: #6b21a8; }
+
+        /* Detailed Logic List */
+        .logic-list { list-style: none; margin: 0; padding: 0; }
+        .logic-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #f1f5f9; padding: 1px 0; color: #4b5563; }
+        .plus { color: var(--success); font-weight: bold; }
+        .minus { color: var(--danger); font-weight: bold; }
+        
+        .score-display { font-size: 16px; font-weight: 900; color: #1e293b; text-align: center; }
+        .date-cell { color: #64748b; font-family: 'Roboto Mono', monospace; line-height: 1.4; white-space: nowrap; }
+
+        /* Reference Table */
+        .ref-header { background: #1e293b !important; color: white !important; }
+        .ref-cat { background: #f1f5f9 !important; font-weight: 700; color: #475569; width: 130px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" value="Sisi" readonly>
+    </div>
+
+    <div class="header-flex">
+        <h1 style="margin:0; font-size: 18px;">Search result example</h1>
+        <select id="sortSelect" onchange="renderUI()">
+            <option value="relevance">Sort by: Relevance Score</option>
+            <option value="updated">Sort by: Last Updated</option>
+            <option value="created">Sort by: Date Created</option>
+            <option value="alpha">Sort by: Alphabetical</option>
+        </select>
+    </div>
+
+    <div class="section-header">📂 Assets</div>
+    <div class="table-card">
+        <table id="assetsTable">
+            <thead>
+                <tr>
+                    <th width="25%">Item Name</th>
+                    <th width="20%">Timestamps</th>
+                    <th width="43%">Scoring Logic</th>
+                    <th width="12%" style="text-align:center">Score</th>
+                </tr>
+            </thead>
+            <tbody id="assetsBody"></tbody>
+        </table>
+    </div>
+
+    <div class="section-header">📝 Tasks</div>
+    <div class="table-card">
+        <table id="tasksTable">
+            <thead>
+                <tr>
+                    <th width="25%">Item Name</th>
+                    <th width="20%">Timestamps</th>
+                    <th width="43%">Scoring Logic</th>
+                    <th width="12%" style="text-align:center">Score</th>
+                </tr>
+            </thead>
+            <tbody id="tasksBody"></tbody>
+        </table>
+    </div>
+
+    <div class="section-header">📋 Scoring Algorithm Reference</div>
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr><th class="ref-header">Category</th><th class="ref-header">Criteria</th><th class="ref-header">Points</th></tr>
+            </thead>
+            <tbody>
+                <tr><td rowspan="4" class="ref-cat">1. Title Match</td><td>Exact Match</td><td>+100</td></tr>
+                <tr><td>Prefix Match</td><td>+80</td></tr>
+                <tr><td>Partial Match</td><td>+40</td></tr>
+                <tr><td>Fuzzy Match</td><td>+20</td></tr>
+                <tr><td rowspan="3" class="ref-cat">2. Recency Bonus</td><td>Modified &lt; 24h</td><td>+30</td></tr>
+                <tr><td>Modified &lt; 7d</td><td>+15</td></tr>
+                <tr><td>Modified &lt; 30d</td><td>+5</td></tr>
+                <tr><td rowspan="3" class="ref-cat">3. Aging Penalty</td><td>6–12 months old</td><td>-10</td></tr>
+                <tr><td>1–2 years old</td><td>-20</td></tr>
+                <tr><td>2+ years old</td><td>-30</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const dataset = [
+        { type: 'asset', name: 'Sisi.png', match: 'Exact', t: 100, rec: 5, boost: 0, updated: '2026-02-15', created: '2026-01-01', recL: 'Updated last 30 days', boostL: 'No recent views' },
+        { type: 'asset', name: 'Sisi_Portrait_1865.jpg', match: 'Prefix', t: 80, rec: -30, boost: 50, updated: '2021-03-09', created: '2021-03-09', recL: 'Age: 2+ years old', boostL: 'Viewed today boost' },
+        { type: 'asset', name: 'Empress-Sisi-Crown.png', match: 'Partial', t: 40, rec: 30, boost: 0, updated: '2026-03-08', created: '2026-02-01', recL: 'Updated last 24 hours', boostL: 'No recent views' },
+        { type: 'asset', name: 'Sissi_Winterhalter.pdf', match: 'Fuzzy', t: 20, rec: 30, boost: 0, updated: '2026-03-09', created: '2026-03-05', recL: 'Updated last 24 hours', boostL: 'No recent views' },
+        { type: 'asset', name: 'Sisi-Signature-Vector.ai', match: 'Prefix', t: 80, rec: 15, boost: 25, updated: '2026-02-28', created: '2026-01-15', recL: 'Updated last 7 days', boostL: 'Viewed this week boost' },
+        { type: 'task', name: 'Sisi (Official Review)', match: 'Exact', t: 100, rec: -20, boost: 0, updated: '2025-03-09', created: '2025-01-01', recL: 'Age: 1-2 years old', boostL: 'No recent views' },
+        { type: 'task', name: 'Sisi Biography Review', match: 'Prefix', t: 80, rec: 30, boost: 50, updated: '2026-03-09', created: '2026-02-15', recL: 'Updated last 24 hours', boostL: 'Viewed today boost' },
+        { type: 'task', name: 'Research Empress Sisi', match: 'Partial', t: 40, rec: 15, boost: 0, updated: '2026-03-05', created: '2025-12-01', recL: 'Updated last 7 days', boostL: 'No recent views' },
+        { type: 'task', name: 'Update Sisi Exhibition', match: 'Partial', t: 40, rec: -30, boost: 50, updated: '2024-03-09', created: '2023-01-10', recL: 'Age: 2+ years old', boostL: 'Viewed today boost' }
+    ];
+
+    function renderUI() {
+        const sort = document.getElementById('sortSelect').value;
+        const aBody = document.getElementById('assetsBody');
+        const tBody = document.getElementById('tasksBody');
+        aBody.innerHTML = ''; tBody.innerHTML = '';
+
+        let sorted = [...dataset].sort((a, b) => {
+            if (sort === 'relevance') return (b.t + b.rec + b.boost) - (a.t + a.rec + a.boost);
+            if (sort === 'updated') return new Date(b.updated) - new Date(a.updated);
+            if (sort === 'created') return new Date(b.created) - new Date(a.created);
+            return a.name.localeCompare(b.name);
+        });
+
+        sorted.forEach(item => {
+            const final = item.t + item.rec + item.boost;
+            const row = `
+                <tr>
+                    <td>
+                        <div class="name-cell">${item.name}</div>
+                        <div class="badge ${item.match.toLowerCase()}">${item.match}</div>
+                    </td>
+                    <td class="date-cell">
+                        <span style="color:#9ca3af">MOD:</span> ${item.updated}<br>
+                        <span style="color:#9ca3af">CRE:</span> ${item.created}
+                    </td>
+                    <td>
+                        <ul class="logic-list">
+                            <li class="logic-item"><span>Title Relevance</span> <span class="plus">+${item.t}</span></li>
+                            <li class="logic-item"><span>${item.recL}</span> <span class="${item.rec < 0 ? 'minus' : 'plus'}">${item.rec > 0 ? '+' : ''}${item.rec}</span></li>
+                            <li class="logic-item"><span>${item.boostL}</span> <span class="plus">+${item.boost}</span></li>
+                        </ul>
+                    </td>
+                    <td class="score-display">${final}</td>
+                </tr>`;
+            item.type === 'asset' ? aBody.innerHTML += row : tBody.innerHTML += row;
+        });
+    }
+    renderUI();
+</script>
+</body>
+</html>
