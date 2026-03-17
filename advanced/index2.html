@@ -70,6 +70,14 @@
             border: 1px solid #ffcdd2;
             color: var(--danger-red);
         }
+        .filter-option.disabled {
+    color: #ccc;
+    cursor: not-allowed;
+    text-decoration: line-through; /* Optional: makes it very clear */
+}
+.filter-option.disabled input {
+    pointer-events: none;
+}
    </style>
 </head>
 <body>
@@ -106,6 +114,16 @@
 </div>
 
 <script>
+const DOMAIN_RESTRICTIONS = {
+    "Assets": ["Work", "Content"],
+    "Collections & Folders": ["Work", "Content"],
+    "Content templates": ["Experience"],
+    "Libraries": ["Libraries"],
+    "Portals": ["Experience"],
+    "Tasks": ["Work"], 
+    "Workrooms": ["Work"]
+};
+
 /* 1) DATASET */
 const mediaIcons = { Image: "🖼️", Document: "📄", Audio: "🎵", Video: "🎥", "3d": "📦", Other: "📎" };
 const rawData = {
@@ -273,11 +291,26 @@ function renderSidebar() {
                             <input type="text" class="user-search-input" oninput="handleUserSearch(this.value)" value="${userSearchTerm}" placeholder="Search...">
                         </div>` : ''}
                     <div class="${group === 'Associated user' ? 'user-list-dropdown' : ''}">
-                        ${options.map(opt => `
-                            <label class="filter-option">
-                                <input type="checkbox" ${activeFilters[group].includes(opt) ? 'checked' : ''} onchange="toggleFilter('${group}', '${opt}')"> 
-                                ${opt}
-                            </label>`).join('')}
+                      ${options.map(opt => {
+    let isDisabled = false;
+    
+    // Check if this is a Domain option and if restrictions apply
+    if (group === "Domains" && currentCategory !== "All") {
+        const allowed = DOMAIN_RESTRICTIONS[currentCategory] || [];
+        if (!allowed.includes(opt)) {
+            isDisabled = true;
+        }
+    }
+
+    return `
+        <label class="filter-option ${isDisabled ? 'disabled' : ''}">
+            <input type="checkbox" 
+                ${activeFilters[group].includes(opt) ? 'checked' : ''} 
+                ${isDisabled ? 'disabled' : ''}
+                onchange="toggleFilter('${group}', '${opt}')"> 
+            ${opt}
+        </label>`;
+}).join('')}
                     </div>
                 </div>
             </div>`;
@@ -293,13 +326,24 @@ function toggleFilterGroup(group, isLocked) {
 function renderPills() {
     const container = document.getElementById('pills-container');
     const allowedGroups = CATEGORY_MAP[currentCategory] || [];
+    const allowedDomains = DOMAIN_RESTRICTIONS[currentCategory] || [];
     
     let html = `<div class="pill">Keyword: Sisi <span onclick="alert('Fixed')">✕</span></div>`;
     
     Object.entries(activeFilters).forEach(([group, values]) => {
         values.forEach(val => {
-            // Check if this filter group is valid for the current category
-            const isInvalid = !allowedGroups.includes(group);
+            // 1. Check if the whole group is invalid for this category
+            const isGroupInvalid = !allowedGroups.includes(group);
+            
+            // 2. Check if this specific domain value is restricted for this category
+            let isValueInvalid = false;
+            if (group === "Domains" && currentCategory !== "All") {
+                if (!allowedDomains.includes(val)) {
+                    isValueInvalid = true;
+                }
+            }
+
+            const isInvalid = isGroupInvalid || isValueInvalid;
             const extraClass = isInvalid ? 'invalid' : '';
             const icon = isInvalid ? '⚠️ ' : '';
 
