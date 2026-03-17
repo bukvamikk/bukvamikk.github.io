@@ -608,7 +608,7 @@ ${cat} <span class="badge">${count}</span>
 <h4 onclick="${isDisabledGroup ? '' : `toggleFilterGroup('${group}')`}">${group}</h4>
 <div class="filter-options-container">
 ${group === "Associated user" ? `
-<div class="sticky-search">
+<div class="user-search-input">
 <input type="text" class="user-search-input" 
 oninput="handleUserSearch(this.value)" 
 value="${userSearchTerm}" 
@@ -681,7 +681,7 @@ ${group}: ${val} <span onclick="toggleFilter('${group}', '${val}')">✕</span>
             });
 
             if (html.length > 50) {
-                html += `<button class="clear-btn-inline" onclick="window.clearAllFilters()">Clear All Filters</button>`;
+                html += `<button class="clear-btn-inline" onclick="window.clearAllFilters()">Clear All</button>`;
             }
             container.innerHTML = html;
         }
@@ -719,13 +719,31 @@ ${group}: ${val} <span onclick="toggleFilter('${group}', '${val}')">✕</span>
         }
 
         function appendSection(root, title, items, catKey) {
+            // Mapping object for specific category labels
+            const labelMap = {
+                "Assets": "Modified by",
+                "Collections & Folders": "Modified by",
+                "Content templates": "Modified by",
+                "Libraries": "Owner",
+                "Portals": "Modified by",
+                "Tasks": "Assigned to",
+                "Workrooms": "Modified by"
+            };
+
+            // Fallback to "User" if the category isn't in the map
+            const userLabel = labelMap[title] || "User";
+
             const html = `
 <div class="result-section">
 <h3 onclick="setCategory('${title}')">${title} (${items.length})</h3>
 ${items.map(i => `
 <div class="list-item">
 <div class="item-name">${i.name}</div>
-<div class="item-meta">User: ${i.associatedUser} • Created: ${i.creationDate} • Modified: ${i.lastUpdated}</div>
+<div class="item-meta">
+${userLabel} ${i.associatedUser} • 
+Created: ${i.creationDate} • 
+Modified: ${i.lastUpdated}
+</div>
 <div class="chip-row">
 <div class="chip" style="color:var(--primary-color)">${i.domain || 'Other'}</div>
 ${i.type ? `<div class="chip" style="background:#fff3e0; border-color:#ffe0b2">${mediaIcons[i.type] || '📎'} ${i.type}</div>` : ''}

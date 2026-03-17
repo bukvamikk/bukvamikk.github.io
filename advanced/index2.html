@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Still fun but strict filters</title>
+    <title>Sisi Archive - Strict Filters & Sorting</title>
     <style>
         :root {
             --border-color: #eee;
@@ -110,7 +110,6 @@
             display: none;
         }
 
-        /* Locked State */
         .filter-group.locked {
             opacity: 0.5;
         }
@@ -126,15 +125,6 @@
             font-size: 0.6rem;
         }
 
-        .sticky-search {
-            position: sticky;
-            top: 0;
-            background: #fafafa;
-            padding-bottom: 8px;
-            z-index: 2;
-            margin-bottom: 4px;
-        }
-
         .user-search-input {
             width: 100%;
             padding: 8px;
@@ -142,6 +132,7 @@
             border-radius: 4px;
             font-size: 0.85rem;
             box-sizing: border-box;
+            margin-bottom: 8px;
         }
 
         .user-list-dropdown {
@@ -158,7 +149,7 @@
             margin-bottom: 6px;
             font-size: 0.85rem;
             cursor: pointer;
-            padding: 2px 0;
+            padding: 2px 4px;
         }
 
         .filter-option input {
@@ -323,6 +314,17 @@
             margin-bottom: 10px;
         }
 
+        .pill.invalid {
+            background: #fbe6ee;
+            border: 1px solid #ffcdd2;
+            color: #b71c1c;
+        }
+
+        .filter-option.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
         .clear-btn-inline {
             background: none;
             border: none;
@@ -331,21 +333,6 @@
             font-size: 0.8rem;
             cursor: pointer;
             padding: 4px 8px;
-        }
-
-        .pill.invalid {
-            background: #fbe6ee;
-            border: 1px solid #ffcdd2;
-            color: var(--danger-red);
-        }
-
-        .filter-option.disabled {
-            color: #ccc;
-            cursor: not-allowed;
-        }
-
-        .filter-option.disabled input {
-            pointer-events: none;
         }
     </style>
 </head>
@@ -394,10 +381,20 @@
             "Workrooms": ["Work"]
         };
 
-        /* 1) DATASET */
-        const mediaIcons = { Image: "🖼️", Document: "📄", Audio: "🎵", Video: "🎥", "3d": "📦", Other: "📎" };
-        const rawData = {
+        const USER_LABEL_MAP = {
+            "Assets": "Modified by",
+            "Collections & Folders": "Modified by",
+            "Content templates": "Modified by",
+            "Libraries": "Owner",
+            "Portals": "Modified by",
+            "Tasks": "Assigned to",
+            "Workrooms": "Modified by",
+            "All": "User"
+        };
 
+        const mediaIcons = { Image: "🖼️", Document: "📄", Audio: "🎵", Video: "🎥", "3d": "📦", Other: "📎" };
+
+        const rawData = {
             assets: [
                 { name: "Sisi Portrait – Imperial Gallery Edition", associatedUser: "Emma Hartmann", lastUpdated: "2026-03-12", creationDate: "2025-11-15", domain: "Work", type: "Image" },
                 { name: "Sisi Riding Attire Illustration", associatedUser: "Lukas Steiner", lastUpdated: "2026-03-10", creationDate: "2026-01-05", domain: "Content", type: "Document" },
@@ -491,12 +488,10 @@
             Workrooms: ["Domains", "Associated user", "Last updated", "Statuses"]
         };
 
-        /* 3) APP STATE */
         let currentCategory = "All", currentSort = "lastUpdated", sortDirection = "desc", userSearchTerm = "";
         let activeFilters = Object.fromEntries(Object.keys(FILTER_STRUCTURE).map(k => [k, []]));
         let collapsedState = {};
 
-        /* 4) STRICT MATCHING LOGIC */
         function matchesFilters(item) {
             if (activeFilters["Domains"].length && !activeFilters["Domains"].includes(item.domain)) return false;
             if (activeFilters["Associated user"].length && !activeFilters["Associated user"].includes(item.associatedUser)) return false;
@@ -520,7 +515,6 @@
             return true;
         }
 
-        /* 5) RENDERING */
         function renderAll() { renderTabs(); renderSidebar(); renderPills(); renderResults(); }
 
         function renderTabs() {
@@ -533,8 +527,8 @@
                     count = (rawData[key] || []).filter(matchesFilters).length;
                 }
                 return `<div class="tab ${cat === currentCategory ? 'active' : ''}" onclick="setCategory('${cat}')">
-${cat} <span class="badge">${count}</span>
-</div>`;
+                    ${cat} <span class="badge">${count}</span>
+                </div>`;
             }).join('');
         }
 
@@ -544,7 +538,6 @@ ${cat} <span class="badge">${count}</span>
 
             root.innerHTML = Object.keys(FILTER_STRUCTURE).map(group => {
                 const isNotApplicable = !allowedGroups.includes(group);
-                // FORCE collapse if not applicable, otherwise check stored state
                 const isCollapsed = isNotApplicable || (collapsedState[group] === undefined ? false : collapsedState[group]);
 
                 let options = FILTER_STRUCTURE[group];
@@ -553,42 +546,31 @@ ${cat} <span class="badge">${count}</span>
                 }
 
                 return `
-<div class="filter-group ${isCollapsed ? 'collapsed' : ''} ${isNotApplicable ? 'locked' : ''}">
-<h4 onclick="toggleFilterGroup('${group}', ${isNotApplicable})">${group}</h4>
-<div class="filter-options-container">
-${group === "Associated user" ? `
-<div class="sticky-search">
-<input type="text" class="user-search-input" oninput="handleUserSearch(this.value)" value="${userSearchTerm}" placeholder="Search...">
-</div>` : ''}
-<div class="${group === 'Associated user' ? 'user-list-dropdown' : ''}">
-${options.map(opt => {
+                <div class="filter-group ${isCollapsed ? 'collapsed' : ''} ${isNotApplicable ? 'locked' : ''}">
+                    <h4 onclick="toggleFilterGroup('${group}', ${isNotApplicable})">${group}</h4>
+                    <div class="filter-options-container">
+                        ${group === "Associated user" ? `<input type="text" class="user-search-input" oninput="handleUserSearch(this.value)" value="${userSearchTerm}" placeholder="Search...">` : ''}
+                        <div class="${group === 'Associated user' ? 'user-list-dropdown' : ''}">
+                            ${options.map(opt => {
                     let isDisabled = false;
-
-                    // Check if this is a Domain option and if restrictions apply
                     if (group === "Domains" && currentCategory !== "All") {
                         const allowed = DOMAIN_RESTRICTIONS[currentCategory] || [];
-                        if (!allowed.includes(opt)) {
-                            isDisabled = true;
-                        }
+                        if (!allowed.includes(opt)) isDisabled = true;
                     }
-
                     return `
-<label class="filter-option ${isDisabled ? 'disabled' : ''}">
-<input type="checkbox" 
-${activeFilters[group].includes(opt) ? 'checked' : ''} 
-${isDisabled ? 'disabled' : ''}
-onchange="toggleFilter('${group}', '${opt}')"> 
-${opt}
-</label>`;
+                                <label class="filter-option ${isDisabled ? 'disabled' : ''}">
+                                    <input type="checkbox" ${activeFilters[group].includes(opt) ? 'checked' : ''} ${isDisabled ? 'disabled' : ''} onchange="toggleFilter('${group}', '${opt}')"> 
+                                    ${opt}
+                                </label>`;
                 }).join('')}
-</div>
-</div>
-</div>`;
+                        </div>
+                    </div>
+                </div>`;
             }).join('');
         }
 
         function toggleFilterGroup(group, isLocked) {
-            if (isLocked) return; // Strictly prevent uncollapsing if locked
+            if (isLocked) return;
             collapsedState[group] = !collapsedState[group];
             renderSidebar();
         }
@@ -597,35 +579,22 @@ ${opt}
             const container = document.getElementById('pills-container');
             const allowedGroups = CATEGORY_MAP[currentCategory] || [];
             const allowedDomains = DOMAIN_RESTRICTIONS[currentCategory] || [];
-
-            let html = `<div class="pill">Keyword: Sisi <span onclick="alert('Fixed')">✕</span></div>`;
+            let html = `<div class="pill">Keyword: Sisi <span onclick="alert('Fixed keyword')">✕</span></div>`;
 
             Object.entries(activeFilters).forEach(([group, values]) => {
                 values.forEach(val => {
-                    // 1. Check if the whole group is invalid for this category
                     const isGroupInvalid = !allowedGroups.includes(group);
-
-                    // 2. Check if this specific domain value is restricted for this category
-                    let isValueInvalid = false;
-                    if (group === "Domains" && currentCategory !== "All") {
-                        if (!allowedDomains.includes(val)) {
-                            isValueInvalid = true;
-                        }
-                    }
-
+                    const isValueInvalid = group === "Domains" && currentCategory !== "All" && !allowedDomains.includes(val);
                     const isInvalid = isGroupInvalid || isValueInvalid;
-                    const extraClass = isInvalid ? 'invalid' : '';
-                    const icon = isInvalid ? '⚠️ ' : '';
-
                     html += `
-<div class="pill ${extraClass}">
-${icon}${group}: ${val} 
-<span onclick="toggleFilter('${group}', '${val}')">✕</span>
-</div>`;
+                    <div class="pill ${isInvalid ? 'invalid' : ''}">
+                        ${isInvalid ? '⚠️ ' : ''}${group}: ${val} 
+                        <span onclick="toggleFilter('${group}', '${val}')">✕</span>
+                    </div>`;
                 });
             });
 
-            if (Object.values(activeFilters).flat().length > 0) {
+            if (Object.values(activeFilters).flat().length > -1) {
                 html += `<button class="clear-btn-inline" onclick="clearAllFilters()">Clear All</button>`;
             }
             container.innerHTML = html;
@@ -639,26 +608,52 @@ ${icon}${group}: ${val}
 
             cats.forEach(cat => {
                 const key = cat.toLowerCase().replace(" & ", "&");
-                const items = (rawData[key] || []).filter(matchesFilters);
+                let items = (rawData[key] || []).filter(matchesFilters);
+
+                // --- SORTING LOGIC ---
+                items.sort((a, b) => {
+                    let valA = a[currentSort];
+                    let valB = b[currentSort];
+
+                    if (currentSort === 'alphabetical') {
+                        valA = a.name.toLowerCase();
+                        valB = b.name.toLowerCase();
+                    }
+
+                    let comparison = 0;
+                    if (valA > valB) comparison = 1;
+                    else if (valA < valB) comparison = -1;
+
+                    return sortDirection === 'desc' ? comparison * -1 : comparison;
+                });
+
+                const userLabel = USER_LABEL_MAP[cat] || "User";
+
                 if (items.length > 0) {
                     totalFound += items.length;
                     root.insertAdjacentHTML('beforeend', `
-<div class="result-section">
-<h3>${cat} (${items.length})</h3>
-${items.map(i => `
-<div class="list-item">
-<div class="item-name">${i.name}</div>
-<div class="chip-row">
-<div class="chip" style="color:var(--primary-color)">${i.domain}</div>
-${i.type ? `<div class="chip">${mediaIcons[i.type]} ${i.type}</div>` : ''}
-${i.state ? `<div class="chip">${i.state}</div>` : ''}
-</div>
-</div>`).join('')}
-</div>`);
+                        <div class="result-section">
+                            <h3>${cat} (${items.length})</h3>
+                            ${items.map(i => `
+                                <div class="list-item">
+                                    <div class="item-name">${i.name}</div>
+                                    <div class="item-meta">
+                                        ${userLabel} ${i.associatedUser} • 
+                                        Created: ${i.creationDate || 'N/A'} • 
+                                        Modified: ${i.lastUpdated}
+                                    </div>
+                                    <div class="chip-row">
+                                        <div class="chip" style="color:var(--primary-color)">${i.domain}</div>
+                                        ${i.type ? `<div class="chip">${mediaIcons[i.type]} ${i.type}</div>` : ''}
+                                        ${i.state ? `<div class="chip">${i.state}</div>` : ''}
+                                        ${i.priority ? `<div class="chip">Priority: ${i.priority}</div>` : ''}
+                                    </div>
+                                </div>`).join('')}
+                        </div>`);
                 }
             });
 
-            if (totalFound === 0) root.innerHTML = `<div class="empty-state"><span class="emoji">😢</span><p>No results match.</p></div>`;
+            if (totalFound === 0) root.innerHTML = `<div class="empty-state"><span class="emoji">😢</span><p>No matches found.</p></div>`;
         }
 
         function setCategory(c) { currentCategory = c; renderAll(); }
@@ -669,6 +664,18 @@ ${i.state ? `<div class="chip">${i.state}</div>` : ''}
         }
         function handleUserSearch(v) { userSearchTerm = v; renderSidebar(); }
         function clearAllFilters() { Object.keys(activeFilters).forEach(k => activeFilters[k] = []); renderAll(); }
+
+        // --- TOOLBAR EVENT LISTENERS ---
+        document.getElementById('sort-select').addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            renderAll();
+        });
+
+        document.getElementById('direction-toggle').addEventListener('click', (e) => {
+            sortDirection = sortDirection === 'desc' ? 'asc' : 'desc';
+            e.target.innerText = sortDirection === 'desc' ? 'DESC ⬇' : 'ASC ⬆';
+            renderAll();
+        });
 
         renderAll();
     </script>
