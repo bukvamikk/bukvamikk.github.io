@@ -334,6 +334,23 @@
             cursor: pointer;
             padding: 4px 8px;
         }
+        .view-more-btn {
+    width: 100%;
+    padding: 12px;
+    background: #f8f9fa;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    color: var(--primary-color);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 5px;
+}
+
+.view-more-btn:hover {
+    background: #eef2ff;
+    border-color: var(--primary-color);
+}
     </style>
 </head>
 
@@ -600,61 +617,66 @@
             container.innerHTML = html;
         }
 
-        function renderResults() {
-            const root = document.getElementById('results-root');
-            root.innerHTML = "";
-            const cats = currentCategory === "All" ? CATEGORIES.slice(1) : [currentCategory];
-            let totalFound = 0;
+ function renderResults() {
+    const root = document.getElementById('results-root');
+    root.innerHTML = "";
+    const cats = currentCategory === "All" ? CATEGORIES.slice(1) : [currentCategory];
+    let totalFound = 0;
 
-            cats.forEach(cat => {
-                const key = cat.toLowerCase().replace(" & ", "&");
-                let items = (rawData[key] || []).filter(matchesFilters);
+    cats.forEach(cat => {
+        const key = cat.toLowerCase().replace(" & ", "&");
+        let items = (rawData[key] || []).filter(matchesFilters);
 
-                // --- SORTING LOGIC ---
-                items.sort((a, b) => {
-                    let valA = a[currentSort];
-                    let valB = b[currentSort];
+        // Sort items
+        items.sort((a, b) => {
+            let valA = currentSort === 'alphabetical' ? a.name.toLowerCase() : a[currentSort];
+            let valB = currentSort === 'alphabetical' ? b.name.toLowerCase() : b[currentSort];
+            let comparison = valA > valB ? 1 : (valA < valB ? -1 : 0);
+            return sortDirection === 'desc' ? comparison * -1 : comparison;
+        });
 
-                    if (currentSort === 'alphabetical') {
-                        valA = a.name.toLowerCase();
-                        valB = b.name.toLowerCase();
-                    }
+        if (items.length > 0) {
+            totalFound += items.length;
+            
+            // Logic for the "All" tab limit
+            const isAllTab = currentCategory === "All";
+            const needsLimit = isAllTab && items.length > 5;
+            const itemsToDisplay = needsLimit ? items.slice(0, 5) : items;
 
-                    let comparison = 0;
-                    if (valA > valB) comparison = 1;
-                    else if (valA < valB) comparison = -1;
-
-                    return sortDirection === 'desc' ? comparison * -1 : comparison;
-                });
-
-                const userLabel = USER_LABEL_MAP[cat] || "User";
-
-                if (items.length > 0) {
-                    totalFound += items.length;
-                    root.insertAdjacentHTML('beforeend', `
-                        <div class="result-section">
-                            <h3>${cat} (${items.length})</h3>
-                            ${items.map(i => `
-                                <div class="list-item">
-                                    <div class="item-name">${i.name}</div>
-                                    <div class="item-meta">
-                                        ${userLabel} ${i.associatedUser} • 
-                                        Created: ${i.creationDate || 'N/A'} • 
-                                        Modified: ${i.lastUpdated}
-                                    </div>
-                                    <div class="chip-row">
-                                        <div class="chip" style="color:var(--primary-color)">${i.domain}</div>
-                                        ${i.type ? `<div class="chip">${mediaIcons[i.type]} ${i.type}</div>` : ''}
-                                        ${i.state ? `<div class="chip">${i.state}</div>` : ''}
-                                        ${i.priority ? `<div class="chip">Priority: ${i.priority}</div>` : ''}
-                                    </div>
-                                </div>`).join('')}
-                        </div>`);
-                }
-            });
-
-            if (totalFound === 0) root.innerHTML = `<div class="empty-state"><span class="emoji">😢</span><p>No matches found.</p></div>`;
+            let sectionHtml = `
+                <div class="result-section">
+                    <h3>${cat} (${items.length})</h3>
+                    ${itemsToDisplay.map(i => `
+                        <div class="list-item">
+                            <div class="item-name">${i.name}</div>
+                            <div class="item-meta">
+                                ${USER_LABEL_MAP[cat] || "User"} ${i.associatedUser} • 
+                                Created: ${i.creationDate || 'N/A'} • 
+                                Modified: ${i.lastUpdated}
+                            </div>
+                            <div class="chip-row">
+                                <div class="chip" style="color:var(--primary-color)">${i.domain}</div>
+                                ${i.type ? `<div class="chip">${mediaIcons[i.type]} ${i.type}</div>` : ''}
+                                ${i.state ? `<div class="chip">${i.state}</div>` : ''}
+                                ${i.priority ? `<div class="chip">Priority: ${i.priority}</div>` : ''}
+                            </div>
+                        </div>`).join('')}
+                    
+                    ${needsLimit ? `
+                        <button class="view-more-btn" onclick="setCategory('${cat}')">
+                            Show all ${items.length} ${cat} →
+                        </button>
+                    ` : ''}
+                </div>`;
+            
+            root.insertAdjacentHTML('beforeend', sectionHtml);
         }
+    });
+
+    if (totalFound === 0) {
+        root.innerHTML = `<div class="empty-state"><span class="emoji">😢</span><p>No matches found.</p></div>`;
+    }
+}
 
         function setCategory(c) { currentCategory = c; renderAll(); }
         function toggleFilter(g, v) {

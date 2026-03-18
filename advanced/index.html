@@ -718,42 +718,54 @@ ${group}: ${val} <span onclick="toggleFilter('${group}', '${val}')">✕</span>
             }
         }
 
-        function appendSection(root, title, items, catKey) {
-            // Mapping object for specific category labels
-            const labelMap = {
-                "Assets": "Modified by",
-                "Collections & Folders": "Modified by",
-                "Content templates": "Modified by",
-                "Libraries": "Owner",
-                "Portals": "Modified by",
-                "Tasks": "Assigned to",
-                "Workrooms": "Modified by"
-            };
+function appendSection(root, title, items, catKey) {
+    const labelMap = {
+        "Assets": "Modified by",
+        "Collections & Folders": "Modified by",
+        "Content templates": "Modified by",
+        "Libraries": "Owner",
+        "Portals": "Modified by",
+        "Tasks": "Assigned to",
+        "Workrooms": "Modified by"
+    };
 
-            // Fallback to "User" if the category isn't in the map
-            const userLabel = labelMap[title] || "User";
+    const userLabel = labelMap[title] || "User";
+    
+  
+    const isAllTab = currentCategory === "All";
+    const showMoreButton = isAllTab && items.length > 5;
+    const displayItems = showMoreButton ? items.slice(0, 5) : items;
 
-            const html = `
-<div class="result-section">
-<h3 onclick="setCategory('${title}')">${title} (${items.length})</h3>
-${items.map(i => `
-<div class="list-item">
-<div class="item-name">${i.name}</div>
-<div class="item-meta">
-${userLabel} ${i.associatedUser} • 
-Created: ${i.creationDate} • 
-Modified: ${i.lastUpdated}
-</div>
-<div class="chip-row">
-<div class="chip" style="color:var(--primary-color)">${i.domain || 'Other'}</div>
-${i.type ? `<div class="chip" style="background:#fff3e0; border-color:#ffe0b2">${mediaIcons[i.type] || '📎'} ${i.type}</div>` : ''}
-${i.priority ? `<div class="chip" style="color:red">${i.priority}</div>` : ''}
-${i.state ? `<div class="chip" style="text-transform:capitalize">${i.state}</div>` : ''}
-</div>
-</div>`).join('')}
-</div>`;
-            root.insertAdjacentHTML('beforeend', html);
-        }
+    const html = `
+    <div class="result-section">
+        <h3 onclick="setCategory('${title}')">${title} (${items.length})</h3>
+        ${displayItems.map(i => `
+        <div class="list-item">
+            <div class="item-name">${i.name}</div>
+            <div class="item-meta">
+                ${userLabel} ${i.associatedUser} • 
+                Created: ${i.creationDate} • 
+                Modified: ${i.lastUpdated}
+            </div>
+            <div class="chip-row">
+                <div class="chip" style="color:var(--primary-color)">${i.domain || 'Other'}</div>
+                ${i.type ? `<div class="chip" style="background:#fff3e0; border-color:#ffe0b2">${mediaIcons[i.type] || '📎'} ${i.type}</div>` : ''}
+                ${i.priority ? `<div class="chip" style="color:red">${i.priority}</div>` : ''}
+                ${i.state ? `<div class="chip" style="text-transform:capitalize">${i.state}</div>` : ''}
+            </div>
+        </div>`).join('')}
+        
+        ${showMoreButton ? `
+            <button class="direction-btn" 
+                    style="width: 100%; margin-top: 10px; border-style: dashed; background: #fdfdfd;" 
+                    onclick="setCategory('${title}')">
+                View all ${items.length} ${title} →
+            </button>
+        ` : ''}
+    </div>`;
+    
+    root.insertAdjacentHTML('beforeend', html);
+}
 
         document.getElementById('sort-select').onchange = (e) => { currentSort = e.target.value; renderResults(); };
         document.getElementById('direction-toggle').onclick = function () {
