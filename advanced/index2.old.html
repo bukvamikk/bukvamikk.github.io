@@ -4,22 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fun with filters</title>
+    <title>Strickt but still fun with filters</title>
     <style>
-      
         :root {
-            /* 1. Primary branding colors from screenshot */
-            --border-color: #d1d9e0; /* Neutral grey-blue border */
-            --primary-teal: #3b87a8; /* Dark teal from 'advanced search' header */
-            --accent-teal: #21a1bb; /* Bright teal for active/special icons */
-            
-            /* 2. Text and Background variations */
-            --text-secondary: #586069;
-            --main-bg: #f6f8fa;     /* Very light grey for main areas */
-            --sidebar-bg: #ffffff;  /* White sidebar for high contrast filters */
-            --active-item-bg: #f1f8ff; /* Lightest blue for active/hover states */
-            
-            /* 3. Original structure variables (retained) */
+            --border-color: #eee;
+            --primary-color: #1976d2;
+            --text-secondary: #666;
             --header-height: 64px;
         }
 
@@ -31,11 +21,8 @@
             height: 100vh;
             overflow: hidden;
             color: #333;
-            /* Changed from pure white to a light grey-blue base */
-            background-color: var(--main-bg);
         }
 
-        /* Update Header color from dark grey to primary teal */
         header {
             height: var(--header-height);
             border-bottom: 1px solid var(--border-color);
@@ -43,8 +30,7 @@
             align-items: center;
             justify-content: center;
             padding: 0 24px;
-            /* Match the reference image header background */
-            background: var(--primary-teal);
+            background: #3a3a3a;
             z-index: 100;
             flex-shrink: 0;
         }
@@ -57,34 +43,22 @@
             align-items: center;
         }
 
-        /* Update input to match header context */
         .search-bar-dummy {
             width: 100%;
             padding: 10px 40px 10px 16px;
-            border: 1px solid transparent;
+            border: 1px solid #ccc;
             border-radius: 20px;
             font-size: 0.9rem;
-            /* Slightly off-white for visibility on teal */
-            background: #ffffffee;
+            background: #f5f5f5;
             color: #333;
             outline: none;
         }
 
-        /* Make the 'cancel' icon on header input clearer */
         .search-cancel-icon {
             position: absolute;
             right: 14px;
-            color: #586069;
+            color: #888;
             font-size: 1.2rem;
-            cursor: default;
-            user-select: none;
-        }
-
-        .cancel-icon {
-            position: absolute;
-            right: 24px;
-            color: #ffffff;
-            font-size: 1.6rem;
             cursor: default;
             user-select: none;
         }
@@ -95,31 +69,26 @@
             overflow: hidden;
         }
 
-        /* Make sidebar white, as in screenshot */
         #sidebar {
             width: 280px;
             padding: 20px;
             border-right: 1px solid var(--border-color);
             overflow-y: auto;
-            background: var(--sidebar-bg);
+            background: #fafafa;
             flex-shrink: 0;
         }
 
         .filter-group {
             margin-bottom: 24px;
-            position: relative;
-            transition: all 0.2s ease;
         }
 
-        /* Update filter group titles to the primary teal */
         .filter-group h4 {
             margin: 0 0 10px 0;
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            /* Change from neutral grey to primary teal */
-            color: var(--primary-teal);
-            border-bottom: 1px solid var(--border-color);
+            color: #888;
+            border-bottom: 1px solid #ddd;
             padding-bottom: 4px;
             cursor: pointer;
             display: flex;
@@ -127,65 +96,49 @@
             align-items: center;
         }
 
-        /* Match the accent teal for active group arrows */
-        .filter-group:not(.collapsed) h4::after {
-            color: var(--accent-teal);
-        }
-
         .filter-group h4::after {
             content: '▾';
             font-size: 0.8rem;
-            opacity: 0.8;
-            transition: color 0.2s;
+            opacity: 0.5;
         }
 
         .filter-group.collapsed h4::after {
             content: '▸';
-            color: var(--text-secondary);
         }
 
         .filter-group.collapsed .filter-options-container {
             display: none;
         }
 
-        .filter-group.disabled {
+        .filter-group.locked {
             opacity: 0.5;
         }
 
-        .filter-group.disabled h4 {
+        .filter-group.locked h4 {
             cursor: not-allowed;
-            border-bottom-color: transparent;
+            color: #ccc;
+            border-bottom-color: #eee;
         }
 
-        .filter-group.disabled .filter-option {
-            cursor: not-allowed;
-            color: #999;
-        }
-
-        .sticky-search {
-            position: sticky;
-            top: 0;
-            /* Match white sidebar bg */
-            background: var(--sidebar-bg);
-            padding-bottom: 8px;
-            z-index: 2;
-            margin-bottom: 4px;
+        .filter-group.locked h4::after {
+            content: '🔒';
+            font-size: 0.6rem;
         }
 
         .user-search-input {
-     width: 100%;
-    padding: 8px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-size: 0.85rem;
-    box-sizing: border-box;
-    background: #fafafa;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            box-sizing: border-box;
+            margin-bottom: 8px;
         }
 
         .user-list-dropdown {
             max-height: 150px;
             overflow-y: auto;
-            border: 1px solid var(--border-color);
+            border: 1px solid #ddd;
             background: #fff;
             border-radius: 4px;
         }
@@ -196,8 +149,7 @@
             margin-bottom: 6px;
             font-size: 0.85rem;
             cursor: pointer;
-            padding: 2px 0;
-            color: #333;
+            padding: 2px 4px;
         }
 
         .filter-option input {
@@ -209,8 +161,7 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            /* Match the light grey-blue main background */
-            background: var(--main-bg);
+            background: white;
         }
 
         .content-padding {
@@ -234,16 +185,15 @@
             white-space: nowrap;
             border-bottom: 2px solid transparent;
             font-size: 0.9rem;
-            color: var(--text-secondary);
+            color: #666;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        /* Use accent teal for active tabs and badges */
         .tab.active {
-            border-bottom-color: var(--accent-teal);
-            color: var(--accent-teal);
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
             font-weight: 600;
         }
 
@@ -257,7 +207,7 @@
         }
 
         .tab.active .badge {
-            background: var(--accent-teal);
+            background: var(--primary-color);
             color: #fff;
         }
 
@@ -270,18 +220,14 @@
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 8px;
             margin-bottom: 16px;
-            /* Darken section titles slightly for contrast on main-bg */
-            color: #24292e;
-            cursor: pointer;
+            color: #444;
         }
 
-        /* Use white for list items to contrast with the light main-bg */
         .list-item {
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 12px;
             margin-bottom: 10px;
-            background: #fff;
         }
 
         .item-name {
@@ -308,16 +254,8 @@
             padding: 2px 8px;
             border-radius: 4px;
             font-size: 0.65rem;
-            border: 1px solid var(--border-color);
-            /* Standard light grey-blue background for chips */
-            background: var(--main-bg);
-            color: #333;
-        }
-
-        /* Special case for the "Work" chip to use primary-teal color */
-        .chip.chip-work {
-            color: var(--primary-teal);
-            font-weight: 500;
+            border: 1px solid #ddd;
+            background: #f9f9f9;
         }
 
         .pills-row {
@@ -328,42 +266,21 @@
             margin-bottom: 20px;
         }
 
-        /* Adapt pills to the new primary-teal and main-bg theme */
         .pill {
             display: inline-flex;
-            background: #cfd8dc;
-            border: 1px solid #ccd9ea;
-            /* Use primary teal for pill text */
-            color: #000;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            color: #3730a3;
             padding: 4px 10px;
             border-radius: 15px;
             font-size: 0.7rem;
             align-items: center;
         }
 
-        .pill.disabled-pill {
-            background: #e3e3e3;
-            border-color: #b7b7b7;
-            color: #999;
-            opacity: 0.7;
-            pointer-events: none;
-        }
-
         .pill span {
             margin-left: 6px;
             cursor: pointer;
             font-weight: bold;
-        }
-
-        .clear-btn-inline {
-            background: none;
-            border: none;
-            /* Use accent teal for clarity on interactive links */
-            color: var(--accent-teal);
-            text-decoration: underline;
-            font-size: 0.8rem;
-            cursor: pointer;
-            padding: 4px 8px;
         }
 
         .toolbar {
@@ -376,13 +293,13 @@
 
         .direction-btn {
             padding: 4px 12px;
-            border: 1px solid var(--border-color);
+            border: 1px solid #ccc;
             background: #fff;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.85rem;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: #444;
         }
 
         .empty-state {
@@ -397,12 +314,43 @@
             margin-bottom: 10px;
         }
 
-        .filter-option.option-disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            pointer-events: none;
-            /* Prevents clicking the label */
+        .pill.invalid {
+            background: #fbe6ee;
+            border: 1px solid #ffcdd2;
+            color: #b71c1c;
         }
+
+        .filter-option.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .clear-btn-inline {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            text-decoration: underline;
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+        .view-more-btn {
+    width: 100%;
+    padding: 12px;
+    background: #f8f9fa;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    color: var(--primary-color);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 5px;
+}
+
+.view-more-btn:hover {
+    background: #eef2ff;
+    border-color: var(--primary-color);
+}
     </style>
 </head>
 
@@ -413,7 +361,6 @@
             <input type="text" class="search-bar-dummy" value="sisi" readonly>
             <span class="search-cancel-icon">✕</span>
         </div>
-         <span class="cancel-icon">✕</span>
     </header>
 
     <div class="app-container">
@@ -441,9 +388,28 @@
     </div>
 
     <script>
-        /* 1) DATASET */
+        const DOMAIN_RESTRICTIONS = {
+            "Assets": ["Work", "Content"],
+            "Collections & Folders": ["Work", "Content"],
+            "Content templates": ["Experience"],
+            "Libraries": ["Libraries"],
+            "Portals": ["Experience"],
+            "Tasks": ["Work"],
+            "Workrooms": ["Work"]
+        };
+
+        const USER_LABEL_MAP = {
+            "Assets": "Modified by",
+            "Collections & Folders": "Modified by",
+            "Content templates": "Modified by",
+            "Libraries": "Owner",
+            "Portals": "Modified by",
+            "Tasks": "Assigned to",
+            "Workrooms": "Modified by",
+            "All": "User"
+        };
+
         const mediaIcons = { Image: "🖼️", Document: "📄", Audio: "🎵", Video: "🎥", "3d": "📦", Other: "📎" };
-        const mediaTypes = Object.keys(mediaIcons);
 
         const rawData = {
             assets: [
@@ -517,13 +483,11 @@
             ]
         };
 
-        const data = rawData;
-
         const CATEGORIES = ["All", "Assets", "Collections & Folders", "Content templates", "Libraries", "Portals", "Tasks", "Workrooms"];
         const FILTER_STRUCTURE = {
             Domains: ["Content", "Work", "Experience", "Libraries"],
-            "Associated user": [...new Set(Object.values(data).flatMap(l => l.map(i => i.associatedUser)))].sort(),
-            "Media types": mediaTypes,
+            "Associated user": [...new Set(Object.values(rawData).flatMap(l => l.map(i => i.associatedUser)))].sort(),
+            "Media types": Object.keys(mediaIcons),
             "Last updated": ["Today", "This week", "This month", "This year", "More then 1 year"],
             Priorities: ["Blocker", "High", "Standard", "Low", "No priority"],
             Statuses: ["Active", "Inactive"],
@@ -541,75 +505,30 @@
             Workrooms: ["Domains", "Associated user", "Last updated", "Statuses"]
         };
 
-        /* 3) APP STATE */
         let currentCategory = "All", currentSort = "lastUpdated", sortDirection = "desc", userSearchTerm = "";
         let activeFilters = Object.fromEntries(Object.keys(FILTER_STRUCTURE).map(k => [k, []]));
-        let collapsedGroups = {};
+        let collapsedState = {};
 
-        /* 4) CORE LOGIC */
-        function matchesFilters(item, key, tabContext = null) {
-            const catName = key === 'collections&folders' ? 'Collections & Folders' : key.charAt(0).toUpperCase() + key.slice(1);
-            const allowed = CATEGORY_MAP[catName] || [];
-
-            const activeTab = tabContext || currentCategory;
-            const isAllTab = activeTab === "All";
-
-            function checkFilter(filterGroup, itemValue) {
-                const activeVals = activeFilters[filterGroup];
-                if (activeVals.length === 0) return true;
-
-                if (isAllTab) {
-                    if (!itemValue) return false;
-                    if (filterGroup === "Statuses") {
-                        return activeVals.some(f => f.toLowerCase() === itemValue.toLowerCase());
-                    }
-                    return activeVals.includes(itemValue);
-                } else {
-                    // 1. If the group itself isn't allowed for this tab, ignore the filter
-                    if (!allowed.includes(filterGroup)) return true;
-
-                    // 2. SPECIAL CASE: For Domains, if the selected domain values are 
-                    // not relevant to this specific tab, ignore the filter.
-                    if (filterGroup === "Domains") {
-                        const validDomainsForTab = DOMAIN_RESTRICTIONS[activeTab] || [];
-                        const relevantActiveDomains = activeVals.filter(v => validDomainsForTab.includes(v));
-
-                        // If the user selected domains that don't exist in this tab, 
-                        // we treat the filter as "not applied" (return true)
-                        if (relevantActiveDomains.length === 0) return true;
-
-                        // Otherwise, filter only by the domains that actually apply here
-                        return relevantActiveDomains.includes(itemValue);
-                    }
-
-                    // Standard logic for other groups (Statuses, Priorities, etc.)
-                    if (filterGroup === "Statuses") {
-                        return activeVals.some(f => f.toLowerCase() === (itemValue || "").toLowerCase());
-                    }
-                    return activeVals.includes(itemValue);
-                }
-            }
-
-            if (!checkFilter("Domains", item.domain)) return false;
-            if (!checkFilter("Associated user", item.associatedUser)) return false;
-            if (!checkFilter("Media types", item.type)) return false;
-            if (!checkFilter("Priorities", item.priority)) return false;
-            if (!checkFilter("Statuses", item.state)) return false;
-            if (!checkFilter("Portal states", item.portalState)) return false;
+        function matchesFilters(item) {
+            if (activeFilters["Domains"].length && !activeFilters["Domains"].includes(item.domain)) return false;
+            if (activeFilters["Associated user"].length && !activeFilters["Associated user"].includes(item.associatedUser)) return false;
+            if (activeFilters["Media types"].length && (!item.type || !activeFilters["Media types"].includes(item.type))) return false;
+            if (activeFilters["Priorities"].length && (!item.priority || !activeFilters["Priorities"].includes(item.priority))) return false;
+            if (activeFilters["Statuses"].length && (!item.state || !activeFilters["Statuses"].some(v => v.toLowerCase() === item.state.toLowerCase()))) return false;
+            if (activeFilters["Portal states"].length && (!item.portalState || !activeFilters["Portal states"].includes(item.portalState))) return false;
 
             if (activeFilters["Last updated"].length) {
                 const today = new Date("2026-03-16");
-                const itemDate = new Date(item.lastUpdated);
-                const diffDays = (today - itemDate) / (1000 * 60 * 60 * 24);
-                return activeFilters["Last updated"].some(f => {
+                const diffDays = (today - new Date(item.lastUpdated)) / (1000 * 60 * 60 * 24);
+                const matchDate = activeFilters["Last updated"].some(f => {
                     if (f === "Today") return diffDays <= 1;
                     if (f === "This week") return diffDays <= 7;
                     if (f === "This month") return diffDays <= 30;
                     if (f === "This year") return diffDays <= 365;
-                    if (f === "More then 1 year") return diffDays > 365;
+                    return diffDays > 365;
                 });
+                if (!matchDate) return false;
             }
-
             return true;
         }
 
@@ -620,214 +539,165 @@
                 const key = cat.toLowerCase().replace(" & ", "&");
                 let count = 0;
                 if (cat === "All") {
-                    Object.keys(data).forEach(k => {
-                        count += data[k].filter(item => matchesFilters(item, k, "All")).length;
-                    });
+                    Object.keys(rawData).forEach(k => { count += rawData[k].filter(matchesFilters).length; });
                 } else {
-                    count = (data[key] || []).filter(item => matchesFilters(item, key, cat)).length;
+                    count = (rawData[key] || []).filter(matchesFilters).length;
                 }
                 return `<div class="tab ${cat === currentCategory ? 'active' : ''}" onclick="setCategory('${cat}')">
-${cat} <span class="badge">${count}</span>
-</div>`;
+                    ${cat} <span class="badge">${count}</span>
+                </div>`;
             }).join('');
         }
 
-        const DOMAIN_RESTRICTIONS = {
-            "Assets": ["Work", "Content"],
-            "Collections & Folders": ["Work", "Content"],
-            "Content templates": ["Experience"],
-            "Libraries": ["Libraries"],
-            "Portals": ["Experience"],
-            "Tasks": ["Work"],
-            "Workrooms": ["Work"]
-        };
-
         function renderSidebar() {
-            const allowedGroups = CATEGORY_MAP[currentCategory] || [];
             const root = document.getElementById('filter-groups-root');
+            const allowedGroups = CATEGORY_MAP[currentCategory] || [];
 
             root.innerHTML = Object.keys(FILTER_STRUCTURE).map(group => {
-                const isDisabledGroup = !allowedGroups.includes(group);
-                const collapsed = isDisabledGroup || collapsedGroups[group];
+                const isNotApplicable = !allowedGroups.includes(group);
+                const isCollapsed = isNotApplicable || (collapsedState[group] === undefined ? false : collapsedState[group]);
 
-                let optionsToRender = FILTER_STRUCTURE[group];
-
-                // Filter users based on search term
+                let options = FILTER_STRUCTURE[group];
                 if (group === "Associated user") {
-                    optionsToRender = optionsToRender.filter(opt =>
-                        opt.toLowerCase().includes(userSearchTerm.toLowerCase())
-                    );
+                    options = options.filter(opt => opt.toLowerCase().includes(userSearchTerm.toLowerCase()));
                 }
 
                 return `
-<div class="filter-group ${isDisabledGroup ? 'disabled' : ''} ${collapsed ? 'collapsed' : ''}">
-<h4 onclick="${isDisabledGroup ? '' : `toggleFilterGroup('${group}')`}">${group}</h4>
-<div class="filter-options-container">
-${group === "Associated user" ? `
-<div>
-<input type="text" class="user-search-input" 
-oninput="handleUserSearch(this.value)" 
-value="${userSearchTerm}" 
-${isDisabledGroup ? 'disabled' : ''} 
-placeholder="Search for a user">
-</div>` : ''}
-<div class="${group === 'Associated user' ? 'user-list-dropdown' : ''}">
-${optionsToRender.map(opt => {
-                    // Check if this specific domain option should be disabled
-                    let isOptionDisabled = false;
+                <div class="filter-group ${isCollapsed ? 'collapsed' : ''} ${isNotApplicable ? 'locked' : ''}">
+                    <h4 onclick="toggleFilterGroup('${group}', ${isNotApplicable})">${group}</h4>
+                    <div class="filter-options-container">
+                        ${group === "Associated user" ? `<input type="text" class="user-search-input" oninput="handleUserSearch(this.value)" value="${userSearchTerm}" placeholder="Search...">` : ''}
+                        <div class="${group === 'Associated user' ? 'user-list-dropdown' : ''}">
+                            ${options.map(opt => {
+                    let isDisabled = false;
                     if (group === "Domains" && currentCategory !== "All") {
-                        const validDomains = DOMAIN_RESTRICTIONS[currentCategory] || [];
-                        if (!validDomains.includes(opt)) {
-                            isOptionDisabled = true;
-                        }
+                        const allowed = DOMAIN_RESTRICTIONS[currentCategory] || [];
+                        if (!allowed.includes(opt)) isDisabled = true;
                     }
-
                     return `
-<label class="filter-option ${isOptionDisabled || isDisabledGroup ? 'option-disabled' : ''}">
-<input type="checkbox" 
-${activeFilters[group].includes(opt) ? 'checked' : ''} 
-${isDisabledGroup || isOptionDisabled ? 'disabled' : ''}
-onchange="toggleFilter('${group}', '${opt}')"> 
-${opt}
-</label>
-`;
+                                <label class="filter-option ${isDisabled ? 'disabled' : ''}">
+                                    <input type="checkbox" ${activeFilters[group].includes(opt) ? 'checked' : ''} ${isDisabled ? 'disabled' : ''} onchange="toggleFilter('${group}', '${opt}')"> 
+                                    ${opt}
+                                </label>`;
                 }).join('')}
-${optionsToRender.length === 0 ? '<div style="font-size:0.7rem; color:#999; padding:5px;">No options available</div>' : ''}
-</div>
-</div>
-</div>`;
+                        </div>
+                    </div>
+                </div>`;
             }).join('');
         }
 
-        function toggleFilterGroup(g) { collapsedGroups[g] = !collapsedGroups[g]; renderSidebar(); }
-        function setCategory(c) { currentCategory = c; renderAll(); }
-        function handleUserSearch(v) { userSearchTerm = v; renderSidebar(); }
-        function toggleFilter(g, v) {
-            const i = activeFilters[g].indexOf(v);
-            if (i > -1) activeFilters[g].splice(i, 1); else activeFilters[g].push(v);
-            renderAll();
+        function toggleFilterGroup(group, isLocked) {
+            if (isLocked) return;
+            collapsedState[group] = !collapsedState[group];
+            renderSidebar();
         }
 
         function renderPills() {
             const container = document.getElementById('pills-container');
             const allowedGroups = CATEGORY_MAP[currentCategory] || [];
-            let html = `<div class="pill static">Keyword: Sisi <span>✕</span></div>`;
+            const allowedDomains = DOMAIN_RESTRICTIONS[currentCategory] || [];
+            let html = `<div class="pill">Keyword: Sisi <span onclick="alert('Fixed keyword')">✕</span></div>`;
 
             Object.entries(activeFilters).forEach(([group, values]) => {
-                const isGroupDisabled = !allowedGroups.includes(group);
-
                 values.forEach(val => {
-                    // New logic: Check if a specific Domain value is irrelevant to the current category
-                    let isValueIrrelevant = false;
-                    if (group === "Domains" && currentCategory !== "All") {
-                        const validDomains = DOMAIN_RESTRICTIONS[currentCategory] || [];
-                        if (!validDomains.includes(val)) {
-                            isValueIrrelevant = true;
-                        }
-                    }
-
-                    // Apply 'disabled-pill' if the whole group is disabled OR the specific domain doesn't apply
-                    const pillClass = (isGroupDisabled || isValueIrrelevant) ? 'pill disabled-pill' : 'pill';
-
+                    const isGroupInvalid = !allowedGroups.includes(group);
+                    const isValueInvalid = group === "Domains" && currentCategory !== "All" && !allowedDomains.includes(val);
+                    const isInvalid = isGroupInvalid || isValueInvalid;
                     html += `
-<div class="${pillClass}">
-${group}: ${val} <span onclick="toggleFilter('${group}', '${val}')">✕</span>
-</div>`;
+                    <div class="pill ${isInvalid ? 'invalid' : ''}">
+                        ${isInvalid ? '⚠️ ' : ''}${group}: ${val} 
+                        <span onclick="toggleFilter('${group}', '${val}')">✕</span>
+                    </div>`;
                 });
             });
 
-            if (html.length > 50) {
-                html += `<button class="clear-btn-inline" onclick="window.clearAllFilters()">Clear All</button>`;
+            if (Object.values(activeFilters).flat().length > -1) {
+                html += `<button class="clear-btn-inline" onclick="clearAllFilters()">Clear All</button>`;
             }
             container.innerHTML = html;
         }
 
-        window.clearAllFilters = () => { Object.keys(activeFilters).forEach(k => activeFilters[k] = []); renderAll(); };
+ function renderResults() {
+    const root = document.getElementById('results-root');
+    root.innerHTML = "";
+    const cats = currentCategory === "All" ? CATEGORIES.slice(1) : [currentCategory];
+    let totalFound = 0;
 
-        function renderResults() {
-            const root = document.getElementById('results-root'); root.innerHTML = "";
-            const cats = currentCategory === "All" ? CATEGORIES.slice(1) : [currentCategory];
-            let totalFound = 0;
+    cats.forEach(cat => {
+        const key = cat.toLowerCase().replace(" & ", "&");
+        let items = (rawData[key] || []).filter(matchesFilters);
 
-            cats.forEach(cat => {
-                const key = cat.toLowerCase().replace(" & ", "&");
-                const filtered = (data[key] || []).filter(i => matchesFilters(i, key));
-                if (filtered.length) {
-                    totalFound += filtered.length;
-                    filtered.sort((a, b) => {
-                        let r = 0;
-                        if (currentSort === "alphabetical") {
-                            r = a.name.localeCompare(b.name);
-                        } else if (currentSort === "creationDate") {
-                            r = new Date(a.creationDate) - new Date(b.creationDate);
-                        } else {
-                            r = new Date(a.lastUpdated) - new Date(b.lastUpdated);
-                        }
-                        return sortDirection === "asc" ? r : -r;
-                    });
-                    appendSection(root, cat, filtered, key);
-                }
-            });
+        // Sort items
+        items.sort((a, b) => {
+            let valA = currentSort === 'alphabetical' ? a.name.toLowerCase() : a[currentSort];
+            let valB = currentSort === 'alphabetical' ? b.name.toLowerCase() : b[currentSort];
+            let comparison = valA > valB ? 1 : (valA < valB ? -1 : 0);
+            return sortDirection === 'desc' ? comparison * -1 : comparison;
+        });
 
-            if (totalFound === 0) {
-                root.innerHTML = `<div class="empty-state"><span class="emoji">😢</span><p>No matches found.</p></div>`;
-            }
+        if (items.length > 0) {
+            totalFound += items.length;
+            
+            // Logic for the "All" tab limit
+            const isAllTab = currentCategory === "All";
+            const needsLimit = isAllTab && items.length > 5;
+            const itemsToDisplay = needsLimit ? items.slice(0, 5) : items;
+
+            let sectionHtml = `
+                <div class="result-section">
+                    <h3>${cat} (${items.length})</h3>
+                    ${itemsToDisplay.map(i => `
+                        <div class="list-item">
+                            <div class="item-name">${i.name}</div>
+                            <div class="item-meta">
+                                ${USER_LABEL_MAP[cat] || "User"} ${i.associatedUser} • 
+                                Created: ${i.creationDate || 'N/A'} • 
+                                Modified: ${i.lastUpdated}
+                            </div>
+                            <div class="chip-row">
+                                <div class="chip" style="color:var(--primary-color)">${i.domain}</div>
+                                ${i.type ? `<div class="chip">${mediaIcons[i.type]} ${i.type}</div>` : ''}
+                                ${i.state ? `<div class="chip">${i.state}</div>` : ''}
+                                ${i.priority ? `<div class="chip">Priority: ${i.priority}</div>` : ''}
+                            </div>
+                        </div>`).join('')}
+                    
+                    ${needsLimit ? `
+                        <button class="view-more-btn" onclick="setCategory('${cat}')">
+                            Show all ${items.length} ${cat} →
+                        </button>
+                    ` : ''}
+                </div>`;
+            
+            root.insertAdjacentHTML('beforeend', sectionHtml);
         }
+    });
 
-function appendSection(root, title, items, catKey) {
-    const labelMap = {
-        "Assets": "Modified by",
-        "Collections & Folders": "Modified by",
-        "Content templates": "Modified by",
-        "Libraries": "Owner",
-        "Portals": "Modified by",
-        "Tasks": "Assigned to",
-        "Workrooms": "Modified by"
-    };
-
-    const userLabel = labelMap[title] || "User";
-    
-  
-    const isAllTab = currentCategory === "All";
-    const showMoreButton = isAllTab && items.length > 5;
-    const displayItems = showMoreButton ? items.slice(0, 5) : items;
-
-    const html = `
-    <div class="result-section">
-        <h3 onclick="setCategory('${title}')">${title} (${items.length})</h3>
-        ${displayItems.map(i => `
-        <div class="list-item">
-            <div class="item-name">${i.name}</div>
-            <div class="item-meta">
-                ${userLabel} ${i.associatedUser} • 
-                Created: ${i.creationDate} • 
-                Modified: ${i.lastUpdated}
-            </div>
-            <div class="chip-row">
-                <div class="chip" style="color:var(--primary-color)">${i.domain || 'Other'}</div>
-                ${i.type ? `<div class="chip" style="background:#fff3e0; border-color:#ffe0b2">${mediaIcons[i.type] || '📎'} ${i.type}</div>` : ''}
-                ${i.priority ? `<div class="chip" style="color:red">${i.priority}</div>` : ''}
-                ${i.state ? `<div class="chip" style="text-transform:capitalize">${i.state}</div>` : ''}
-            </div>
-        </div>`).join('')}
-        
-        ${showMoreButton ? `
-            <button class="direction-btn"
-                    onclick="setCategory('${title}')">
-                Show all ${items.length} ${title} →
-            </button>
-        ` : ''}
-    </div>`;
-    
-    root.insertAdjacentHTML('beforeend', html);
+    if (totalFound === 0) {
+        root.innerHTML = `<div class="empty-state"><span class="emoji">😢</span><p>No matches found.</p></div>`;
+    }
 }
 
-        document.getElementById('sort-select').onchange = (e) => { currentSort = e.target.value; renderResults(); };
-        document.getElementById('direction-toggle').onclick = function () {
-            sortDirection = sortDirection === "asc" ? "desc" : "asc";
-            this.innerText = sortDirection === "asc" ? "ASC ⬆" : "DESC ⬇";
-            renderResults();
-        };
+        function setCategory(c) { currentCategory = c; renderAll(); }
+        function toggleFilter(g, v) {
+            const i = activeFilters[g].indexOf(v);
+            if (i > -1) activeFilters[g].splice(i, 1); else activeFilters[g].push(v);
+            renderAll();
+        }
+        function handleUserSearch(v) { userSearchTerm = v; renderSidebar(); }
+        function clearAllFilters() { Object.keys(activeFilters).forEach(k => activeFilters[k] = []); renderAll(); }
+
+        // --- TOOLBAR EVENT LISTENERS ---
+        document.getElementById('sort-select').addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            renderAll();
+        });
+
+        document.getElementById('direction-toggle').addEventListener('click', (e) => {
+            sortDirection = sortDirection === 'desc' ? 'asc' : 'desc';
+            e.target.innerText = sortDirection === 'desc' ? 'DESC ⬇' : 'ASC ⬆';
+            renderAll();
+        });
 
         renderAll();
     </script>

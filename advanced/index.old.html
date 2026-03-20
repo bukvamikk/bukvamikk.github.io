@@ -6,20 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fun with filters</title>
     <style>
-      
         :root {
-            /* 1. Primary branding colors from screenshot */
-            --border-color: #d1d9e0; /* Neutral grey-blue border */
-            --primary-teal: #3b87a8; /* Dark teal from 'advanced search' header */
-            --accent-teal: #21a1bb; /* Bright teal for active/special icons */
-            
-            /* 2. Text and Background variations */
-            --text-secondary: #586069;
-            --main-bg: #f6f8fa;     /* Very light grey for main areas */
-            --sidebar-bg: #ffffff;  /* White sidebar for high contrast filters */
-            --active-item-bg: #f1f8ff; /* Lightest blue for active/hover states */
-            
-            /* 3. Original structure variables (retained) */
+            --border-color: #eee;
+            --primary-color: #1976d2;
+            --text-secondary: #666;
             --header-height: 64px;
         }
 
@@ -31,11 +21,8 @@
             height: 100vh;
             overflow: hidden;
             color: #333;
-            /* Changed from pure white to a light grey-blue base */
-            background-color: var(--main-bg);
         }
 
-        /* Update Header color from dark grey to primary teal */
         header {
             height: var(--header-height);
             border-bottom: 1px solid var(--border-color);
@@ -43,8 +30,7 @@
             align-items: center;
             justify-content: center;
             padding: 0 24px;
-            /* Match the reference image header background */
-            background: var(--primary-teal);
+            background: #3a3a3a;
             z-index: 100;
             flex-shrink: 0;
         }
@@ -57,34 +43,22 @@
             align-items: center;
         }
 
-        /* Update input to match header context */
         .search-bar-dummy {
             width: 100%;
             padding: 10px 40px 10px 16px;
-            border: 1px solid transparent;
+            border: 1px solid #ccc;
             border-radius: 20px;
             font-size: 0.9rem;
-            /* Slightly off-white for visibility on teal */
-            background: #ffffffee;
+            background: #f5f5f5;
             color: #333;
             outline: none;
         }
 
-        /* Make the 'cancel' icon on header input clearer */
         .search-cancel-icon {
             position: absolute;
             right: 14px;
-            color: #586069;
+            color: #888;
             font-size: 1.2rem;
-            cursor: default;
-            user-select: none;
-        }
-
-        .cancel-icon {
-            position: absolute;
-            right: 24px;
-            color: #ffffff;
-            font-size: 1.6rem;
             cursor: default;
             user-select: none;
         }
@@ -95,13 +69,12 @@
             overflow: hidden;
         }
 
-        /* Make sidebar white, as in screenshot */
         #sidebar {
             width: 280px;
             padding: 20px;
             border-right: 1px solid var(--border-color);
             overflow-y: auto;
-            background: var(--sidebar-bg);
+            background: #fafafa;
             flex-shrink: 0;
         }
 
@@ -111,15 +84,13 @@
             transition: all 0.2s ease;
         }
 
-        /* Update filter group titles to the primary teal */
         .filter-group h4 {
             margin: 0 0 10px 0;
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            /* Change from neutral grey to primary teal */
-            color: var(--primary-teal);
-            border-bottom: 1px solid var(--border-color);
+            color: #888;
+            border-bottom: 1px solid #ddd;
             padding-bottom: 4px;
             cursor: pointer;
             display: flex;
@@ -127,21 +98,14 @@
             align-items: center;
         }
 
-        /* Match the accent teal for active group arrows */
-        .filter-group:not(.collapsed) h4::after {
-            color: var(--accent-teal);
-        }
-
         .filter-group h4::after {
             content: '▾';
             font-size: 0.8rem;
-            opacity: 0.8;
-            transition: color 0.2s;
+            opacity: 0.6;
         }
 
         .filter-group.collapsed h4::after {
             content: '▸';
-            color: var(--text-secondary);
         }
 
         .filter-group.collapsed .filter-options-container {
@@ -165,27 +129,25 @@
         .sticky-search {
             position: sticky;
             top: 0;
-            /* Match white sidebar bg */
-            background: var(--sidebar-bg);
+            background: #fafafa;
             padding-bottom: 8px;
             z-index: 2;
             margin-bottom: 4px;
         }
 
         .user-search-input {
-     width: 100%;
-    padding: 8px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-size: 0.85rem;
-    box-sizing: border-box;
-    background: #fafafa;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            box-sizing: border-box;
         }
 
         .user-list-dropdown {
             max-height: 150px;
             overflow-y: auto;
-            border: 1px solid var(--border-color);
+            border: 1px solid #ddd;
             background: #fff;
             border-radius: 4px;
         }
@@ -197,7 +159,6 @@
             font-size: 0.85rem;
             cursor: pointer;
             padding: 2px 0;
-            color: #333;
         }
 
         .filter-option input {
@@ -209,8 +170,7 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            /* Match the light grey-blue main background */
-            background: var(--main-bg);
+            background: white;
         }
 
         .content-padding {
@@ -234,16 +194,15 @@
             white-space: nowrap;
             border-bottom: 2px solid transparent;
             font-size: 0.9rem;
-            color: var(--text-secondary);
+            color: #666;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        /* Use accent teal for active tabs and badges */
         .tab.active {
-            border-bottom-color: var(--accent-teal);
-            color: var(--accent-teal);
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
             font-weight: 600;
         }
 
@@ -257,7 +216,7 @@
         }
 
         .tab.active .badge {
-            background: var(--accent-teal);
+            background: var(--primary-color);
             color: #fff;
         }
 
@@ -270,18 +229,15 @@
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 8px;
             margin-bottom: 16px;
-            /* Darken section titles slightly for contrast on main-bg */
-            color: #24292e;
+            color: #444;
             cursor: pointer;
         }
 
-        /* Use white for list items to contrast with the light main-bg */
         .list-item {
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 12px;
             margin-bottom: 10px;
-            background: #fff;
         }
 
         .item-name {
@@ -308,16 +264,8 @@
             padding: 2px 8px;
             border-radius: 4px;
             font-size: 0.65rem;
-            border: 1px solid var(--border-color);
-            /* Standard light grey-blue background for chips */
-            background: var(--main-bg);
-            color: #333;
-        }
-
-        /* Special case for the "Work" chip to use primary-teal color */
-        .chip.chip-work {
-            color: var(--primary-teal);
-            font-weight: 500;
+            border: 1px solid #ddd;
+            background: #f9f9f9;
         }
 
         .pills-row {
@@ -328,13 +276,11 @@
             margin-bottom: 20px;
         }
 
-        /* Adapt pills to the new primary-teal and main-bg theme */
         .pill {
             display: inline-flex;
-            background: #cfd8dc;
-            border: 1px solid #ccd9ea;
-            /* Use primary teal for pill text */
-            color: #000;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            color: #3730a3;
             padding: 4px 10px;
             border-radius: 15px;
             font-size: 0.7rem;
@@ -342,8 +288,8 @@
         }
 
         .pill.disabled-pill {
-            background: #e3e3e3;
-            border-color: #b7b7b7;
+            background: #f5f5f5;
+            border-color: #ddd;
             color: #999;
             opacity: 0.7;
             pointer-events: none;
@@ -358,8 +304,7 @@
         .clear-btn-inline {
             background: none;
             border: none;
-            /* Use accent teal for clarity on interactive links */
-            color: var(--accent-teal);
+            color: var(--primary-color);
             text-decoration: underline;
             font-size: 0.8rem;
             cursor: pointer;
@@ -376,13 +321,13 @@
 
         .direction-btn {
             padding: 4px 12px;
-            border: 1px solid var(--border-color);
+            border: 1px solid #ccc;
             background: #fff;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.85rem;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: #444;
         }
 
         .empty-state {
@@ -413,7 +358,6 @@
             <input type="text" class="search-bar-dummy" value="sisi" readonly>
             <span class="search-cancel-icon">✕</span>
         </div>
-         <span class="cancel-icon">✕</span>
     </header>
 
     <div class="app-container">
@@ -664,12 +608,12 @@ ${cat} <span class="badge">${count}</span>
 <h4 onclick="${isDisabledGroup ? '' : `toggleFilterGroup('${group}')`}">${group}</h4>
 <div class="filter-options-container">
 ${group === "Associated user" ? `
-<div>
+<div class="user-search-input">
 <input type="text" class="user-search-input" 
 oninput="handleUserSearch(this.value)" 
 value="${userSearchTerm}" 
 ${isDisabledGroup ? 'disabled' : ''} 
-placeholder="Search for a user">
+placeholder="Search users...">
 </div>` : ''}
 <div class="${group === 'Associated user' ? 'user-list-dropdown' : ''}">
 ${optionsToRender.map(opt => {
@@ -812,9 +756,10 @@ function appendSection(root, title, items, catKey) {
         </div>`).join('')}
         
         ${showMoreButton ? `
-            <button class="direction-btn"
+            <button class="direction-btn" 
+                    style="width: 100%; margin-top: 10px; border-style: dashed; background: #fdfdfd;" 
                     onclick="setCategory('${title}')">
-                Show all ${items.length} ${title} →
+                View all ${items.length} ${title} →
             </button>
         ` : ''}
     </div>`;
