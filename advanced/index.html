@@ -44,9 +44,17 @@
             justify-content: center;
             padding: 0 24px;
             /* Match the reference image header background */
-            background: var(--primary-teal);
+            background: #455a64;
             z-index: 100;
             flex-shrink: 0;
+        }
+
+        .main-title {
+            position: absolute;
+            left: 24px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 1.2rem;
         }
 
         .search-bar-wrapper {
@@ -409,6 +417,7 @@
 <body>
 
     <header>
+        <div class="main-title">Advanced Search (Semi-strict)</div>
         <div class="search-bar-wrapper">
             <input type="text" class="search-bar-dummy" value="sisi" readonly>
             <span class="search-cancel-icon">✕</span>
