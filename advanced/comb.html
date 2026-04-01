@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>Advanced Search (Unified Hybrid)</title>
+
+<style>
+/* ---------------------------------------
+ ROOT VARIABLES
+---------------------------------------- */
+:root {
+  --border-color: #d1d9e0;
+  --primary-teal: #3b87a8;
+  --accent-teal: #21a1bb;
+  --text-secondary: #586069;
+  --main-bg: #f6f8fa;
+  --sidebar-bg: #ffffff;
+  --active-item-bg: #f1f8ff;
+  --header-height: 64px;
+}
+
+/* ---------------------------------------
+ GLOBAL LAYOUT
+---------------------------------------- */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  color: #333;
+  background-color: var(--main-bg);
+}
+
+/* ---------------------------------------
+ HEADER
+---------------------------------------- */
+header {
+  height: var(--header-height);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  background: #455a64;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.main-title {
+  position: absolute;
+  left: 24px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.search-bar-wrapper {
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-bar-dummy {
+  width: 100%;
+  padding: 10px 40px 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  background: #ffffffee;
+  color: #333;
+  outline: none;
+}
+
+.search-cancel-icon,
+.cancel-icon {
+  position: absolute;
+  right: 14px;
+  color: #586069;
+  font-size: 1.2rem;
+  user-select: none;
+}
+
+.cancel-icon {
+  right: 24px;
+  color: #ffffff;
+  font-size: 1.6rem;
+}
+
+/* ---------------------------------------
+ APP LAYOUT
+---------------------------------------- */
+.app-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ---------------------------------------
+ SIDEBAR
+---------------------------------------- */
+#sidebar {
+  width: 280px;
+  padding: 20px;
+  border-right: 1px solid var(--border-color);
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background: var(--sidebar-bg);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  
+}
+
+.filter-group {
+  margin-bottom: 24px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+.title{
+  margin: 0 0 10px 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--primary-teal);
+  padding-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.filter-group h4 {
+  margin: 0 0 10px 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--primary-teal);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-group h4::after {
+  content: '▼';
+  font-size: 0.8rem;
+  opacity: 0.8;
+  transition: color 0.2s;
+}
+
+.filter-group:not(.collapsed) h4::after {
+  color: var(--accent-teal);
+}
+
+
+.filter-group.collapsed h4::after {
+  content: '▶';
+  color: var(--text-secondary);
+}
+
+.filter-group.collapsed .filter-options-container {
+  display: none;
+}
+
+.filter-group.locked h4::after {
+  content: '▶';
+  color:var(--border-color);
+}
+
+.filter-group.locked h4 {
+  cursor: not-allowed;
+  border-bottom-color: transparent;
+  color: var(--border-color);
+}
+
+.filter-group.locked .filter-option {
+  cursor: not-allowed;
+  color: #999;
+}
+
+/* User search field inside user filter */
+.user-search-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  background: #fafafa;
+  box-sizing: border-box;
+}
+
+.user-list-dropdown {
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  border-radius: 4px;
+}
+
+/* Filter options */
+.filter-option {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 2px 0;
+  color: #333;
+}
+
+.filter-option input {
+  margin-right: 8px;
+}
+
+
+.filter-option.disabled {
+  color:var(--border-color);
+  cursor: not-allowed;
+  /* keep pointer events enabled */
+}
+
+
+/* ---------------------------------------
+ MAIN CONTENT
+---------------------------------------- */
+#main-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--main-bg);
+}
+
+.content-padding {
+  padding: 24px;
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  padding: 0 24px;
+}
+
+.tab {
+  padding: 16px 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab.active {
+  border-bottom-color: var(--accent-teal);
+  color: var(--accent-teal);
+  font-weight: 600;
+}
+
+.badge {
+  background: #eee;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  color: #777;
+  font-weight: bold;
+}
+
+.tab.active .badge {
+  background: var(--accent-teal);
+  color: #fff;
+}
+
+/* ---------------------------------------
+ RESULTS LIST
+---------------------------------------- */
+.result-section {
+  margin-bottom: 40px;
+}
+
+.result-section h3 {
+  font-size: 1.1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  color: #24292e;
+  cursor: pointer;
+}
+
+.list-item {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: #fff;
+}
+
+.item-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.item-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+/* CHIPS */
+.chip-row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  border: 1px solid var(--border-color);
+  background: var(--main-bg);
+  color: #333;
+}
+
+.chip.chip-work {
+  color: var(--primary-teal);
+  font-weight: 500;
+}
+
+/* PILLS */
+.pills-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  overflow: visible;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.pill {
+  display: inline-flex;
+  background: #cfd8dc;
+  border: 1px solid #ccd9ea;
+  color: #000;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 0.7rem;
+  align-items: center;
+}
+
+.pill span {
+  margin-left: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.pill.invalid {
+background: #fff1df;
+    border-color: #f39100;
+    color: #ff6c00;
+}
+
+
+.pill.invalid::before {
+  content: "⚠️";          /* or use an SVG via data-URI */
+  padding-right: 4px;
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+
+.pill.disabled-pill {
+  background: #e9e9e9;
+  color: #a4a4a4;
+  pointer-events: none;
+}
+
+/* CLEAR BUTTON */
+.clear-btn-inline {
+  background: none;
+  border: none;
+  color: var(--accent-teal);
+  text-decoration: underline;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+/* TOOLBAR */
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.direction-btn {
+  padding: 4px 12px;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: #999;
+}
+
+.empty-state .emoji {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* ---------------------------------------
+ SEGMENTED CONTROL (NEW)
+---------------------------------------- */
+.segment-control {
+  display: flex;
+  width: 100%;
+  border: 1px solid var(--border-color);
+  overflow: visible;
+  margin-bottom: 24px;
+}
+
+.segment-btn {
+  flex: 1;
+  padding: 8px 12px;
+  background: #f5f7f9;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #333;
+  transition: background 0.2s, color 0.2s;
+  position: relative;
+  overflow: visible !important;
+}
+
+.segment-btn:hover {
+  background: #e7ecef;
+}
+
+.segment-btn.active {
+  background: var(--accent-teal);
+  color: #fff;
+}
+
+/* Tooltip */
+.tooltip-bubble {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #455a64;
+  color: #fff;
+  font-size: 0.7rem;
+  line-height: 1.3;
+  padding: 6px 10px;
+  border-radius: 6px;
+  width: 130px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease-out;
+  z-index: 9999;
+  white-space: normal;
+} 
+
+.segment-btn:hover .tooltip-bubble {
+  opacity: 1;
+  visibility: visible;
+}
+.filter-lock-tooltip {
+    position: absolute;
+    left: 50px;
+    top: 0;
+    background: #455a64;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-transform: none;
+    width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease-out;
+    z-index: 9999;
+    font-weight: 400;
+    font-display: block;
+  font-size: 0.7rem;
+  line-height: 1.3;
+letter-spacing: 0;}
+
+.filter-group.locked h4:hover .filter-lock-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+
+
+.pill.disabled-pill {
+  position: relative;
+  pointer-events: auto;
+  cursor: not-allowed;
+}
+
+
+.pill.invalid {
+  position: relative;
+  pointer-events:all;
+  cursor:pointer;
+}
+
+
+
+
+.tooltip-pills {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #455a64;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  line-height: 1.3;
+  width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease-out;
+  z-index: 9999;
+  letter-spacing: 0;
+  font-weight: 400!important;
+}
+
+.pill.disabled-pill:hover .tooltip-pills,
+.pill.invalid:hover .tooltip-pills {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* prevent clipping */
+.pills-row {
+  overflow: visible;
+}
+
+.filter-option.disabled {
+  position: relative;
+  cursor: not-allowed;
+  
+  
+}
+
+.tooltip-disabled-option {
+  position: absolute;
+  top: 50%;
+  left: 100px;
+  transform: translateY(-50%);
+  background: #455a64;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  width: 140px;
+  font-size: 0.7rem;
+  line-height: 1.3;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease-out;
+  z-index: 9999;
+  white-space: normal;
+}
+
+.filter-option.disabled:hover .tooltip-disabled-option {
+  opacity: 1;
+  visibility: visible;
+}
+
+</style>
+<body>
+
+<header>
+  <div class="main-title">Advanced Search (Unified Hybrid)</div>
+  <div class="search-bar-wrapper">
+    <input type="text" class="search-bar-dummy" value="sisi" readonly />
+    <span class="search-cancel-icon">✕</span>
+  </div>
+  <span class="cancel-icon">✕</span>
+</header>
+
+<div class="app-container">
+  <div id="sidebar">
+    <h4 class="title">Filter mode</h4>
+
+
+<div class="filter-mode-toggle">
+    <div class="segment-control">
+        <button 
+            class="segment-btn" 
+            id="seg-any"
+            onclick="setFilterMode('semi')"
+        >
+            Match Any
+            <span class="tooltip-bubble">
+                Broaden your search. Shows items that match at least one filter.
+            </span>
+        </button>
+
+        <button 
+            class="segment-btn" 
+            id="seg-all"
+            onclick="setFilterMode('strict')"
+        >
+            Match All
+            <span class="tooltip-bubble">
+                Narrow your search. Only shows items that satisfy every applied filter.
+            </span>
+        </button>
+
+    </div>
+</div>
+<h4 class="title">Category visibility</h4>
+<div class="filter-group">
+  <label class="filter-option">
+    <input 
+      type="checkbox" 
+      id="toggle-domain-filter" 
+      onchange="toggleDomainView()"
+    >
+    Show categories matching selected domain
+  </label>
+</div>
+    <div id="filter-groups-root"></div>
+  </div>
+
+  <div id="main-content">
+    <div class="tabs" id="tabs-root"></div>
+
+    <div class="content-padding">
+      <div class="toolbar">
+        <span style="font-size:0.85rem; font-weight:600;">Sort by:</span>
+
+
+
+        <select id="sort-select" style="padding:4px; font-size:0.85rem;">
+          <option value="lastUpdated">Modification date</option>
+          <option value="creationDate">Creation date</option>
+          <option value="alphabetical">Alphabetical</option>
+        </select>
+
+        <button id="direction-toggle" class="direction-btn">DESC ⬇</button>
+      </div>
+
+      <div id="pills-container" class="pills-row"></div>
+      <div id="results-root"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================
+     PART 2 — DATA MODEL + MAPPINGS
+======================================================= -->
+<script>
+    let filterMode = "semi"; // "strict", "semi"
+    let domainCategoryFilterEnabled = false;
+    
+/* ------------------------------------------
+   MEDIA ICONS
+------------------------------------------- */
+const mediaIcons = {
+  Image: "🖼️",
+  Document: "📄",
+  Audio: "🎵",
+  Video: "🎥",
+  "3d": "📦",
+  Other: "📎"
+};
+
+/* ------------------------------------------
+   RAW DATA  (Merged from both files)
+------------------------------------------- */
+const rawData = {
+  assets: [
+    { name: "Sisi Portrait – Imperial Gallery Edition", associatedUser: "Emma Hartmann", lastUpdated: "2026-03-12", creationDate: "2025-11-15", domain: "Work", type: "Image" },
+    { name: "Sisi Riding Attire Illustration", associatedUser: "Lukas Steiner", lastUpdated: "2026-03-10", creationDate: "2026-01-05", domain: "Content", type: "Document" },
+    { name: "Sisi Crown Jewel Close-up", associatedUser: "Clara Weiss", lastUpdated: "2026-03-02", creationDate: "2025-12-20", domain: "Work", type: "3d" },
+    { name: "Sisi Letter Transcription Scan", associatedUser: "Daniel Király", lastUpdated: "2026-02-05", creationDate: "2025-10-12", domain: "Content", type: "Document" },
+    { name: "Sisi Palace Garden Photograph", associatedUser: "Marie Farkas", lastUpdated: "2026-01-18", creationDate: "2025-09-30", domain: "Work", type: "Image" },
+    { name: "Sisi Diary Fragment – Corfu", associatedUser: "Emma Hartmann", lastUpdated: "2026-03-15", creationDate: "2025-12-01", domain: "Content", type: "Other" },
+    { name: "Achilleion Palace 3D Model", associatedUser: "Lukas Steiner", lastUpdated: "2026-03-14", creationDate: "2026-01-14", domain: "Work", type: "3d" },
+    { name: "Sisi Poetry Recitation – Archive", associatedUser: "Clara Weiss", lastUpdated: "2025-11-20", creationDate: "2025-06-15", domain: "Content", type: "Audio" },
+    { name: "Hungarian Coronation Gown Footage", associatedUser: "Marie Farkas", lastUpdated: "2026-02-25", creationDate: "2025-11-10", domain: "Work", type: "Video" },
+    { name: "Sisi’s Private Rail Carriage Plan", associatedUser: "Tobias Leitner", lastUpdated: "2026-03-05", creationDate: "2026-01-20", domain: "Content", type: "Document" },
+    { name: "Sisi Portrait – Winterhalter Study", associatedUser: "Sarah Toth", lastUpdated: "2026-01-05", creationDate: "2025-08-15", domain: "Work", type: "Image" },
+    { name: "Fan Language Manual – Imperial Court", associatedUser: "David Varga", lastUpdated: "2025-12-10", creationDate: "2025-07-01", domain: "Content", type: "Other" },
+    { name: "Sisi Riding Boots – High Res Scan", associatedUser: "Emma Hartmann", lastUpdated: "2026-03-12", creationDate: "2025-12-15", domain: "Work", type: "3d" },
+    { name: "Geneva Harbor Map 1898", associatedUser: "Benjamin Reich", lastUpdated: "2026-02-14", creationDate: "2025-11-01", domain: "Content", type: "Image" },
+    { name: "Sisi’s Exercise Ring Blueprint", associatedUser: "Linda Graf", lastUpdated: "2026-01-20", creationDate: "2025-10-10", domain: "Work", type: "Document" },
+    { name: "Imperial Waltz – Audio Track", associatedUser: "Thomas Berger", lastUpdated: "2026-03-01", creationDate: "2025-12-05", domain: "Content", type: "Audio" },
+    { name: "Cottage in Possenhofen Photo", associatedUser: "Nina Hoffmann", lastUpdated: "2025-10-30", creationDate: "2025-05-12", domain: "Work", type: "Image" },
+    { name: "Sisi’s Greek Notebook – Digital", associatedUser: "Patrik Novak", lastUpdated: "2026-02-01", creationDate: "2025-11-20", domain: "Content", type: "Document" },
+    { name: "Star Diamond Hairpin Analysis", associatedUser: "Sophie Lehner", lastUpdated: "2026-03-14", creationDate: "2026-01-02", domain: "Work", type: "Other" },
+    { name: "Sisi Boat Trip Journal – Madeira", associatedUser: "Robert Szabo", lastUpdated: "2026-02-28", creationDate: "2025-12-28", domain: "Content", type: "Document" },
+    { name: "Vienna Court Etiquette Audio Guide", associatedUser: "Johanna Beck", lastUpdated: "2026-01-10", creationDate: "2025-10-01", domain: "Work", type: "Audio" },
+    { name: "Sisi Bust – Marble Texture", associatedUser: "Oliver Schuster", lastUpdated: "2026-03-04", creationDate: "2026-01-10", domain: "Content", type: "Image" },
+    { name: "Empress Sisi Signature Overlay", associatedUser: "Sarah Toth", lastUpdated: "2026-02-11", creationDate: "2025-11-15", domain: "Work", type: "Other" },
+    { name: "Gödöllő Palace Interior Panorama", associatedUser: "Emma Hartmann", lastUpdated: "2025-12-28", creationDate: "2025-09-05", domain: "Work", type: "Image" },
+    { name: "Sisi’s Last Letter Transcription", associatedUser: "Lukas Steiner", lastUpdated: "2026-03-15", creationDate: "2026-01-20", domain: "Content", type: "Document" }
+  ],
+
+  "collections&folders": [
+    { name: "Sisi – Portrait References", associatedUser: "Tobias Leitner", lastUpdated: "2026-03-14", creationDate: "2025-12-01", domain: "Work" },
+    { name: "Sisi – Historical Documents", associatedUser: "Julia Kovács", lastUpdated: "2026-03-01", creationDate: "2025-11-15", domain: "Work" },
+    { name: "Sisi – Costume Research", associatedUser: "Benjamin Reich", lastUpdated: "2026-02-20", creationDate: "2025-10-30", domain: "Work" },
+    { name: "Sisi – Travel Diaries Archive", associatedUser: "Hanna Gruber", lastUpdated: "2026-01-30", creationDate: "2025-09-10", domain: "Content" },
+    { name: "Sisi – Schönbrunn Materials", associatedUser: "Martin Schröder", lastUpdated: "2026-02-26", creationDate: "2025-12-20", domain: "Content" }
+  ],
+
+  "content templates": [
+    { name: "Sisi Biography Page Template", associatedUser: "Sarah Toth", lastUpdated: "2026-02-22", creationDate: "2025-11-01", state: "inactive", domain: "Experience" },
+    { name: "Sisi Museum Label Template", associatedUser: "David Varga", lastUpdated: "2026-01-19", creationDate: "2025-10-10", state: "active", domain: "Experience" },
+    { name: "Sisi Exhibition Poster Layout", associatedUser: "Linda Graf", lastUpdated: "2026-02-10", creationDate: "2025-11-15", state: "inactive", domain: "Experience" },
+    { name: "Sisi Timeline Template", associatedUser: "Andreas Müller", lastUpdated: "2026-03-03", creationDate: "2026-01-05", state: "active", domain: "Experience" },
+    { name: "Sisi Royal Correspondence Template", associatedUser: "Peter Fuchs", lastUpdated: "2026-02-27", creationDate: "2025-11-30", state: "active", domain: "Experience" }
+  ],
+
+  libraries: [
+    { name: "Sisi – Early Life Collection", associatedUser: "Johanna Beck", lastUpdated: "2026-02-08", creationDate: "2025-10-15", state: "active", domain: "Libraries" },
+    { name: "Sisi – Royal Household Collection", associatedUser: "Leon Wagner", lastUpdated: "2026-01-25", creationDate: "2025-10-01", state: "inactive", domain: "Libraries" },
+    { name: "Sisi – European Travels Collection", associatedUser: "Veronika Szalai", lastUpdated: "2026-02-29", creationDate: "2025-11-20", state: "active", domain: "Libraries" },
+    { name: "Sisi – Fashion & Elegance Collection", associatedUser: "Markus Binder", lastUpdated: "2026-03-04", creationDate: "2026-01-10", state: "inactive", domain: "Libraries" },
+    { name: "Sisi – Cultural Impact Collection", associatedUser: "Isabel Vogel", lastUpdated: "2026-02-16", creationDate: "2025-11-01", state: "active", domain: "Libraries" }
+  ],
+
+  portals: [
+    { name: "Sisi Heritage Virtual Tour", associatedUser: "Thomas Berger", lastUpdated: "2026-03-01", creationDate: "2025-12-05", portalState: "Published", state: "active", domain: "Experience" },
+    { name: "Sisi Historical Archive Online", associatedUser: "Nina Hoffmann", lastUpdated: "2026-02-24", creationDate: "2025-11-15", portalState: "Unpublished", state: "inactive", domain: "Experience" },
+    { name: "Sisi Fashion Evolution Microsite", associatedUser: "Patrik Novak", lastUpdated: "2026-02-09", creationDate: "2025-10-12", portalState: "Protected", state: "active", domain: "Experience" },
+    { name: "Sisi Travel Map Interactive", associatedUser: "Sophie Lehner", lastUpdated: "2026-01-31", portalState: "Public", state: "inactive", domain: "Experience" },
+    { name: "Sisi Diary Browsing Experience", associatedUser: "Robert Szabo", lastUpdated: "2026-02-28", creationDate: "2025-11-20", portalState: "Published", state: "active", domain: "Experience" }
+  ],
+
+  tasks: [
+    { name: "Review Sisi Diary Translations", associatedUser: "Laura König", lastUpdated: "2026-02-11", creationDate: "2025-11-01", priority: "High", domain: "Work" },
+    { name: "Tag Sisi Photos for Archive", associatedUser: "Bence Kiss", lastUpdated: "2026-02-01", creationDate: "2025-10-15", priority: "Low", domain: "Work" },
+    { name: "Design Sisi Exhibit Landing Page", associatedUser: "Michelle Bauer", lastUpdated: "2026-03-02", creationDate: "2026-01-10", priority: "Blocker", domain: "Work" },
+    { name: "Update Sisi Costume Metadata", associatedUser: "Felix Lang", lastUpdated: "2026-01-20", creationDate: "2025-10-05", priority: "Standard", domain: "Work" },
+    { name: "Verify Sisi Travel Dates", associatedUser: "Anna Molnár", lastUpdated: "2026-02-14", creationDate: "2025-11-10", priority: "No priority", domain: "Work" }
+  ],
+
+  workrooms: [
+    { name: "Sisi Interactive Exhibition 2026", associatedUser: "Oliver Schuster", lastUpdated: "2026-03-05", creationDate: "2026-01-01", state: "active", domain: "Work" },
+    { name: "Sisi Archival Digitization Project", associatedUser: "Elisa Nagy", lastUpdated: "2026-02-25", creationDate: "2025-11-20", state: "inactive", domain: "Work" },
+    { name: "Sisi Film Research Initiative", associatedUser: "Adrian Vogel", lastUpdated: "2026-01-29", creationDate: "2025-10-10", state: "active", domain: "Work" },
+    { name: "Sisi Cultural Revival Campaign", associatedUser: "Sandra Holzer", lastUpdated: "2026-02-17", creationDate: "2025-11-01", state: "active", domain: "Work" },
+    { name: "Sisi Royal Letters Restoration", associatedUser: "Patrícia Barta", lastUpdated: "2026-03-03", creationDate: "2025-12-15", state: "inactive", domain: "Work" }
+  ]
+};
+
+/* ------------------------------------------
+   CATEGORIES
+------------------------------------------- */
+const CATEGORIES = [
+  "All",
+  "Assets",
+  "Collections & Folders",
+  "Content templates",
+  "Libraries",
+  "Portals",
+  "Tasks",
+  "Workrooms"
+];
+
+/* ------------------------------------------
+   FILTER STRUCTURE
+------------------------------------------- */
+const FILTER_STRUCTURE = {
+  "Domains": ["Content", "Work", "Experience", "Libraries"],
+  "Associated user": [...new Set(
+    Object.values(rawData).flatMap(list => list.map(i => i.associatedUser))
+  )].sort(),
+  "Media types": Object.keys(mediaIcons),
+  "Last updated": ["Today", "This week", "This month", "This year", "More then 1 year"],
+  "Priorities": ["Blocker", "High", "Standard", "Low", "No priority"],
+  "Statuses": ["Active", "Inactive"],
+  "Portal states": ["Public", "Protected", "Published", "Unpublished"]
+};
+
+/* ------------------------------------------
+   CATEGORY → FILTER GROUP MAP
+------------------------------------------- */
+const CATEGORY_MAP = {
+  "All": Object.keys(FILTER_STRUCTURE),
+
+  "Assets": ["Domains", "Associated user", "Media types", "Last updated"],
+  "Collections & Folders": ["Domains", "Associated user", "Last updated"],
+  "Content templates": ["Domains", "Associated user", "Last updated", "Statuses"],
+  "Libraries": ["Domains", "Associated user", "Last updated", "Statuses"],
+  "Portals": ["Domains", "Associated user", "Last updated", "Statuses", "Portal states"],
+  "Tasks": ["Domains", "Associated user", "Last updated", "Priorities"],
+  "Workrooms": ["Domains", "Associated user", "Last updated", "Statuses"]
+};
+
+/* ------------------------------------------
+   USER LABEL MAP
+------------------------------------------- */
+const USER_LABEL_MAP = {
+  "Assets": "Modified by",
+  "Collections & Folders": "Modified by",
+  "Content templates": "Modified by",
+  "Libraries": "Owner",
+  "Portals": "Modified by",
+  "Tasks": "Assigned to",
+  "Workrooms": "Modified by",
+  "All": "User"
+};
+
+/* ------------------------------------------
+   DOMAIN RESTRICTIONS
+------------------------------------------- */
+const DOMAIN_RESTRICTIONS = {
+  "Assets": ["Work", "Content"],
+  "Collections & Folders": ["Work", "Content"],
+  "Content templates": ["Experience"],
+  "Libraries": ["Libraries"],
+  "Portals": ["Experience"],
+  "Tasks": ["Work"],
+  "Workrooms": ["Work"]
+};
+
+/* ======================================================
+   PART 3 — HYBRID MATCH LOGIC + UI STATE
+====================================================== */
+
+/* APP STATE */
+let currentCategory = "All";
+let currentSort = "lastUpdated";
+let sortDirection = "desc";
+let userSearchTerm = "";
+let collapsedGroups = {};
+
+/* Active filters (group -> [values]) */
+let activeFilters = Object.fromEntries(
+  Object.keys(FILTER_STRUCTURE).map(k => [k, []])
+);
+
+/* ------------------------------------------------------
+   HYBRID MATCH LOGIC
+   - Semi-strict: irrelevant filters are ignored
+   - Strict: domain restrictions validate pills
+------------------------------------------------------- */
+function matchesFilters(item, rawKey, tabContext = null) {
+  const activeTab = tabContext || currentCategory;
+  const allowedGroups = CATEGORY_MAP[activeTab] || [];
+  const isAll = activeTab === "All";
+
+  function checkGroup(groupName, itemValue) {
+    const selected = activeFilters[groupName];
+    if (selected.length === 0) return true;
+
+    const groupAllowed = allowedGroups.includes(groupName);
+
+    // SEMI-STRICT: ignore irrelevant groups
+    if (filterMode === "semi" && !groupAllowed) return true;
+
+    // HYBRID: ignore irrelevant groups, but treat DOMAIN separately
+    if (filterMode === "hybrid" && !groupAllowed && groupName !== "Domains") {
+      return true;
+    }
+
+    // STRICT: irrelevant groups still apply → filtered out normally
+
+    // STATUS (case insensitive)
+    if (groupName === "Statuses") {
+      if (!itemValue) return false;
+      return selected.some(s => s.toLowerCase() === itemValue.toLowerCase());
+    }
+
+    // DOMAIN HANDLING
+    if (groupName === "Domains") {
+      const validDomains = DOMAIN_RESTRICTIONS[activeTab] || [];
+
+      if (filterMode === "strict") {
+    const validDomains = DOMAIN_RESTRICTIONS[activeTab] ?? [];
+    
+    // If ANY selected domain is invalid → result should be empty
+    if (selected.some(d => !validDomains.includes(d))) return false;
+
+    // Remaining selection is valid, now item must match the domain
+    return selected.includes(item.domain);
+}
+if (filterMode === "semi") {
+
+    // ✔ FIX: In the ALL tab, domain filtering should work normally
+    if (activeTab === "All") {
+        return selected.includes(item.domain);
+    }
+
+    const relevant = selected.filter(d => validDomains.includes(d));
+    if (relevant.length === 0) return true;
+    return relevant.includes(item.domain);
+}
+    }
+
+    // Default
+    return selected.includes(itemValue);
+  }
+
+  // Apply each filter category
+  if (!checkGroup("Domains", item.domain)) return false;
+  if (!checkGroup("Associated user", item.associatedUser)) return false;
+  if (!checkGroup("Media types", item.type)) return false;
+  if (!checkGroup("Priorities", item.priority)) return false;
+  if (!checkGroup("Statuses", item.state)) return false;
+  if (!checkGroup("Portal states", item.portalState)) return false;
+
+  // LAST UPDATED filter
+  if (activeFilters["Last updated"].length) {
+    const today = new Date("2026-03-16");
+    const diff = (today - new Date(item.lastUpdated)) / (1000 * 60 * 60 * 24);
+
+    const match = activeFilters["Last updated"].some(filter => {
+      if (filter === "Today") return diff <= 1;
+      if (filter === "This week") return diff <= 7;
+      if (filter === "This month") return diff <= 30;
+      if (filter === "This year") return diff <= 365;
+      if (filter === "More then 1 year") return diff > 365;
+      return false;
+    });
+
+    if (!match) return false;
+  }
+
+  return true;
+}
+
+/* ------------------------------------------------------
+   CATEGORY SWITCH
+------------------------------------------------------- */
+function setCategory(cat) {
+
+
+
+  currentCategory = cat;
+  renderAll();
+}
+
+/* ------------------------------------------------------
+   FILTER GROUP COLLAPSE
+------------------------------------------------------- */
+function toggleFilterGroup(group) {
+  collapsedGroups[group] = !collapsedGroups[group];
+  renderSidebar();
+}
+
+/* ------------------------------------------------------
+   FILTER HANDLER
+------------------------------------------------------- */
+function toggleFilter(group, value) {
+  const arr = activeFilters[group];
+  const index = arr.indexOf(value);
+
+  if (index >= 0) arr.splice(index, 1);
+  else arr.push(value);
+
+  renderAll();
+}
+
+/* ------------------------------------------------------
+   USER SEARCH (Inside "Associated user" filter group)
+------------------------------------------------------- */
+function handleUserSearch(value) {
+  userSearchTerm = value;
+  renderSidebar();
+}
+
+/* ------------------------------------------------------
+   CLEAR ALL FILTERS
+------------------------------------------------------- */
+function clearAllFilters() {
+  Object.keys(activeFilters).forEach(g => (activeFilters[g] = []));
+  renderAll();
+}
+/* ======================================================
+   PART 4 — RENDERING FUNCTIONS
+====================================================== */
+
+/* ------------------------------------------------------
+   MASTER RENDER FUNCTION
+------------------------------------------------------- */
+function renderAll() {
+  renderTabs();
+  renderSidebar();
+  renderPills();
+  renderResults();
+}
+
+/* ------------------------------------------------------
+   TABS
+------------------------------------------------------- */
+function renderTabs() {
+  const root = document.getElementById("tabs-root");
+
+  
+root.innerHTML = CATEGORIES
+  .filter(cat => {
+      if (!domainCategoryFilterEnabled) return true;
+
+      const selectedDomains = activeFilters["Domains"];
+      if (selectedDomains.length === 0) return true; // No domain filter selected → show all
+
+      if (cat === "All") return true;
+
+      const allowed = DOMAIN_RESTRICTIONS[cat] || [];
+      return selectedDomains.some(d => allowed.includes(d));
+  })
+  .map(cat => {
+
+    const key = cat.toLowerCase().replace(" & ", "&");
+    let count = 0;
+
+    if (cat === "All") {
+      Object.keys(rawData).forEach(dataKey => {
+        count += rawData[dataKey].filter(item => matchesFilters(item, dataKey, "All")).length;
+      });
+    } else {
+      const list = rawData[key] || [];
+      count = list.filter(item => matchesFilters(item, key, cat)).length;
+    }
+
+    return `
+      <div class="tab ${cat === currentCategory ? "active" : ""}"
+           onclick="setCategory('${cat}')">
+        ${cat} <span class="badge">${count}</span>
+      </div>
+    `;
+  }).join("");
+}
+
+/* ------------------------------------------------------
+   SIDEBAR (filter groups)
+------------------------------------------------------- */
+function renderSidebar() {
+  const root = document.getElementById("filter-groups-root");
+  const allowedGroups = CATEGORY_MAP[currentCategory] ?? [];
+
+  root.innerHTML = Object.keys(FILTER_STRUCTURE)
+    .map(group => {
+      const isLocked = !allowedGroups.includes(group);
+
+      // Default collapsed state
+      let collapsed = collapsedGroups[group] ?? false;
+
+      // Auto-collapse locked groups except Domains
+      if (isLocked && group !== "Domains") {
+        collapsed = true;
+      }
+
+      const originalOptions = FILTER_STRUCTURE[group];
+      let options = originalOptions;
+
+      // User search filtering
+      if (group === "Associated user") {
+        options = originalOptions.filter(user =>
+          user.toLowerCase().includes(userSearchTerm.toLowerCase())
+        );
+      }
+
+      return `
+        <div class="filter-group ${isLocked ? "locked" : ""} ${collapsed ? "collapsed" : ""}">
+          <h4 onclick="${!isLocked ? `toggleFilterGroup('${group}')` : ""}">
+            ${group}
+            ${
+              isLocked
+                ? `<span class="filter-lock-tooltip">
+                    This filter is not applicable in the selected category
+                  </span>`
+                : ""
+            }
+          </h4>
+
+          <div class="filter-options-container">
+
+            ${
+              group === "Associated user"
+                ? `
+              <input
+                type="text"
+                class="user-search-input"
+                placeholder="Search for a user"
+                value="${userSearchTerm}"
+                oninput="handleUserSearch(this.value)"
+                ${isLocked ? "disabled" : ""}
+              />`
+                : ""
+            }
+
+            <div class="${group === "Associated user" ? "user-list-dropdown" : ""}">
+              ${options
+                .map(option => {
+                  // Domain restriction: disable if invalid for category
+                  let isDisabled = false;
+                  if (group === "Domains" && currentCategory !== "All") {
+                    const validDomains = DOMAIN_RESTRICTIONS[currentCategory] ?? [];
+                    if (!validDomains.includes(option)) isDisabled = true;
+                  }
+
+                  const disabledClass = isDisabled || isLocked ? "disabled" : "";
+                  const disabledAttr = isDisabled || isLocked ? "disabled" : "";
+
+                  // Inject tooltip ONLY when domain is disabled
+                  const tooltip =
+                    isDisabled && group === "Domains"
+                      ? `
+                        <span class="tooltip-disabled-option">
+                          This domain is not available in the selected category.
+                        </span>
+                      `
+                      : "";
+
+                  return `
+                    <label class="filter-option ${disabledClass}">
+                      <input
+                        type="checkbox"
+                        ${activeFilters[group].includes(option) ? "checked" : ""}
+                        ${disabledAttr}
+                        onchange="toggleFilter('${group}', '${option}')"
+                      >
+                      ${option}
+                      ${tooltip}
+                    </label>
+                  `;
+                })
+                .join("")}
+
+              ${
+                options.length === 0
+                  ? `<div style="font-size:0.7rem; color:#999; padding:5px;">
+                       No options available
+                     </div>`
+                  : ""
+              }
+            </div>
+
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+/* ------------------------------------------------------
+   PILLS (active filters summary)
+------------------------------------------------------- */
+function renderPills() {
+  const container = document.getElementById("pills-container");
+  const allowedGroups = CATEGORY_MAP[currentCategory] ?? [];
+
+  // Static keyword pill
+  let html = `
+    <div class="pill static">
+      Keyword: Sisi
+      <span onclick="alert('Fixed keyword cannot be removed')">✕</span>
+    </div>
+  `;
+
+  // Build dynamic pills
+  Object.entries(activeFilters).forEach(([group, values]) => {
+    values.forEach(val => {
+
+      // Determine pill class
+      let pillClass = "pill";
+
+      if (currentCategory !== "All") {
+        if (group === "Domains") {
+          const validDomains = DOMAIN_RESTRICTIONS[currentCategory] ?? [];
+          const irrelevant = !validDomains.includes(val);
+
+          if (filterMode === "strict" && irrelevant) {
+            pillClass = "pill invalid";
+          }
+          if (filterMode === "semi" && irrelevant) {
+            pillClass = "pill disabled-pill";
+          }
+          if (filterMode === "hybrid" && irrelevant) {
+            pillClass = "pill invalid";
+          }
+        } else {
+          if (!allowedGroups.includes(group)) {
+            pillClass =
+              filterMode === "semi"
+                ? "pill disabled-pill"
+                : "pill invalid";
+          }
+        }
+      }
+
+      // ------------------------------------
+      // TOOLTIP for disabled + invalid pills
+      // ------------------------------------
+      const needsTooltip =
+        pillClass.includes("disabled-pill") ||
+        pillClass.includes("invalid");
+
+      if (needsTooltip) {
+        html += `
+          <div class="${pillClass}">
+            ${group}: ${val}
+            <span class="tooltip-pills">
+              This filter doesn’t apply in the selected category
+            </span>
+            <span onclick="toggleFilter('${group}', '${val}')">✕</span>
+          </div>
+        `;
+      } else {
+        // Normal pill
+        html += `
+          <div class="${pillClass}">
+            ${group}: ${val}
+            <span onclick="toggleFilter('${group}', '${val}')">✕</span>
+          </div>
+        `;
+      }
+    });
+  });
+
+  // Clear all button
+  html += `
+    <button class="clear-btn-inline" onclick="clearAllFilters()">
+      Clear All
+    </button>
+  `;
+
+  container.innerHTML = html;
+}
+
+/* ------------------------------------------------------
+   RESULTS
+------------------------------------------------------- */
+function renderResults() {
+  const root = document.getElementById("results-root");
+  root.innerHTML = "";
+
+  const categoriesToShow =
+    currentCategory === "All" ? CATEGORIES.slice(1) : [currentCategory];
+
+  let totalFound = 0;
+
+  categoriesToShow.forEach(cat => {
+    const key = cat.toLowerCase().replace(" & ", "&");
+    const list = rawData[key] || [];
+
+    // Filter items
+    let filtered = list.filter(item => matchesFilters(item, key));
+
+    if (filtered.length === 0) return;
+
+    totalFound += filtered.length;
+
+    // Sort items
+    filtered.sort((a, b) => {
+      let av = currentSort === "alphabetical" ? a.name.toLowerCase() : a[currentSort];
+      let bv = currentSort === "alphabetical" ? b.name.toLowerCase() : b[currentSort];
+
+      // Date sorting uses Date objects
+      if (currentSort !== "alphabetical") {
+        av = new Date(av);
+        bv = new Date(bv);
+      }
+
+      const comp = av > bv ? 1 : av < bv ? -1 : 0;
+      return sortDirection === "desc" ? -comp : comp;
+    });
+
+    // Show limited items in "All"
+    const limit = currentCategory === "All" && filtered.length > 5;
+    const displayList = limit ? filtered.slice(0, 5) : filtered;
+
+    // Render section
+    let sectionHTML = `
+      <div class="result-section">
+        <h3 onclick="setCategory('${cat}')">${cat} (${filtered.length})</h3>
+
+        ${displayList.map(i => `
+          <div class="list-item">
+            <div class="item-name">${i.name}</div>
+            <div class="item-meta">
+              ${USER_LABEL_MAP[cat] || "User"} ${i.associatedUser} •
+              Created: ${i.creationDate || "N/A"} •
+              Modified: ${i.lastUpdated}
+            </div>
+
+            <div class="chip-row">
+              <div class="chip">${i.domain}</div>
+
+              ${i.type
+                ? `<div class="chip">${mediaIcons[i.type]} ${i.type}</div>`
+                : ""
+              }
+
+              ${i.state
+                ? `<div class="chip" style="text-transform:capitalize;">${i.state}</div>`
+                : ""
+              }
+
+              ${i.priority
+                ? `<div class="chip">Priority: ${i.priority}</div>`
+                : ""
+              }
+            </div>
+          </div>
+        `).join("")}
+
+        ${limit ? `
+          <button class="direction-btn" onclick="setCategory('${cat}')">
+            Show all ${filtered.length} ${cat} →
+          </button>
+        ` : ""}
+      </div>
+    `;
+
+    root.insertAdjacentHTML("beforeend", sectionHTML);
+  });
+
+  if (totalFound === 0) {
+    root.innerHTML = `
+      <div class="empty-state">
+        <span class="emoji">😢</span>
+        <p>No matches found.</p>
+      </div>
+    `;
+  }
+}
+/* ======================================================
+   PART 5 — EVENT HANDLERS + INITIALIZATION
+====================================================== */
+
+/* SORT SELECT HANDLER */
+document.getElementById("sort-select").addEventListener("change", (e) => {
+  currentSort = e.target.value;
+  renderAll();
+});
+
+/* SORT DIRECTION TOGGLE (ASC/DESC) */
+document.getElementById("direction-toggle").addEventListener("click", (e) => {
+  sortDirection = (sortDirection === "desc") ? "asc" : "desc";
+  e.target.innerText = sortDirection === "desc" ? "DESC ⬇" : "ASC ⬆";
+  renderAll();
+});
+
+// Initial activation
+document.getElementById("seg-any").classList.add("active");
+
+
+/* INITIAL RENDER */
+renderAll();
+
+
+function setFilterMode(mode) {
+  filterMode = mode;
+
+  document.getElementById("seg-any").classList.toggle("active", mode === "semi");
+  document.getElementById("seg-all").classList.toggle("active", mode === "strict");
+
+  renderAll();
+}
+
+function toggleDomainView() {
+  domainCategoryFilterEnabled = document.getElementById("toggle-domain-filter").checked;
+  renderAll();
+}
+
+</script>
+
+</body>
+</html>
