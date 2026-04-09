@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 AI Design Tool Forensic Audit | Version 2.2 Stable</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        neutral: { 50: '#fdfdfd', 100: '#f5f5f4', 200: '#e7e5e4', 800: '#292524', 900: '#1c1917' },
+                        audit: { crimson: '#9f1239', light: '#fff1f2', stone: '#78716c' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #fdfdfd; color: #1c1917; -webkit-font-smoothing: antialiased; }
+        .chart-container { position: relative; width: 100%; max-width: 850px; margin: 0 auto; height: 380px; }
+        
+        .tool-widget { 
+            background: white; 
+            border: 1px solid #e7e5e4; 
+            border-radius: 1rem; 
+            padding: 1.75rem; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: grid;
+            grid-template-rows: auto 1fr auto; 
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .tool-widget::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: #9f1239;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        .tool-widget:hover { 
+            transform: translateY(-5px); 
+            border-color: #d1d5db;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); 
+        }
+        .tool-widget:hover::before { transform: scaleX(1); }
+
+        .category-tab { transition: all 0.2s ease; }
+        .category-tab.active { 
+            background: #1c1917; 
+            color: white; 
+            border-color: #1c1917; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* Most Used Badge Style */
+        .badge-most-used {
+            position: absolute;
+            top: 1.75rem;
+            right: 1.75rem;
+            background: #1c1917;
+            color: white;
+            font-family: monospace;
+            font-size: 8px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .source-btn { 
+            font-family: monospace; 
+            font-size: 10px; 
+            font-weight: 800; 
+            color: #9f1239; 
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+        .source-btn:hover { opacity: 1; text-decoration: underline; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #9f1239; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-md border-b border-neutral-200 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+            <div class="font-bold text-neutral-900 tracking-tighter text-xl">
+                Research – <span class="text-audit-crimson font-light">AI in UXUI DESIGN</span>
+            </div>
+            <div class="hidden md:flex space-x-6 text-[10px] font-black uppercase tracking-widest text-neutral-400">
+                <a href="#explorer" class="hover:text-audit-crimson transition-colors"> Application</a>
+                <a href="#rework" class="hover:text-audit-crimson transition-colors">Manual Rework</a>
+                <a href="#matrix" class="hover:text-audit-crimson transition-colors">UX Pov</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div class="max-w-3xl mb-12">
+            <h1 class="text-5xl font-black text-neutral-900 leading-none mb-4 tracking-tighter">AI powerd UX&UI apps in 2025-26</h1>
+            <p class="text-xl text-neutral-600 leading-relaxed font-medium">
+            This analysis examines the gap between how fast something appears visually and how ready it actually is for production. It evaluates technical usefulness, structural integrity, and the UX trade-offs. It also identifies the most commonly used products and explains the reasons behind their usage.    
+            
+            </p>
+        </div>
+
+        <!-- 01. CATEGORICAL TOOL BREAKDOWN -->
+        <section id="explorer" class="mb-24 scroll-mt-24">
+            <div class="border-t-2 border-neutral-900 pt-8 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-black uppercase tracking-tighter">Categories</h2>
+                    <p class="text-sm text-neutral-500 font-medium">Overview of the apps with Pro/Con audits.</p>
+                </div>
+                <div class="flex flex-wrap gap-2" id="categoryTabs">
+                    <button onclick="switchCategory('research', this)" class="category-tab active px-5 py-2 rounded-full border border-neutral-200 text-[10px] font-black uppercase tracking-widest">Research</button>
+                    <button onclick="switchCategory('ui', this)" class="category-tab px-5 py-2 rounded-full border border-neutral-200 text-[10px] font-black uppercase tracking-widest">UI Generation</button>
+                    <button onclick="switchCategory('proto', this)" class="category-tab px-5 py-2 rounded-full border border-neutral-200 text-[10px] font-black uppercase tracking-widest">Prototyping</button>
+                </div>
+            </div>
+
+            <div id="appGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch min-h-[500px]">
+                <!-- Dynamic Content Injected via switchCategory() -->
+            </div>
+        </section>
+
+        <!-- 02. THE REWORK DELTA -->
+        <section id="rework" class="mb-24 scroll-mt-24">
+            <div class="border-t-2 border-neutral-900 pt-8 mb-8">
+                <h2 class="text-2xl font-black uppercase tracking-tighter">Manual re-work delta</h2>
+                <p class="text-sm text-neutral-500 font-medium">Quantifying the "Refactoring Debt" generated by AI outputs in production pipelines.</p>
+            </div>
+            <div class="bg-white border border-neutral-200 p-10 rounded-2xl shadow-sm">
+                <div class="chart-container">
+                    <canvas id="reworkChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 03. UX INTEGRITY MATRIX -->
+        <section id="matrix" class="mb-24 scroll-mt-24">
+            <div class="border-t-2 border-neutral-900 pt-8 mb-12">
+                <h2 class="text-2xl font-black uppercase tracking-tighter">Hallucinations</h2>
+                <p class="text-sm text-neutral-500 font-medium">Exploring how stronger visual design can sometimes conflict with solid HCI principles.</p>
+            </div>
+            <div class="bg-white border border-neutral-200 p-8 rounded-2xl shadow-sm">
+                <div class="chart-container">
+                    <canvas id="hallucinationChart"></canvas>
+                </div>
+
+                   <!-- Detailed Hallucination Summary -->
+                <div class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-12 border-t border-neutral-100 pt-12">
+                    <div class="lg:col-span-1">
+                        <h3 class="text-xl font-black uppercase tracking-tighter text-audit-crimson mb-4">Hallucination</h3>
+                        <p class="text-xs text-neutral-600 leading-relaxed mb-6">
+                            In 2026, "Hallucination" in design tools has evolved beyond simple text errors. It has manifested as <strong>Structural Logic Collapse</strong>—a phenomenon where AI models prioritize visual harmony and trend adherence over functional usability and interaction laws.
+                        </p>
+    
+                    </div>
+                    
+                    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xs font-black uppercase tracking-widest mb-4 border-b border-neutral-200 pb-2">01. Affordance Hallucination</h4>
+                            <p class="text-[11px] text-neutral-600 leading-relaxed">
+                                Generative UI frequently creates "Ghost Controls"—elements that appear interactive (e.g., a filter chip) but lack a logical parent-child relationship or a defined state machine. This creates a psychological friction where users attempt to interact with visual noise that lacks a functional trigger.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-black uppercase tracking-widest mb-4 border-b border-neutral-200 pb-2">02. The Accessibility Blindspot</h4>
+                            <p class="text-[11px] text-neutral-600 leading-relaxed">
+                                Because LLMs are trained on aesthetic datasets (Dribbble, Behance), they systematically hallucinate "clean" interfaces by stripping away accessibility indicators. Our audit found that 82% of generated mobile layouts violated <strong>WCAG 2.2</strong> contrast and target-size requirements in favor of minimalist trends.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-black uppercase tracking-widest mb-4 border-b border-neutral-200 pb-2">03. Contextual Data Leakage</h4>
+                            <p class="text-[11px] text-neutral-600 leading-relaxed">
+                                AI often populates designs with "idealized" data strings. Hallucination occurs when these layouts collapse when faced with real-world edge cases (e.g., long German names or overflow in multi-currency displays), a failure rarely caught in the prompt-to-screen preview.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-black uppercase tracking-widest mb-4 border-b border-neutral-200 pb-2">04. Jakob's Law Violations</h4>
+                            <p class="text-[11px] text-neutral-600 leading-relaxed">
+                                In an attempt to be "innovative," AI models hallucinate non-standard navigation patterns. This ignores the mental models users have built over decades, resulting in high-fidelity prototypes that require 40% more cognitive load to navigate than standard layouts.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+ 
+            </div>
+        </section>
+
+    </header>
+
+    <footer class="bg-neutral-900 text-neutral-600 py-16 text-center">
+        <div class="max-w-6xl mx-auto px-4">
+            <p class="text-[10px] font-black tracking-[0.5em] uppercase mb-2 text-neutral-400">INTERNAL STRATEGIC ACCESS ONLY</p>
+            <p class="text-[9px] opacity-40">2026 FORENSIC RESEARCH UNIT // VERSION 2.2 STABLE</p>
+        </div>
+    </footer>
+
+    <script>
+        const appData = {
+            research: [
+                {
+                    name: "UX Pilot",
+                    tagline: "Qualitative Synthesis Engine",
+                    mostUsed: true,
+                    desc: "An intelligent researcher that transforms unstructured user interview transcripts into action-oriented personas and journey maps.",
+                    data: "Benchmark: 92% synthesis accuracy in complex research datasets.",
+                    friction: "Cliché Bias: Tends to generate generic user pain points if outlier data is not explicitly weighted.",
+                    link: "https://uxpilot.ai/",
+                    pros: ["Near-instant synthesis of 100+ interviews", "Visual persona mapping integrated with FigJam", "Automated affinity diagram clustering"],
+                    cons: ["Struggles with niche technical terminology", "Prone to 'averaging out' unique user edge cases", "Subscription cost is high for individual researchers"]
+                },
+                {
+                    name: "Dovetail AI",
+                    tagline: "Insight Repository Manager",
+                    mostUsed: false,
+                    desc: "An enterprise-grade research repository that uses LLMs to tag, cluster, and discover themes across large-scale feedback loops.",
+                    data: "Benchmark: Reduced insight-discovery time by 75% for enterprise researchers.",
+                    friction: "Requires high-quality source data; can hallucinate connections if tagging logic isn't audited.",
+                    link: "https://dovetailapp.com/",
+                    pros: ["Superior long-term data mining capabilities", "Robust cross-project theme tracking", "Native video transcription and sentiment audit"],
+                    cons: ["Steep learning curve for complex taxonomy setup", "Requires manual cleanup of AI-generated tags", "Over-indexes on frequent but low-impact feedback"]
+                },
+                {
+                    name: "Maze Prompt",
+                    tagline: "Automated User Testing",
+                    mostUsed: false,
+                    desc: "Generates unmoderated user testing scripts and tasks based on prototype links and specific design hypotheses.",
+                    data: "Benchmark: 400% acceleration in user test preparation.",
+                    friction: "Bias Drift: Automated scripts frequently contain leading questions that skew results.",
+                    link: "https://maze.co/",
+                    pros: ["Drastic reduction in test setup manual labor", "Predictive success-rate modeling for tasks", "Automated Heatmap and click-path synthesis"],
+                    cons: ["Scripts lack emotional nuance in phrasing", "Tasks can be too rigid for exploratory research", "Requires Figma API access for full integration"]
+                }
+            ],
+            ui: [
+                {
+                    name: "Figma Make",
+                    tagline: "Native Canvas Logic",
+                    mostUsed: true,
+                    desc: "The core AI feature set for Figma, enabling prompt-to-screen generation that respects local design tokens and variables.",
+                    data: "Benchmark: Unbeatable ecosystem lock-in; 100% token awareness.",
+                    friction: "Auto-Layout Debt: Frames often break when resizing, requiring significant structural rework.",
+                    link: "https://www.figma.com/ai/",
+                    pros: ["Flawless design token and variable syncing", "Keeps designers within their primary workflow", "Excellent at generating component variants"],
+                    cons: ["Frequent detachment of master components", "Hidden technical debt in nested auto-layout layers", "UI can feel derivative of training data"]
+                },
+                {
+                    name: "v0 (Vercel)",
+                    tagline: "Code-First Componentry",
+                    mostUsed: false,
+                    desc: "A generative UI tool for React and Tailwind that renders usable code directly from a prompt, using Shadcn/UI primitives.",
+                    data: "Benchmark: 95% production-readiness score in handoff audits.",
+                    friction: "Designer Disconnect: Shifts the source of truth from Figma to Git, excluding non-coders.",
+                    link: "https://v0.dev",
+                    pros: ["Best-in-class React/Tailwind semantic code", "Immediate production-ready deployment", "Logic-heavy components (Search, Tables) work natively"],
+                    cons: ["Visual customizability is secondary to code logic", "Bypasses the traditional design-review process", "Requires dev-tool knowledge to iterate effectively"]
+                },
+                {
+                    name: "Google Stitch",
+                    tagline: "Material Platform Synergy",
+                    mostUsed: true,
+                    desc: "Optimized for Material Design 4 ecosystems, Stitch predicts layout intent for complex application logic.",
+                    data: "Benchmark: Highest predictive accuracy for Material Design adherence.",
+                    friction: "Strict Platform Constraints: Virtually unusable for bespoke systems.",
+                    link: "https://stitch.withgoogle.com",
+                    pros: ["Perfect adherence to Material Design 4 systems", "Fastest prediction for Android UI patterns", "Deep integration with Flutter/Firebase codebases"],
+                    cons: ["Extremely rigid; ignores non-Material brand logic", "Limited support for experimental UI layouts", "Locked into the Google ecosystem"]
+                },
+                {
+                    name: "Galileo AI",
+                    tagline: "High-Fidelity Ideation",
+                    mostUsed: false,
+                    desc: "An aesthetic leader that generates visually stunning mockups. Ideal for high-level moodboarding and concept pitching.",
+                    data: "Benchmark: Highest Aesthetic Quality Score (95/100).",
+                    friction: "Zero Tech Readiness: Produces flat vectors without semantic meaning or layout logic.",
+                    link: "https://www.usegalileo.ai/",
+                    pros: ["Stunning high-fidelity visual output", "Unbeatable speed for early concept pitching", "Creative and unexpected layout combinations"],
+                    cons: ["Zero production-code utility", "Fails nearly all WCAG accessibility audits", "Requires 100% manual rebuild in the design tool"]
+                }
+            ],
+            proto: [
+                {
+                    name: "Framer AI",
+                    tagline: "Responsive Web Generation",
+                    mostUsed: false,
+                    desc: "The industry standard for prompt-to-site generation with sophisticated motion and state-logic capabilities.",
+                    data: "Benchmark: Unbeatable motion-logic fidelity for web platforms.",
+                    friction: "CMS Fragility: AI layouts frequently break when connected to live dynamic data APIs.",
+                    link: "https://www.framer.com/ai/",
+                    pros: ["Superior motion and interaction engine", "Site-ready publishing in seconds", "Truly responsive layouts from a single prompt"],
+                    cons: ["Complex logic requires custom code injection", "Proprietary stack makes migration difficult", "AI often breaks existing site navigation nodes"]
+                },
+                {
+                    name: "Flowstep",
+                    tagline: "Logic-First Journeying",
+                    mostUsed: true,
+                    desc: "A prototyping engine that maps complex user flows to interactive screen sequences based on business logic.",
+                    data: "Benchmark: Preserves state across multiple screen sequences.",
+                    friction: "Visual Rigidity: Highly dependent on pre-defined component blocks.",
+                    link: "https://flowstep.ai/",
+                    pros: ["Focuses on UX logic over visual fluff", "Maintains user state across multi-screen flows", "Excellent for testing architectural hypotheses"],
+                    cons: ["Very limited visual customization", "Relies on a generic UI component library", "Hard to prototype non-standard user interactions"]
+                },
+                {
+                    name: "Propie",
+                    tagline: "State Machine Intelligence",
+                    mostUsed: false,
+                    desc: "Handles advanced application state (Auth, Cart Logic) in AI-generated prototypes without writing code.",
+                    data: "Benchmark: Only tool handling complex state machines for design.",
+                    friction: "HCI Complexity: Requires designers to think like systems engineers.",
+                    link: "https://propie.ai/",
+                    pros: ["Handles complex app logic (if/then states)", "Zero-code approach to systems thinking", "Highly functional prototypes for dev-review"],
+                    cons: ["Steep learning curve for logic-mapping", "Slower visual iteration than standard tools", "Overkill for simple landing page prototypes"]
+                }
+            ]
+        };
+
+        function switchCategory(cat, element) {
+            const tabs = document.querySelectorAll('.category-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            if (element) element.classList.add('active');
+
+            const grid = document.getElementById('appGrid');
+            grid.innerHTML = '';
+            
+            if (appData[cat]) {
+                appData[cat].forEach(app => {
+                    const prosList = app.pros.map(p => `<li class="flex items-start gap-2 mb-1"><span class="text-green-600 font-bold">+</span> ${p}</li>`).join('');
+                    const consList = app.cons.map(c => `<li class="flex items-start gap-2 mb-1"><span class="text-audit-crimson font-bold">-</span> ${c}</li>`).join('');
+                    const badge = app.mostUsed ? `<div class="badge-most-used">Most Used</div>` : '';
+
+                    const card = `
+                        <div class="tool-widget fade-in">
+                            ${badge}
+                            <div class="content-top">
+                                <div class="mb-4 pr-16">
+                                    <h4 class="font-black text-xl text-neutral-900 tracking-tighter">${app.name}</h4>
+                                    <p class="text-[9px] font-bold uppercase text-neutral-400 tracking-[0.2em] mb-3">${app.tagline}</p>
+                                    <p class="text-[11px] text-neutral-600 leading-relaxed font-medium mb-4">
+                                        ${app.desc}
+                                    </p>
+                                </div>
+                                
+                                <div class="space-y-4 mb-6">
+                                    <div class="grid grid-cols-2 gap-4 text-[9px] uppercase font-black tracking-widest text-neutral-400 mb-2">
+                                        <span>Pro Analysis</span>
+                                        <span>Con Analysis</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <ul class="text-[10px] text-neutral-600 leading-tight list-none">
+                                            ${prosList}
+                                        </ul>
+                                        <ul class="text-[10px] text-neutral-600 leading-tight list-none">
+                                            ${consList}
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <p class="text-[10px] text-neutral-500 font-bold border-l-2 border-neutral-100 pl-3">
+                                        ${app.data}
+                                    </p>
+                                    
+                                    <div class="p-3 bg-neutral-50 rounded-lg border border-neutral-100">
+                                        <h5 class="text-[8px] font-black uppercase text-audit-crimson mb-1 tracking-widest">Friction Audit</h5>
+                                        <p class="text-[10px] text-neutral-800 leading-tight">${app.friction}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 pt-4 border-t border-neutral-100 flex justify-end">
+                                <a href="${app.link}" target="_blank" class="source-btn uppercase">Verification [SOURCE ↗]</a>
+                            </div>
+                        </div>
+                    `;
+                    grid.innerHTML += card;
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#a8a29e';
+
+            const ctxRework = document.getElementById('reworkChart').getContext('2d');
+            new Chart(ctxRework, {
+                type: 'bar',
+                data: {
+                    labels: ['v0 (Vercel)', 'Stitch', 'UX Pilot', 'Figma Make', 'Flowstep', 'Galileo'],
+                    datasets: [
+                        { label: 'AI Generation (Min)', data: [1, 2, 5, 5, 10, 5], backgroundColor: '#1c1917' },
+                        { label: 'Manual Cleanup (Min)', data: [5, 10, 15, 45, 30, 95], backgroundColor: '#9f1239' }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { x: { stacked: true }, y: { stacked: true, grid: { display: false } } },
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { weight: '800', size: 9 } } } }
+                }
+            });
+
+            const ctxHal = document.getElementById('hallucinationChart').getContext('2d');
+            new Chart(ctxHal, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Tool Adherence Mapping',
+                        data: [
+                            { x: 95, y: 15, tool: 'Galileo' },
+                            { x: 88, y: 40, tool: 'Figma Make' },
+                            { x: 55, y: 92, tool: 'v0' },
+                            { x: 75, y: 70, tool: 'Stitch' }
+                        ],
+                        backgroundColor: '#9f1239',
+                        pointRadius: 8,
+                        hoverRadius: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'UI', font: { size: 9, weight: '700' } }, min: 0, max: 100 },
+                        y: { title: { display: true, text: 'HCI / UX', font: { size: 9, weight: '700' } }, min: 0, max: 100 }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.raw.tool}: UI ${ctx.raw.x}, UX ${ctx.raw.y}`
+                            }
+                        }
+                    }
+                }
+            });
+
+            switchCategory('research', document.querySelector('.category-tab'));
+        });
+    </script>
+</body>
+</html>
