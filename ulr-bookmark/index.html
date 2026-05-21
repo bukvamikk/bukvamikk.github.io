@@ -238,7 +238,7 @@
 
         .form-actions {
             display: flex;
-            justify-content: flex-end;
+            justify-http-content: flex-end;
             gap: 10px;
             margin-top: 14px;
         }
@@ -294,8 +294,9 @@
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            max-height: 235px;
+            gap: 6px;
+            /* Exact math constraint: (46px element height * 5 items) + (6px gap * 4 spaces) = 254px */
+            max-height: 254px;
             overflow-y: auto;
             padding-right: 2px;
         }
@@ -303,11 +304,12 @@
         .popup-list-item {
             display: flex;
             align-items: center;
-            padding: 8px 10px;
+            padding: 6px 10px;
             background-color: var(--bg-light);
             border: 1px solid #EAEAEA;
             border-radius: 6px;
             gap: 12px;
+            height: 46px; /* Explicit height set to ensure perfect layout calculation */
         }
 
         .popup-item-checkbox {
@@ -537,7 +539,6 @@
         const popupScrollableList = document.getElementById('popupScrollableList');
         const popupListTitle = document.getElementById('popupListTitle');
 
-        // Structured mockup catalog data with simulated preview attributes
         const categoryItemsData = {
             assets: [
                 { id: 'as1', name: 'Company Logo Branding.png', detail: 'PNG Image • 2.4 MB' },
@@ -596,7 +597,6 @@
             ]
         };
 
-        // Master active state array
         let bookmarks = [];
         let dragSrcIndex = null;
 
@@ -683,7 +683,6 @@
             });
         }
 
-        /* Drag and Drop Processors */
         function handleDragStart(e) {
             dragSrcIndex = parseInt(this.getAttribute('data-index'));
             this.classList.add('dragging');
@@ -717,7 +716,6 @@
             dragSrcIndex = null;
         }
 
-        /* Category Selector Layout Setup and Sync Routing */
         function syncCategoryViewState(category) {
             const selectedOptionText = categoryDropdown.options[categoryDropdown.selectedIndex].text;
             popupSearchInput.value = '';
@@ -834,7 +832,6 @@
         function showPopup() {
             let activeCategory;
             
-            // Check condition: If list is empty, default selection becomes explicitly 'assets'
             if (bookmarks.length === 0) {
                 activeCategory = 'assets';
             } else {
@@ -867,7 +864,6 @@
             urlError.style.display = 'none';
         }
 
-        // Action Hookup Listeners
         toggleFormBtn.addEventListener('click', () => {
             if (bookmarkPopupCard.style.display === 'block') {
                 hidePopup();
@@ -915,7 +911,6 @@
             hidePopup();
         });
 
-        // Initialize Data Load
         loadFromLocalStorage();
         updateUI();
     </script>
