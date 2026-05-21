@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookmarks Widget</title>
+    <style>
+        :root {
+            --primary-color: #00A3C4;
+            --primary-hover: #008ca8;
+            --error-color: #D9383A;
+            --text-color: #333333;
+            --text-secondary: #757575;
+            --border-color: #D1D1D1;
+            --bg-light: #F9F9F9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #EBF3F5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Phone Container Emulation */
+        .phone-container {
+            width: 360px;
+            height: 640px;
+            background-color: #FFFFFF;
+            border-radius: 24px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+            border: 8px solid #333;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Widget Header */
+        .widget-header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #EEEEEE;
+            background: #fff;
+            z-index: 10;
+        }
+
+        .widget-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .add-btn-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            transition: transform 0.2s;
+        }
+
+        .add-btn-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .add-btn-toggle svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* Content Area */
+        .widget-content {
+            flex-grow: 1;
+            padding: 16px;
+            overflow-y: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 0;
+            color: var(--border-color);
+            text-align: center;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 12px;
+            fill: #E0E0E0;
+        }
+
+        /* Add Bookmark Popup Card */
+        .bookmark-popup-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            display: none;
+        }
+
+        /* Category Selector Row inside Popup */
+        .popup-category-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #EAEAEA;
+        }
+
+        .category-dropdown {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 24px 6px 8px;
+            font-size: 13px;
+            color: var(--text-color);
+            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E") no-repeat right 6px center;
+            appearance: none;
+            cursor: pointer;
+            max-width: 140px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .popup-search-input-wrapper {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .popup-disabled-input {
+            width: 100%;
+            padding: 6px 28px 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 13px;
+            outline: none;
+            background-color: #F5F5F5;
+            color: #A0A0A0;
+            cursor: not-allowed;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #B0B0B0;
+            pointer-events: none;
+        }
+
+        /* Inputs configuration */
+        .input-group {
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .form-input.input-error {
+            border-color: var(--error-color);
+            background-color: #FFF8F8;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 11px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-transform: uppercase;
+        }
+
+        .btn-cancel {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-cancel:hover {
+            background-color: var(--bg-light);
+        }
+
+        .btn-add {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-add:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Bookmarks Main External List View */
+        .bookmarks-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Drag and drop layout classes */
+        .bookmark-item-wrapper {
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            position: relative;
+        }
+
+        /* Target line helper styling when hovering dragged element */
+        .bookmark-item-wrapper.drag-over {
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 2px;
+        }
+
+        .bookmark-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #EAEAEA;
+            border-radius: 6px;
+            background-color: #FFFFFF;
+            transition: all 0.2s ease;
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+            cursor: grab; /* Shows reorder grab hand */
+        }
+
+        .bookmark-item:active {
+            cursor: grabbing;
+        }
+
+        .bookmark-item-wrapper.dragging {
+            opacity: 0.4;
+        }
+
+        .bookmark-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0,163,196,0.1);
+        }
+
+        .bookmark-favicon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            background-color: #F0F4F6;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            pointer-events: none; /* Prevents disruption during drag events */
+        }
+
+        .bookmark-favicon img {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+        }
+
+        .bookmark-details {
+            flex-grow: 1;
+            min-width: 0;
+            pointer-events: none;
+        }
+
+        .bookmark-display-title {
+            font-size: 14px;
+            color: var(--text-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-main-remove {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s, color 0.2s;
+            margin-left: 8px;
+        }
+
+        .bookmark-item:hover .btn-main-remove {
+            opacity: 1;
+        }
+
+        .btn-main-remove:hover {
+            color: var(--error-color);
+            background-color: #FFF0F0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <header class="widget-header">
+            <h1 class="widget-title">Bookmarks</h1>
+            <button class="add-btn-toggle" id="toggleFormBtn" title="Add bookmark">
+                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </button>
+        </header>
+
+        <main class="widget-content">
+            
+            <div class="bookmark-popup-card" id="bookmarkPopupCard">
+                
+                <div class="popup-category-row">
+                    <select class="category-dropdown" id="categoryDropdown">
+                        <option value="assets">Assets</option>
+                        <option value="collections">Collections & Folders</option>
+                        <option value="templates">Content templates</option>
+                        <option value="libraries">Libraries</option>
+                        <option value="portals">Portals</option>
+                        <option value="tasks">Tasks</option>
+                        <option value="url" selected>URL</option>
+                        <option value="workrooms">Workrooms</option>
+                    </select>
+                    <div class="popup-search-input-wrapper">
+                        <input type="text" class="popup-disabled-input" id="popupSearchInput" placeholder="Search for URL" disabled>
+                        <span class="search-icon">
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                        </span>
+                    </div>
+                </div>
+
+                <form id="bookmarkForm" novalidate>
+                    <div class="input-group">
+                        <input type="text" id="urlInput" class="form-input" placeholder="Insert URL" autocomplete="off">
+                        <div class="error-message" id="urlError">Incorrect URL address</div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="nameInput" class="form-input" placeholder="Add name (optional)" autocomplete="off">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-cancel" id="cancelFormBtn">Cancel</button>
+                        <button type="submit" class="btn btn-add">Add</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="empty-state" id="emptyState">
+                <svg viewBox="0 0 24 24">
+                    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>
+                </svg>
+                <p style="font-size: 14px;">No active bookmarks visible</p>
+            </div>
+
+            <ul class="bookmarks-list" id="bookmarksList"></ul>
+
+        </main>
+    </div>
+
+    <script>
+        const toggleFormBtn = document.getElementById('toggleFormBtn');
+        const cancelFormBtn = document.getElementById('cancelFormBtn');
+        const bookmarkPopupCard = document.getElementById('bookmarkPopupCard');
+        const bookmarkForm = document.getElementById('bookmarkForm');
+        const urlInput = document.getElementById('urlInput');
+        const nameInput = document.getElementById('nameInput');
+        const urlError = document.getElementById('urlError');
+        const emptyState = document.getElementById('emptyState');
+        const bookmarksList = document.getElementById('bookmarksList');
+        const categoryDropdown = document.getElementById('categoryDropdown');
+        const popupSearchInput = document.getElementById('popupSearchInput');
+
+        let bookmarks = [];
+        let dragSrcIndex = null;
+
+        function saveToLocalStorage() {
+            localStorage.setItem('widget_bookmarks', JSON.stringify(bookmarks));
+        }
+
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('widget_bookmarks');
+            if (savedData) {
+                try {
+                    bookmarks = JSON.parse(savedData);
+                } catch(e) {
+                    bookmarks = [];
+                }
+            }
+        }
+
+        function updateUI() {
+            saveToLocalStorage();
+            if (bookmarks.length === 0) {
+                emptyState.style.display = 'flex';
+                bookmarksList.innerHTML = '';
+            } else {
+                emptyState.style.display = 'none';
+                renderMainList(bookmarks);
+            }
+        }
+
+        function renderMainList(itemsToRender) {
+            bookmarksList.innerHTML = '';
+            itemsToRender.forEach((bookmark, index) => {
+                const li = document.createElement('li');
+                li.className = 'bookmark-item-wrapper';
+                li.setAttribute('draggable', 'true');
+                li.setAttribute('data-index', index);
+
+                const displayLabel = bookmark.name ? bookmark.name : bookmark.cleanUrl;
+
+                li.innerHTML = `
+                    <div class="bookmark-item">
+                        <div class="bookmark-favicon">
+                            <img src="https://www.google.com/s2/favicons?sz=32&domain=${bookmark.url}" 
+                                 onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' width=\'16\' height=\'16\'><path d=\'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z\' fill=\'%23757575\'/></svg>';" 
+                                 alt="icon">
+                        </div>
+                        <div class="bookmark-details" onclick="window.open('${bookmark.url}', '_blank')">
+                            <div class="bookmark-display-title">${displayLabel}</div>
+                        </div>
+                        <button class="btn-main-remove" title="Remove bookmark">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </button>
+                    </div>
+                `;
+
+                // Remove link logic
+                li.querySelector('.btn-main-remove').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    bookmarks.splice(index, 1);
+                    updateUI();
+                });
+
+                // Attach Reorder Drag Events
+                li.addEventListener('dragstart', handleDragStart);
+                li.addEventListener('dragover', handleDragOver);
+                li.addEventListener('dragleave', handleDragLeave);
+                li.addEventListener('drop', handleDrop);
+                li.addEventListener('dragend', handleDragEnd);
+
+                bookmarksList.appendChild(li);
+            });
+        }
+
+        /* Drag and Drop Algorithm Mechanics */
+        function handleDragStart(e) {
+            dragSrcIndex = parseInt(this.getAttribute('data-index'));
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault(); // Required to enable dropping
+            }
+            this.classList.add('drag-over');
+            return false;
+        }
+
+        function handleDragLeave() {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.stopPropagation();
+            const targetIndex = parseInt(this.getAttribute('data-index'));
+            
+            if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
+                // Reorder index elements inside our true master state array
+                const movedItem = bookmarks.splice(dragSrcIndex, 1)[0];
+                bookmarks.splice(targetIndex, 0, movedItem);
+                updateUI();
+            }
+            this.classList.remove('drag-over');
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            const wrappers = document.querySelectorAll('.bookmark-item-wrapper');
+            wrappers.forEach(item => item.classList.remove('drag-over'));
+            dragSrcIndex = null;
+        }
+
+        categoryDropdown.addEventListener('change', (e) => {
+            const text = e.target.options[e.target.selectedIndex].text;
+            popupSearchInput.placeholder = `Search for ${text}`;
+        });
+
+        function validateUrl(input) {
+            let cleanInput = input.trim();
+            if (!cleanInput) return false;
+            if (/\s/.test(cleanInput) || cleanInput.includes('\\')) return false;
+
+            let testUrl = cleanInput;
+            if (!/^https?:\/\//i.test(testUrl)) {
+                testUrl = 'https://' + testUrl;
+            }
+
+            try {
+                const parsed = new URL(testUrl);
+                const hostname = parsed.hostname;
+                if (!hostname.includes('.')) return false;
+
+                const parts = hostname.split('.');
+                const tld = parts[parts.length - 1];
+                if (!/^[a-z]{2,}$/i.test(tld)) return false;
+                if (hostname.includes('..') || hostname.startsWith('.') || hostname.endsWith('.')) return false;
+
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function cleanUrlDisplay(input) {
+            return input.trim().replace(/^https?:\/\//i, '').replace(/\/$/, '');
+        }
+
+        function showPopup() {
+            bookmarkPopupCard.style.display = 'block';
+            urlInput.focus();
+        }
+
+        function hidePopup() {
+            bookmarkPopupCard.style.display = 'none';
+            bookmarkForm.reset();
+            categoryDropdown.value = "url";
+            popupSearchInput.placeholder = "Search for URL";
+            clearErrors();
+        }
+
+        function clearErrors() {
+            urlInput.classList.remove('input-error');
+            urlError.style.display = 'none';
+        }
+
+        toggleFormBtn.addEventListener('click', () => {
+            if (bookmarkPopupCard.style.display === 'block') {
+                hidePopup();
+            } else {
+                showPopup();
+            }
+        });
+
+        cancelFormBtn.addEventListener('click', hidePopup);
+        urlInput.addEventListener('input', clearErrors);
+
+        bookmarkForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const rawUrl = urlInput.value;
+            const name = nameInput.value.trim();
+
+            if (!validateUrl(rawUrl)) {
+                urlInput.classList.add('input-error');
+                urlError.style.display = 'block';
+                return;
+            }
+
+            let formattedUrl = rawUrl.trim();
+            if (!/^https?:\/\//i.test(formattedUrl)) {
+                formattedUrl = 'https://' + formattedUrl;
+            }
+
+            bookmarks.push({
+                url: formattedUrl,
+                cleanUrl: cleanUrlDisplay(rawUrl),
+                name: name
+            });
+
+            hidePopup();
+            updateUI();
+        });
+
+        loadFromLocalStorage();
+        updateUI();
+    </script>
+</body>
+</html>
