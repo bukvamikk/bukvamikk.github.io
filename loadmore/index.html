@@ -53,20 +53,20 @@
         .category-select-wrapper {
             position: relative;
             border-right: 1px solid var(--border-color);
-            display: inline-grid; /* Uses native browser rendering to size container */
+            display: inline-grid; 
             align-items: center;
             flex-shrink: 0;
-            min-width: 80px; /* Minimum width constraint */
+            min-width: 80px; 
         }
 
-        /* Shared font and padding configurations for the label and its text mirror */
+        /* Shared font and padding configurations */
         .category-dropdown-trigger,
         .dropdown-text-mirror {
-            grid-area: 1 / 1; /* Stacks elements perfectly */
+            grid-area: 1 / 1; 
             font-size: 11px;
             font-weight: 400;
             white-space: nowrap;
-            padding: 16px 32px 16px 16px; /* 16px Left | 8px gap + 8px arrow width + 12px right padding */
+            padding: 16px 32px 16px 16px; 
         }
 
         .category-dropdown-trigger {
@@ -82,14 +82,14 @@
             overflow: hidden;
         }
 
-        /* Hidden mirror layout text box that naturally pushes parent width */
+        /* Hidden mirror layout text box */
         .dropdown-text-mirror {
             visibility: hidden;
             pointer-events: none;
             display: inline-block;
         }
 
-        /* Chevron down arrow placed strictly via right edge metric padding rules */
+        /* Chevron down arrow */
         .category-select-wrapper::after {
             content: "";
             position: absolute;
@@ -299,7 +299,6 @@
         <div class="search-bar">
             <div class="category-select-wrapper">
                 <span class="dropdown-text-mirror" id="dropdownMirror">All</span>
-                
                 <button type="button" class="category-dropdown-trigger" id="dropdownTriggerBtn">All</button>
             </div>
             
@@ -369,7 +368,6 @@
                 item.classList.add('is-selected');
                 currentSelection = item.getAttribute('data-value');
                 
-                // Update text layout on both trigger label and width mirror synchronously
                 dropdownTriggerBtn.innerText = item.innerText;
                 dropdownMirror.innerText = item.innerText;
                 
@@ -517,15 +515,16 @@
             return item;
         }
 
+        // FIXED: Removed "how many left" logic strings from the banner element templates
         function createInfoBanner(shown, total, left, isCategoryFiltered) {
             const banner = document.createElement('div');
             banner.className = 'info-banner';
             
             if (left > 0) {
                 if (isCategoryFiltered) {
-                    banner.innerHTML = `Showing ${shown} of ${total} results (${left} left). Try a better keyword or use <a href="#advanced">Advanced Search</a>.`;
+                    banner.innerHTML = `Showing ${shown} of ${total} results. Try a better keyword or use <a href="#advanced">Advanced Search</a>.`;
                 } else {
-                    banner.innerHTML = `Showing ${shown} of ${total} results (${left} left). Try a better keyword, select a category, or use <a href="#advanced">Advanced Search</a>.`;
+                    banner.innerHTML = `Showing ${shown} of ${total} results. Try a better keyword, select a category, or use <a href="#advanced">Advanced Search</a>.`;
                 }
             } else {
                 banner.innerHTML = `Showing all ${total} results matching your selected scope. Want to filter deeper? Try <a href="#advanced">Advanced Search</a>.`;
