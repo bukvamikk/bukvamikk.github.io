@@ -340,7 +340,7 @@
         const dropdownMirror = document.getElementById('dropdownMirror');
         const customDropdownMenu = document.getElementById('customDropdownMenu');
         const dropdownItems = document.querySelectorAll('.dropdown-item');
-        const resultsBox = document.getElementById('resultsBox');
+        constresultsBox = document.getElementById('resultsBox');
         const searchActionBtn = document.getElementById('searchActionBtn');
         const actionIcon = document.getElementById('actionIcon');
 
@@ -462,7 +462,7 @@
                     } else {
                         const remaining = category.total - 10;
                         if (remaining > 0) {
-                            section.appendChild(createInfoBanner(10, category.total, remaining, false));
+                            section.appendChild(createInfoBanner(remaining));
                         }
                     }
                 }
@@ -493,7 +493,9 @@
             section.appendChild(listContainer);
 
             const remaining = category.total - itemsToShow;
-            section.appendChild(createInfoBanner(itemsToShow, category.total, remaining, true));
+            if (remaining > 0) {
+                section.appendChild(createInfoBanner(remaining));
+            }
 
             resultsBox.appendChild(section);
         }
@@ -515,20 +517,15 @@
             return item;
         }
 
-        // FIXED: Removed "how many left" logic strings from the banner element templates
-        function createInfoBanner(shown, total, left, isCategoryFiltered) {
+        /* FIXED: Modern updated text structure string based on specs */
+        function createInfoBanner(left) {
             const banner = document.createElement('div');
             banner.className = 'info-banner';
             
-            if (left > 0) {
-                if (isCategoryFiltered) {
-                    banner.innerHTML = `Showing ${shown} of ${total} results. Try a better keyword or use <a href="#advanced">Advanced Search</a>.`;
-                } else {
-                    banner.innerHTML = `Showing ${shown} of ${total} results. Try a better keyword, select a category, or use <a href="#advanced">Advanced Search</a>.`;
-                }
-            } else {
-                banner.innerHTML = `Showing all ${total} results matching your selected scope. Want to filter deeper? Try <a href="#advanced">Advanced Search</a>.`;
-            }
+            // Handles result vs results pluralization dynamically
+            const resultWord = left === 1 ? 'result' : 'results';
+            
+            banner.innerHTML = `${left} more search ${resultWord}. Try a more specific search, or go to <a href="#advanced">Advanced search</a>.`;
             return banner;
         }
     </script>
