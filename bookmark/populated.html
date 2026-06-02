@@ -1208,7 +1208,7 @@
             setTimeout(() => {
                 isBatchLoading = false;
                 renderCategoryList(false);
-            }, 2000);
+            }, 1700);
         }
 
         function renderCategoryList(appendWithSpinner = false) {
@@ -1274,7 +1274,7 @@
                     appendElementsToList(executionTargetArray, category);
                     loadedItemsCount = 50;
                     isBatchLoading = false;
-                }, 2000);
+                }, 1700);
             } else {
                 appendElementsToList(executionTargetArray, category);
             }
