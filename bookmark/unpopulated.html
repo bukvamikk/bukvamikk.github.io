@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookmarks Widget</title>
+    <style>
+        :root {
+            --primary-color: #00A3C4;
+            --primary-hover: #008ca8;
+            --error-color: #D9383A;
+            --text-color: #333333;
+            --text-secondary: #757575;
+            --border-color: #D1D1D1;
+            --bg-light: #F9F9F9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #EBF3F5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Phone Container Emulation */
+        .phone-container {
+            width: 360px;
+            height: 640px;
+            background-color: #FFFFFF;
+            border-radius: 24px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+            border: 1px solid #CFD8DC;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Widget Header */
+        .widget-header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            z-index: 10;
+        }
+
+        .widget-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        /* Toggle Wrapper container context to absolute position the custom dark tooltip safely */
+        .add-btn-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .add-btn-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            transition: transform 0.2s;
+            z-index: 100;
+        }
+
+        .add-btn-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .add-btn-toggle svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+        /* Custom Dark Tooltip Component Style Mapping */
+        .custom-tooltip {
+            position: absolute;
+            bottom: -32px;
+            left: 10%;
+            transform: translateX(-50%) translateY(4px);
+            background-color: #333333;
+            color: #FFFFFF;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 200;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .add-btn-wrapper:hover .custom-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Content Area */
+        .widget-content {
+            flex-grow: 1;
+            padding: 16px;
+            overflow-y: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 0;
+            color: var(--border-color);
+            text-align: center;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 12px;
+            fill: #E0E0E0;
+        }
+
+        /* Backdrop Overlay */
+        .popup-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.15);
+            z-index: 40;
+            display: none;
+            backdrop-filter: blur(1px);
+        }
+
+        /* Add Bookmark Popup Card Container */
+        .bookmark-popup-card {
+            position: absolute;
+            top: 60px;
+            left: 16px;
+            right: 16px;
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 50;
+        }
+
+        /* Category Selector Row inside Popup */
+        .popup-category-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #EAEAEA;
+        }
+
+        .category-dropdown {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 24px 6px 8px;
+            font-size: 13px;
+            color: var(--text-color);
+            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E") no-repeat right 6px center;
+            appearance: none;
+            cursor: pointer;
+            width: 140px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .popup-search-input-wrapper {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .popup-search-input {
+            width: 100%;
+            padding: 6px 28px 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 13px;
+            outline: none;
+            background-color: #FFFFFF;
+            color: var(--text-color);
+        }
+
+        .popup-search-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .popup-search-input:disabled {
+            background-color: #F5F5F5;
+            color: #A0A0A0;
+            border-color: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #B0B0B0;
+            pointer-events: none;
+        }
+
+        /* Inputs configuration */
+        .input-group {
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .form-input.input-error {
+            border-color: var(--error-color);
+            background-color: #FFF8F8;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 11px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-transform: uppercase;
+        }
+
+        .btn-cancel {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-cancel:hover {
+            background-color: var(--bg-light);
+        }
+
+        .btn-add {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-add:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* List for Non-URL Category Selections inside Popup */
+        .popup-category-list-section {
+            display: none;
+            margin-top: 8px;
+        }
+
+        .popup-list-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .popup-list-placeholder {
+            padding: 18px 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+            line-height: 1.5;
+            background-color: #FAFBFB;
+            border: 1px dashed #E7E7E7;
+            border-radius: 10px;
+            margin: 0 4px;
+        }
+
+        .popup-scrollable-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            /* Exact math constraint: (46px element height * 5 items) + (6px gap * 4 spaces) = 254px */
+            max-height: 254px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .popup-list-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 10px;
+            background-color: var(--bg-light);
+            border: 1px solid #EAEAEA;
+            border-radius: 6px;
+            gap: 12px;
+            height: 46px; /* Explicit height set to ensure perfect layout calculation */
+        }
+
+        .popup-item-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .popup-item-details {
+            min-width: 0;
+            flex-grow: 1;
+        }
+
+        .popup-item-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .popup-item-subtitle {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Bookmarks Main External List View */
+        .bookmarks-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bookmark-item-wrapper {
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            position: relative;
+        }
+
+        .bookmark-item-wrapper.drag-over {
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 2px;
+        }
+
+        .bookmark-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #EAEAEA;
+            border-radius: 6px;
+            background-color: #FFFFFF;
+            transition: all 0.2s ease;
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+            cursor: grab;
+        }
+
+        .bookmark-item:active {
+            cursor: grabbing;
+        }
+
+        .bookmark-item-wrapper.dragging {
+            opacity: 0.4;
+        }
+
+        .bookmark-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0,163,196,0.1);
+        }
+
+        .bookmark-favicon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            background-color: #F0F4F6;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            pointer-events: none;
+        }
+
+        .bookmark-favicon img {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+        }
+
+        .bookmark-details {
+            flex-grow: 1;
+            min-width: 0;
+            pointer-events: none;
+        }
+
+        .bookmark-display-title {
+            font-size: 14px;
+            color: var(--text-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bookmark-display-subtitle {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-main-remove {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s, color 0.2s;
+            margin-left: 8px;
+        }
+
+        .bookmark-item:hover .btn-main-remove {
+            opacity: 1;
+        }
+
+        .btn-main-remove:hover {
+            color: var(--error-color);
+            background-color: #FFF0F0;
+        }
+
+        /* Visual unification styling matching image_998598.png without breaking baseline variables */
+        .popup-search-block-group {
+            display: flex;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: #FFFFFF;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .popup-search-block-group:focus-within {
+            border-color: var(--primary-color);
+        }
+
+        .popup-search-block-group .category-dropdown {
+            border: none;
+            border-radius: 0;
+            border-right: 1px solid var(--border-color);
+            background-position: right 10px center;
+            width: 110px;
+            padding: 8px 24px 8px 12px;
+            height: 100%;
+        }
+
+        .popup-search-block-group .popup-search-input-wrapper {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .popup-search-block-group .popup-search-input {
+            border: none;
+            border-radius: 0;
+            padding: 8px 32px 8px 12px;
+            height: 100%;
+        }
+
+        .popup-search-block-group .popup-search-input:focus {
+            border-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <div class="popup-backdrop" id="popupBackdrop"></div>
+
+        <header class="widget-header">
+            <h1 class="widget-title">Bookmarks</h1>
+            <div class="add-btn-wrapper">
+                <button class="add-btn-toggle" id="toggleFormBtn">
+                    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                </button>
+                <div class="custom-tooltip">Add bookmark</div>
+            </div>
+        </header>
+
+        <main class="widget-content">
+            
+            <div class="bookmark-popup-card" id="bookmarkPopupCard">
+                
+                <div class="popup-category-row">
+                    <div class="popup-search-block-group">
+                        <select class="category-dropdown" id="categoryDropdown">
+                            <option value="assets">Assets</option>
+                            <option value="collections">Collections & Folders</option>
+                            <option value="templates">Content templates</option>
+                            <option value="libraries">Libraries</option>
+                            <option value="portals">Portals</option>
+                            <option value="tasks">Tasks</option>
+                            <option value="url">URL</option>
+                            <option value="workrooms">Workrooms</option>
+                        </select>
+                        <div class="popup-search-input-wrapper">
+                            <input type="text" class="popup-search-input" id="popupSearchInput" placeholder="Search for URL">
+                            <span class="search-icon">
+                                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="bookmarkForm" novalidate>
+                    <div class="input-group">
+                        <input type="text" id="urlInput" class="form-input" placeholder="Insert URL" autocomplete="off">
+                        <div class="error-message" id="urlError">Incorrect URL address</div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="nameInput" class="form-input" placeholder="Add name (optional)" autocomplete="off">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-cancel" id="cancelFormBtn">Cancel</button>
+                        <button type="submit" class="btn btn-add">Add</button>
+                    </div>
+                </form>
+
+                <div class="popup-category-list-section" id="popupCategoryListSection">
+                    <div class="popup-list-title" id="popupListTitle">Recent</div>
+                    <ul class="popup-scrollable-list" id="popupScrollableList"></ul>
+                </div>
+            </div>
+
+            <div class="empty-state" id="emptyState">
+                <svg viewBox="0 0 24 24">
+                    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>
+                </svg>
+                <p style="font-size: 14px;">No active bookmarks visible</p>
+            </div>
+
+            <ul class="bookmarks-list" id="bookmarksList"></ul>
+
+        </main>
+    </div>
+
+    <script>
+        const toggleFormBtn = document.getElementById('toggleFormBtn');
+        const cancelFormBtn = document.getElementById('cancelFormBtn');
+        const bookmarkPopupCard = document.getElementById('bookmarkPopupCard');
+        const popupBackdrop = document.getElementById('popupBackdrop');
+        const bookmarkForm = document.getElementById('bookmarkForm');
+        const urlInput = document.getElementById('urlInput');
+        const nameInput = document.getElementById('nameInput');
+        const urlError = document.getElementById('urlError');
+        const emptyState = document.getElementById('emptyState');
+        const bookmarksList = document.getElementById('bookmarksList');
+        const categoryDropdown = document.getElementById('categoryDropdown');
+        const popupSearchInput = document.getElementById('popupSearchInput');
+        const popupCategoryListSection = document.getElementById('popupCategoryListSection');
+        const popupScrollableList = document.getElementById('popupScrollableList');
+        const popupListTitle = document.getElementById('popupListTitle');
+
+        // Detailed historical generation specifically connected to Empress Elisabeth (Sisi)
+        const categoryItemsData = {
+            assets: [
+                { id: "as1", name: "Sisi's Diamond Hair Stars", detail: "Designed by Alexander Köchert for her hair" },
+                { id: "as2", name: "Empress Court Gala Gown", detail: "Famous 19th-century portrait dress by Worth" },
+                { id: "as3", name: "Imperial Riding Habit", detail: "Custom leather-tailored equestrian costume" },
+                { id: "as4", name: "The Winterhalter Portrait", detail: "1865 masterpiece canvas painting oil asset" },
+                { id: "as5", name: "Sisi's Golden Fan Collection", detail: "Intricate lace fans used to shield her face" },
+                { id: "as6", name: "Imperial Gymnastics Rings", detail: "Wood gym apparatus installed in Hofburg Palace" },
+                { id: "as7", name: "Sisi's Raven Black Umbrella", detail: "Silk parasol used during her continuous travels" },
+                { id: "as8", name: "Empress Mother of Pearl Comb", detail: "Used daily for her floor-length hair care" },
+                { id: "as9", name: "Sisi's Leather Travel Album", detail: "Contains landscape sketches of the Mediterranean" },
+                { id: "as10", name: "Hungarian Coronation Crown", detail: "Used in Buda 1867 crown portrait asset" },
+                { id: "as11", name: "Sisi's Black Silk Veil", detail: "Worn strictly after 1889 following Mayerling" },
+                { id: "as12", name: "Miramare Castle Diary", detail: "Handwritten travel memoirs from Trieste coast" },
+                { id: "as13", name: "Empress Portrait by Franz Russ", detail: "Rare archival print asset from Schloss Schönbrunn" },
+                { id: "as14", name: "Sisi's Silver Pocket Mirror", detail: "Carried during her rigorous daily walking trips" },
+                { id: "as15", name: "Imperial Monarch Monogram Stamp", detail: "Engraved 'E' crown sigil stationery asset" },
+                { id: "as16", name: "Sisi's Personal Riding Crop", detail: "Woven leather handle with gold horse finish" },
+                { id: "as17", name: "Empress Silk Slippers", detail: "Ultra-lightweight court shoes worn in Vienna" },
+                { id: "as18", name: "Sisi's Violet Sorbet Recipe", detail: "Her favorite floral confectionery culinary asset" },
+                { id: "as19", name: "Imperial Pearl Necklace", detail: "Given by Franz Joseph at their 1854 wedding" },
+                { id: "as20", name: "Sisi's Anchor Tattoo Sketch", detail: "Commemorating her deep love for the open sea" },
+                { id: "as21", name: "Empress Onyx Mourning Ring", detail: "Worn in memory of Crown Prince Rudolf" },
+                { id: "as22", name: "Sisi's Miniature Greek Statue", detail: "Marble bust of Achilles from Achilleion palace" },
+                { id: "as23", name: "Imperial Court Carriage Photo", detail: "Historical photograph asset from Wagenburg Museum" },
+                { id: "as24", name: "Sisi's Hunting Horn", detail: "Used during equestrian events in Gödöllő" },
+                { id: "as25", name: "Empress Brocade Writing Desk", detail: "Mahogany table artifact from Hofburg apartments" },
+                // Batch 2 items (loaded via infinite scroll)
+                { id: "as26", name: "Sisi's Travelling Medicine Chest", detail: "Contained standard 19th-century home remedies" },
+                { id: "as27", name: "Imperial Silver Hairbrush", detail: "Used for her three-hour daily hair routine" },
+                { id: "as28", name: "Sisi's Venetian Glass Flask", detail: "Carried rose water skin care cosmetic asset" },
+                { id: "as29", name: "Empress Hand-Woven Shawl", detail: "Irish lace wrapper item worn in Bad Ischl" },
+                { id: "as30", name: "Sisi's Poetry Quill", detail: "Ink pen used for writing her Heinrich Heine poems" },
+                { id: "as31", name: "Imperial Wittelsbach Family Tree", detail: "Historical lineage chart document asset" },
+                { id: "as32", name: "Sisi's Embroidered Handkerchief", detail: "Fine linen napkin bearing the Bavarian crest" },
+                { id: "as33", name: "Empress Leather Saddle Bag", detail: "Used on her equestrian tours across Ireland" },
+                { id: "as34", name: "Sisi's Tortoiseshell Hairpins", detail: "Special structural pins to hold heavy updos" },
+                { id: "as35", name: "Imperial Waltz Sheet Music", detail: "Dedicated to Sisi during her bridal entry" },
+                { id: "as36", name: "Sisi's Velvet Photo Locket", detail: "Contained pictures of her daughter Marie Valerie" },
+                { id: "as37", name: "Empress Diamond Tiara Model", detail: "Exquisite Habsburg jewel restoration layout blueprint" },
+                { id: "as38", name: "Sisi's Greek Grammar Book", detail: "Notebook used to learn fluent ancient Greek" },
+                { id: "as39", name: "Imperial Court Dinner Menu", detail: "Archival menu showing her minimal diet choices" },
+                { id: "as40", name: "Sisi's Silk Ribbons", detail: "Used to tie her massive braided crowns" },
+                { id: "as41", name: "Empress Emerald Brooch", detail: "Gift from the Hungarian delegation in 1867" },
+                { id: "as42", name: "Sisi's Leather Travel Trunk", detail: "Reinforced luggage box used on royal yacht Miramar" },
+                { id: "as43", name: "Imperial Scale Blueprint", detail: "Gymnastics wall bars design for Hermesvilla" },
+                { id: "as44", name: "Sisi's Walking Cane", detail: "Sturdy mountain staff used in the Swiss Alps" },
+                { id: "as45", name: "Empress Velvet Cape", detail: "Fur-lined winter garment worn in Munich" },
+                { id: "as46", name: "Sisi's Scented Letter Wax", detail: "Lavender-infused royal seal imprint matrix" },
+                { id: "as47", name: "Imperial Coronation Medal", detail: "Commemorative gold coin artifact from Budapest" },
+                { id: "as48", name: "Sisi's Sketch of Corfu Coast", detail: "Pencil drawing from her estate overlooking the sea" },
+                { id: "as49", name: "Empress Silk Waist Ribbon", detail: "Worn to track her legendary 20-inch waistline" },
+                { id: "as50", name: "Sisi's Golden Key of Budapest", detail: "Presented during her official civic reception" }
+            ],
+            collections: [
+                { id: "co1", name: "Schloss Possenhofen Archives", detail: "Documents from Sisi's peaceful childhood home" },
+                { id: "co2", name: "Hofburg Imperial Apartments", detail: "Sisi's dressing room and private chambers" },
+                { id: "co3", name: "Achilleion Palace Records", detail: "Her sanctuary villa located on Corfu Island" },
+                { id: "co4", name: "Gödöllő Manor Collection", detail: "Sisi's beloved Hungarian country hunting lodge" },
+                { id: "co5", name: "Hermesvilla Palace Portfolio", detail: "The 'Palace of Dreams' gifted by Franz Joseph" },
+                { id: "co6", name: "Kaiservilla Bad Ischl Vault", detail: "Summer resort archives where Sisi first met the Emperor" },
+                { id: "co7", name: "Habsburg Court Records 1854", detail: "Official state marriage registry portfolios" },
+                { id: "co8", name: "Sisi Museum Vienna Catalog", detail: "Complete inventory of her preserved belongings" },
+                { id: "co9", name: "Wittelsbach Dynasty Legacy", detail: "Bavarian family folders and historic chronicles" },
+                { id: "co10", name: "Corfu Seaside Sketchbooks", detail: "Collection of maritime drawings and poetry drafts" },
+                { id: "co11", name: "Mayerling Mourning Dossier", detail: "Sisi's personal files from the tragic 1889 event" },
+                { id: "co12", name: "Imperial Travel Logbooks", detail: "Tracks her rapid movements across Venice and Egypt" },
+                { id: "co13", name: "Sisi's Heinrich Heine Library", detail: "Her extensive private book collection of romantic poetry" },
+                { id: "co14", name: "Hungarian State Correspondence", detail: "Letters written by Sisi advocating for the Compromise" },
+                { id: "co15", name: "Equestrian Championship Records", detail: "Sisi's fox hunting trophies from her UK stays" },
+                { id: "co16", name: "Geneva Lake Travel Papers", detail: "Sisi's fatal journey terminal destination ledger" },
+                { id: "co17", name: "Schloss Schönbrunn Gardens Map", detail: "Sisi's secluded walking pathways directory" },
+                { id: "co18", name: "Empress Wardrobe Inventory", detail: "Detailed ledgers of all silks, velvets, and laces" },
+                { id: "co19", name: "Capuchin Crypt Vault Records", detail: "Habsburg imperial burial plot historical documents" },
+                { id: "co20", name: "Sisi's Photographic Beauty Albums", detail: "Portraits of attractive women collected worldwide" },
+                { id: "co21", name: "Imperial Diet & Workout Plans", detail: "Archival fasting logs and exercise notes" },
+                { id: "co22", name: "Royal Yacht Miramar Logs", detail: "Nautical records from Sisi's Mediterranean cruises" },
+                { id: "co23", name: "Bavarian Royal Letters", detail: "Sisi's personal notes to her sister Maria Sophie" },
+                { id: "co24", name: "Countess Festetics Diaries", detail: "Private notes from Sisi's primary lady-in-waiting" },
+                { id: "co25", name: "Empress Floral Stationery Kit", detail: "Embossed violet flower writing papers box" },
+                // Batch 2 items
+                { id: "co26", name: "Sisi's Swiss Alp Hiking Guides", detail: "Topographical map collections used on her mountain treks" },
+                { id: "co27", name: "Vienna Riding School Journals", detail: "Equestrian masterclass registration ledgers" },
+                { id: "co28", name: "Habsburg Bridal Jewelry Chest", detail: "Inventory lists of the Empress's tiaras and necklaces" },
+                { id: "co29", name: "Sisi's Childhood Poem Albums", detail: "Early creative writing books compiled in Bavaria" },
+                { id: "co30", name: "Imperial Court Costume Sketches", detail: "Historical garment designs prepared for court functions" },
+                { id: "co31", name: "Sisi's Correspondence with Andrássy", detail: "Political letter folders from the Hungarian statesman" },
+                { id: "co32", name: "Trieste Castle Guest Registers", detail: "Visitor books noting Sisi's arrivals at Miramare" },
+                { id: "co33", name: "Empress Health Cream Formulations", detail: "Apothecary recipes for her famous cold creams" },
+                { id: "co34", name: "Sisi's English Countryside Maps", detail: "Riding estate catalogs from Northamptonshire" },
+                { id: "co35", name: "Habsburg Child Raising Dossiers", detail: "Archival records regarding Gisela and Rudolf's education" },
+                { id: "co36", name: "Sisi's Portrait Coin Collection", detail: "Silver currency designs featuring Elisabeth's profile" },
+                { id: "co37", name: "Imperial Palace Guard Protocols", detail: "Security log logs tracking the Empress's wanderings" },
+                { id: "co38", name: "Sisi's Translated Greek Tragedies", detail: "Her personal hand-translated manuscript folders" },
+                { id: "co39", name: "Empress Memorial Fund Letters", detail: "Charity foundation documents set up in her honor" },
+                { id: "co40", name: "Sisi's Autumn Wardrobe Catalog", detail: "Frock coats and outdoor walking dress ledgers" },
+                { id: "co41", name: "Wittelsbach Estate Contracts", detail: "Financial inheritance papers from Duke Max in Bavaria" },
+                { id: "co42", name: "Sisi's Travel Souvenir Boxes", detail: "Curio catalogs filled with shells and dried flowers" },
+                { id: "co43", name: "Imperial Household Silk Swatches", detail: "Fabric archives used for her palace drapes" },
+                { id: "co44", name: "Sisi's Private Chapel Inventory", detail: "Religious items and prayer books at Hofburg" },
+                { id: "co45", name: "Empress Hair Care Ingredient Logs", detail: "Records of cognac and egg yolks used for her washing" },
+                { id: "co46", name: "Sisi's Irish Hunting Club Folders", detail: "Equestrian club guest registries and schedules" },
+                { id: "co47", name: "Imperial Portrait Gallery Prints", detail: "Lithograph collections distributed to the public" },
+                { id: "co48", name: "Sisi's Sea Poetry Master Manuscripts", detail: "Her complete compiled creative verse volumes" },
+                { id: "co49", name: "Schloss Laxenburg Stay Registers", detail: "Chamber assignment logs from her honeymoon in 1854" },
+                { id: "co50", name: "Sisi's Golden Jubilee Album", detail: "Commemorative picture archive from the Austro-Hungarian state" }
+            ],
+            templates: [
+                { id: "te1", name: "Sisi's Poetry Layout Template", detail: "Stylized layout for her poetic verses" },
+                { id: "te2", name: "Imperial Court Invitation Grid", detail: "Elegant text structure mirroring Habsburg stationery" },
+                { id: "te3", name: "Sisi's Daily Workout Log Sheet", detail: "Tabular configuration for tracking calorie burn and gym hours" },
+                { id: "te4", name: "Empress Travel Itinerary Form", detail: "Dynamic structural schedule design for cross-border trips" },
+                { id: "te5", name: "Habsburg Monogram Design Guide", detail: "Crown embossing vector grid for corporate royalty theme" },
+                { id: "te6", name: "Sisi's Hair Care Routine Checklist", detail: "Step-by-step calendar template for continuous washing cycles" },
+                { id: "te7", name: "Bavarian Palace Sketch Layout", detail: "Drawing canvas border template with historical detailing" },
+                { id: "te8", name: "Sisi's Dietary Restriction Chart", detail: "Minimalist layout layout for documenting restricted caloric plans" },
+                { id: "te9", name: "Equestrian Event Planning Sheet", detail: "Fox hunting timeline setup modeled after Sisi's tours" },
+                { id: "te10", name: "Achilleion Palace Architectural Card", detail: "Greek classical column layout frame pattern" },
+                { id: "te11", name: "Sisi's Mourning Letterhead Draft", detail: "Black-bordered digital message design theme" },
+                { id: "te12", name: "Imperial Coronation Page Layout", detail: "Ornate gold trim document presentation canvas" },
+                { id: "te13", name: "Sisi's Royal Locket Graphic Grid", detail: "Oval photo cropping mask design template" },
+                { id: "te14", name: "Empress Secluded Walk Scheduler", detail: "Hourly time blocks layout for extended walking sessions" },
+                { id: "te15", name: "Habsburg Royal Waltz Certificate", detail: "Vintage ornamental certificate template structure" },
+                { id: "te16", name: "Sisi's Sea Poetry Verse Matrix", detail: "Stanza layout alignment form inspired by Heinrich Heine" },
+                { id: "te17", name: "Hungarian Court Reception Blueprint", detail: "Seating arrangement flowchart card config" },
+                { id: "te18", name: "Sisi's Wardrobe Tailoring Matrix", detail: "Measurement database schema for tight-lacing tracking" },
+                { id: "te19", name: "Imperial Apothecary Label Form", detail: "Vintage cosmetic bottle wrapping label structure" },
+                { id: "te20", name: "Sisi's Mirror Portrait Border", detail: "Ornate rococo gold frame layout layer" },
+                { id: "te21", name: "Empress Botanical Press Sheet", detail: "Dried wildflower presentation page format" },
+                { id: "te22", name: "Sisi's Mediterranean Voyage Log", detail: "Nautical coordinate entry form layout template" },
+                { id: "te23", name: "Imperial Wax Seal Placement Blueprint", detail: "Enclosing stamp circle graphic wireframe guide" },
+                { id: "te24", name: "Sisi's Greek Translation Worksheet", detail: "Dual column text comparison layout canvas" },
+                { id: "te25", name: "Empress Memorial Banner Canvas", detail: "Historic remembrance poster background preset" },
+                // Batch 2 items
+                { id: "te26", name: "Sisi's Alpine Trekking Diary Card", detail: "Weather and altitude logging sheet structure" },
+                { id: "te27", name: "Imperial Riding Stable Roster Form", detail: "Pedigree database entry template for royal horses" },
+                { id: "te28", name: "Sisi's Violet Cake Dessert Card", detail: "Artisanal bakery card layout frame style" },
+                { id: "te29", name: "Habsburg Archival Index Layout", detail: "Historic manuscript cataloging data structure" },
+                { id: "te30", name: "Sisi's Fan Language Signaling Guide", detail: "Graphic instruction card layout for secret messages" },
+                { id: "te31", name: "Empress Diamond Star Pin Mockup", detail: "Jewelry design rendering coordinate layout" },
+                { id: "te32", name: "Sisi's Childhood Memoir Template", detail: "Storytelling paragraph layout block with Bavarian motifs" },
+                { id: "te33", name: "Imperial Court Musician Program Sheet", detail: "Classical music concert schedule template" },
+                { id: "te34", name: "Sisi's Custom Saddle Design Grid", detail: "Equestrian equipment technical vector frame" },
+                { id: "te35", name: "Empress Hand Portrait Silhouette Layout", detail: "Minimal shadow vector placeholder format" },
+                { id: "te36", name: "Sisi's Private Library Bookplate", detail: "Ex-libris sticker layout card for antique bindings" },
+                { id: "te37", name: "Habsburg Royal Lineage Infographic", detail: "Dynastic family chart tree structural design" },
+                { id: "te38", name: "Sisi's Skincare Milk Bath Tracker", detail: "Weekly logs template for luxury beauty treatments" },
+                { id: "te39", name: "Imperial Court Carriage Parade Guide", detail: "Procession route mapping layout outline" },
+                { id: "te40", name: "Sisi's Sea Anchor Tattoo Vector Form", detail: "Monochrome stencil design guide model" },
+                { id: "te41", name: "Empress Evening Banquet Place Card", detail: "Formal typography seating ticket placeholder" },
+                { id: "te42", name: "Sisi's Corfu Garden Planting Matrix", detail: "Horticultural landscaping grid template plan" },
+                { id: "te43", name: "Imperial Coronation Prayer Banner", detail: "Gothic script scroll layout canvas profile" },
+                { id: "te44", name: "Sisi's Swiss Villa Reservation Sheet", detail: "Historic luxury hotel lodging layout mockup" },
+                { id: "te45", name: "Empress Silk Parasol Frame Scheme", detail: "Industrial umbrella component layout grid" },
+                { id: "te46", name: "Sisi's Countess Assignment Rota", detail: "Court lady shift management dashboard layout" },
+                { id: "te47", name: "Habsburg Crest Wax Seal Blueprint", detail: "Engraving vector mask outline format" },
+                { id: "te48", name: "Sisi's Achilles Monument Brochure", detail: "Travel guide double-sided folding layout frame" },
+                { id: "te49", name: "Empress Tight Waistline Scale Form", detail: "Historic physics measurement data tracking log" },
+                { id: "te50", name: "Sisi's Memorial Medal Certificate", detail: "Ornate commemorative stamp backing paper template" }
+            ],
+            libraries: [
+                { id: "li1", name: "Sisi's Poem Collection Module", detail: "Global package for compiling her extensive poetry texts" },
+                { id: "li2", name: "Habsburg Court Etiquette Registry", detail: "Standard NPM dependency library containing strict palace protocols" },
+                { id: "li3", name: "Sisi's Apothecary Recipe Engine", detail: "Skincare formulation logic source code framework" },
+                { id: "li4", name: "Imperial Gym Workout API", detail: "Calculates gymnastics agility stats based on Sisi's home gyms" },
+                { id: "li5", name: "Achilleion Marble Asset Handler", detail: "3D rendering helper library for her Greek sanctuary architecture" },
+                { id: "li6", name: "Sisi's Hair Star Asset Weaver", detail: "Generates custom diamond decoration matrices in web layouts" },
+                { id: "li7", name: "Equestrian Ride Path Tracking Script", detail: "Mapping engine mapping her massive cross-country rides" },
+                { id: "li8", name: "Sisi's Caloric Intake Parser", detail: "Data analysis script monitoring historical low-calorie fasting trends" },
+                { id: "li9", name: "Habsburg Heraldic Monogram Engine", detail: "Renders royal initials with accurate stylistic typography scripts" },
+                { id: "li10", name: "Bavarian Childhood Woods Audio Package", detail: "Soundscape files capturing birds and forests around Possenhofen" },
+                { id: "li11", name: "Sisi's Travelling Route Geocoder", detail: "Resolves historical 19th-century map coordinates into modern states" },
+                { id: "li12", name: "Mayerling Memorial Archive Extension", detail: "Data collection covering mourning literature and historical timelines" },
+                { id: "li13", name: "Sisi's Fan Signal State Machine", detail: "Translates micro-gestures into text string meanings" },
+                { id: "li14", name: "Hungarian State Compromise Logic Module", detail: "Algorithmic layout sorting political treaties from 1867" },
+                { id: "li15", name: "Sisi's Wardrobe Tightness Index Builder", detail: "Ecosystem tracking tool analyzing fabric tension vs waist diameter" },
+                { id: "li16", name: "Empress Portrait Metadata Parser", detail: "Indexes Winterhalter canvas art variations across global museums" },
+                { id: "li17", name: "Sisi's Ancient Greek Vocab Engine", detail: "Translation database storing her personal language flashcards" },
+                { id: "li18", name: "Imperial Court Ballroom Music Library", detail: "Audio composition nodes for traditional Viennese strings" },
+                { id: "li19", name: "Sisi's Anchor Seal SVG Renderer", detail: "Outputs customized maritime graphic modules dynamically" },
+                { id: "li20", name: "Hermesvilla Dream Garden Router", detail: "Virtual walkthrough mapping library for her secluded park estate" },
+                { id: "li21", name: "Sisi's Rose Water Distillation Compiler", detail: "Calculates fluid composition values for floral oils" },
+                { id: "li22", name: "Habsburg Royal Lineage Tree Handler", detail: "Renders multi-generational family node graphics effortlessly" },
+                { id: "li23", name: "Sisi's Swiss Alp Altitude Calculator", detail: "Tracks pedestrian vertical ascent rates for elite fast-walkers" },
+                { id: "li24", name: "Empress Scented Mail Encryption Plugin", detail: "Security framework mimicking lavender wax seals on packets" },
+                { id: "li25", name: "Sisi Museum Historical Timeline Core", detail: "Universal time-series library storing her complete life trajectory" },
+                // Batch 2 items
+                { id: "li26", name: "Sisi's Locket Photo Compression Tool", detail: "Optimizes vintage black-and-white portraits for display" },
+                { id: "li27", name: "Imperial Horse Pedigree Engine", detail: "Sorts royal equestrian ancestry lines automatically" },
+                { id: "li28", name: "Sisi's Violet Sorbet Color Scheme", detail: "UI hex code library reflecting her favorite floral treats" },
+                { id: "li29", name: "Empress Silk Umbrella Physics Model", detail: "Simulates wind resistance for historical parasols" },
+                { id: "li30", name: "Sisi's Countess Festetics Memo Sync", detail: "Automated logging system for primary court attendants" },
+                { id: "li31", name: "Habsburg Crown Coronation Registry", detail: "Authenticates digital tokens representing historical artifacts" },
+                { id: "li32", name: "Sisi's Childhood Bavaria Story Node", detail: "Interactive narrative parser for early life visual novels" },
+                { id: "li33", name: "Empress Mirror Veil Blur Filter", detail: "CSS styling package replicating her face-shielding screens" },
+                { id: "li34", name: "Sisi's English Estate Riding Log Core", detail: "Data storage library managing cross-country track speeds" },
+                { id: "li35", name: "Imperial Court Dinner Invitation Automator", detail: "Batch typography renderer matching formal script guidelines" },
+                { id: "li36", name: "Sisi's Heinrich Heine Verse Indexer", detail: "Text search script matching keywords within her poetry books" },
+                { id: "li37", name: "Empress Skincare Milk Bath Simulator", detail: "Calculates pH values and ingredient concentrations" },
+                { id: "li38", name: "Sisi's Achilles Statue 3D Grid Engine", detail: "Processes poly-count layouts for classical garden sculptures" },
+                { id: "li39", name: "Habsburg Bridal Procession Route Mapper", detail: "Renders vector pathways across historic Danube rivers maps" },
+                { id: "li40", name: "Sisi's Walking Cane Shock Absorb Tracker", detail: "Measures stress impacts during rapid mountain hiking tasks" },
+                { id: "li41", name: "Empress Velvet Cape Texture Layer", detail: "Shading library providing high-definition textile graphics" },
+                { id: "li42", name: "Sisi's Scented Stationary Stamp Module", detail: "Generates digital floral marks on outgoing platform text" },
+                { id: "li43", name: "Imperial Gold Coin Weight Verification", detail: "Checks mass parameters of commemorative coronation tokens" },
+                { id: "li44", name: "Sisi's Corfu Botanical Classification Core", detail: "Differentiates plants imported to her Achilleion property" },
+                { id: "li45", name: "Empress Memorial Fund Transaction Script", detail: "Secure ledger verifying relief payments to historical hospitals" },
+                { id: "li46", name: "Sisi's Court Uniform Measurement API", detail: "Calculates seam stress states on highly custom tight gowns" },
+                { id: "li47", name: "Habsburg Castle Gate Security Check Plugin", detail: "Simulates historic token authentication for court visitors" },
+                { id: "li48", name: "Sisi's Sea Travel Sea-Sickness Data Model", detail: "Tracks ocean wave resonance against imperial vessel stability" },
+                { id: "li49", name: "Schloss Laxenburg Honeymoon Log Pipeline", detail: "Processes data logs detailing Sisi's first royal retreats" },
+                { id: "li50", name: "Sisi's Golden Jubilee Graphic Palette", detail: "Theme colors compilation representing late imperial grandeur" }
+            ],
+            portals: [
+                { id: "po1", name: "Sisi Museum Visitor Hub", detail: "Connected digital gateway space to the Vienna exhibition palace" },
+                { id: "po2", name: "Habsburg Imperial Court Portal", detail: "Secure administrative client pane tracking royal decrees" },
+                { id: "po3", name: "Achilleion Palace Corfu Guide", detail: "Interactive tourist panel exploring Sisi's island refuge" },
+                { id: "po4", name: "Gödöllő Hungarian Manor Portal", detail: "Breakout space for organizing equestrian events in Hungary" },
+                { id: "po5", name: "Schloss Possenhofen Bavarian Hub", detail: "Historical connection link to Sisi's early childhood estate" },
+                { id: "po6", name: "Sisi's Private Poetry Repository", detail: "Digital space hosting her hidden creative verse manuscripts" },
+                { id: "po7", name: "Habsburg Dynastic Lineage Dashboard", detail: "Global family tree panel tracing royal connections" },
+                { id: "po8", name: "Empress Beauty and Skincare Forum", detail: "Client hub dissecting Sisi's wellness and hair care secrets" },
+                { id: "po9", name: "Imperial Riding Academy Network", detail: "Equestrian management space modeled after Sisi's high training" },
+                { id: "po10", name: "Sisi's Mediterranean Voyage Portal", detail: "Interactive tracking screen mapping the cruise routes of yacht Miramar" },
+                { id: "po11", name: "Mayerling Historical Research Panel", detail: "Archive portal addressing the events of Crown Prince Rudolf" },
+                { id: "po12", name: "Hermesvilla Palace Visitor Desk", detail: "Booking portal exploring the villa gifted by Emperor Franz Joseph" },
+                { id: "po13", name: "Sisi's Fan Language Interactive Hub", detail: "Educational panel decrypting her secret gestural communications" },
+                { id: "po14", name: "Hungarian Compromise Treaty Vault", detail: "Historic document portal tracing the 1867 dual monarchy foundation" },
+                { id: "po15", name: "Empress Diamond Hair Star Boutique", detail: "Digital jewelry showroom recreating Köchert's classic work" },
+                { id: "po16", name: "Sisi's Alpine Trekking Trail Network", detail: "Hiking directory panel covering her pathways in Switzerland" },
+                { id: "po17", name: "Winterhalter Portrait Restoration Desk", detail: "Art conservation workspace tracking oil painting cleaning files" },
+                { id: "po18", name: "Imperial Court Dinner Logistics Center", detail: "Catering system portal managing royal banqueting records" },
+                { id: "po19", name: "Sisi's Heinrich Heine Fan Society", detail: "Literary focus workspace dissecting romantic poetry modules" },
+                { id: "po20", name: "Empress Wardrobe Historic Registry", detail: "Fashion archive panel indexing her gowns, lace, and mourning veils" },
+                { id: "po21", name: "Habsburg Crypt Memorial Directory", detail: "Solemn guide space detailing imperial final resting plots" },
+                { id: "po22", name: "Sisi's Violet Confectionery Source", detail: "Gourmet platform supplying her preferred floral treats" },
+                { id: "po23", name: "Bavarian Wittelsbach Heritage Desk", detail: "Historic royal records chamber tracking Munich ancestry lines" },
+                { id: "po24", name: "Countess Festetics Archival Diary Hub", detail: "Transcribed letters database detailing Sisi's interior thoughts" },
+                { id: "po25", name: "Sisi's Anchor Maritime Tattoo Gallery", detail: "Artistic display portal analyzing her unorthodox coastal style" },
+                // Batch 2 items
+                { id: "po26", name: "Sisi's Swiss Hotel Booking Registry", detail: "Historical travel logging panel tracking elite arrivals" },
+                { id: "po27", name: "Imperial Equestrian Training Tracker", detail: "Performance logging platform for elite court horses" },
+                { id: "po28", name: "Sisi's Skincare Milk Bath Lounge", detail: "Wellness salon booking desk based on luxury classic baths" },
+                { id: "po29", name: "Habsburg Crown Jewel Valuation Center", detail: "Insurance and curation dashboard for sovereign treasures" },
+                { id: "po30", name: "Sisi's Childhood Memoir Archive Portal", detail: "Youth journal collection portal tracking Lake Starnberg stories" },
+                { id: "po31", name: "Empress Secluded Trail Hiking Monitor", detail: "Pedometer telemetry hub tracking extreme alpine speed-walks" },
+                { id: "po32", name: "Sisi's Custom Dress Design Lab", detail: "Interactive fashion modeling portal mirroring 1860 style bounds" },
+                { id: "po33", name: "Imperial Court Orchestra Score Hub", detail: "Sheet music distribution portal for Strauss waltz pieces" },
+                { id: "po34", name: "Sisi's English Fox-Hunting Club Portal", detail: "Equestrian tournament organization desk for UK country stays" },
+                { id: "po35", name: "Empress Silk Parasol Restoration Workshop", detail: "Textile conservation forum tracking preservation files" },
+                { id: "po36", name: "Sisi's Greek Translation Peer Review", detail: "Academic validation portal assessing her ancient texts coursework" },
+                { id: "po37", name: "Habsburg Dynasty Wedding Medal Showcase", detail: "Numismatic display platform highlighting 1854 marital coins" },
+                { id: "po38", name: "Sisi's Achilles Monument Curation Hub", detail: "Sculpture cataloging interface for Corfu palace gardens" },
+                { id: "po39", name: "Empress Memorial Charity Donation Desk", detail: "Public crowdfunding workspace supporting historical civic hospitals" },
+                { id: "po40", name: "Sisi's Scented Letter Envelope Showroom", detail: "Stationery customization workspace with imperial accents" },
+                { id: "po41", name: "Schloss Laxenburg Honeymoon Special Event", detail: "Historical tour organization interface for Austrian parks" },
+                { id: "po42", name: "Sisi's Waistline Metric Analytics Board", detail: "Data-driven body tracking visualization portal for research" },
+                { id: "po43", name: "Imperial Court Carriage Museum Entry Desk", detail: "Ticketing platform for the Schönbrunn Wagenburg displays" },
+                { id: "po44", name: "Sisi's Rose Water Distiller Connect", detail: "Apothecary distribution network tracking botanical oils supplies" },
+                { id: "po45", name: "Empress Golden Jubilee Celebration Hub", detail: "Festival management platform organizing royal anniversary data" },
+                { id: "po46", name: "Sisi's Irish Hunting Lodge Curation", detail: "Property oversight dashboard managing royal holiday houses" },
+                { id: "po47", name: "Habsburg Crest Wax Engraving Vector Panel", detail: "Digital design tool producing verified sovereign marks" },
+                { id: "po48", name: "Sisi's Sea Poetry Audio Streaming Desk", detail: "Spoken-word digital panel reciting her maritime verses" },
+                { id: "po49", name: "Countess Court Shift Planner Portal", detail: "Staffing coordination space for Sisi's close inner circle" },
+                { id: "po50", name: "Sisi's Final Alps Voyage Travel Desk", detail: "Commemorative historical portal tracing her path through Europe" }
+            ],
+            tasks: [
+                { id: "ta1", name: "Sisi's Three-Hour Hair Brushing", detail: "Daily high-priority assignment for her personal maids" },
+                { id: "ta2", name: "Imperial Gym Workout Verification", detail: "Checklist monitoring her intense daily rings and bars drills" },
+                { id: "ta3", name: "Sisi's Hungarian Language Practice", detail: "Fluent speech training module with tutor János Falk" },
+                { id: "ta4", name: "Worth Gala Gown Fitting Session", detail: "Coordinate dress alterations before the major imperial banquet" },
+                { id: "ta5", name: "Sisi's Daily Fasting Weight Check", detail: "Strict tracking milestone to preserve her 20-inch waist metric" },
+                { id: "ta6", name: "Write Evening Poem to Heinrich Heine", detail: "Sisi's personal midnight creative verse drafting goal" },
+                { id: "ta7", name: "Achilleion Palace Achilles Statue Install", detail: "Supervise placement of Greek marble monuments in Corfu gardens" },
+                { id: "ta8", name: "Pack Sisi's Travelling Skincare Chest", detail: "Prepare raw milk, strawberries, and rose water for transit" },
+                { id: "ta9", name: "Gödöllő Fox Hunting Horse Prep", detail: "Groom her top Irish stallion for the morning equestrian chase" },
+                { id: "ta10", name: "Review Countess Festetics Court Diary", detail: "Audit inner circle logs before submitting files to state storage" },
+                { id: "ta11", name: "Sisi's 15-Mile Speed-Walking Tour", detail: "Extreme outdoor trail trek across the Vienna woods tracks" },
+                { id: "ta12", name: "Habsburg Coronation Gown Silk Repair", detail: "Delicate lace restoration assignment for the Budapest feast" },
+                { id: "ta13", name: "Prepare Sisi's Floral Violet Sorbet", detail: "Kitchen checklist task for crafting her preferred dessert ice" },
+                { id: "ta14", name: "Anchor Sea Tattoo Fine Line Detail", detail: "Unorthodox body art session checklist during port stop" },
+                { id: "ta15", name: "Sisi's Ancient Greek Text Translation", detail: "Complete reading Odyssey chapters with reader Christomanos" },
+                { id: "ta16", name: "Franz Joseph Bridal Locket Polish", detail: "Clean and refurbish gold wedding anniversary locket item" },
+                { id: "ta17", name: "Mayerling Mourning Veil Dye Process", detail: "Transform all court garments to solid black post-1889 guidelines" },
+                { id: "ta18", name: "Royal Yacht Miramar Departure Check", detail: "Nautical readiness inspection before Sisi cruises to Egypt" },
+                { id: "ta19", name: "Hermesvilla Palace Gym Ring Tuning", detail: "Verify structural safety of wall-mounted leather handles" },
+                { id: "ta20", name: "Sisi's Correspondence Sorting Task", detail: "Isolate letters written to her sister Queen Maria Sophie" },
+                { id: "ta21", name: "Collect Photographic Beauty Portraits", detail: "Acquire new photos of international women for Sisi's albums" },
+                { id: "ta22", name: "Bad Ischl Summer Cottage Setup", detail: "Prepare the royal alpine retreat for Sisi and Franz Joseph" },
+                { id: "ta23", name: "Sisi's Face Mask Ingredient Sourcing", detail: "Procure fresh veal slices for her overnight facial wrap task" },
+                { id: "ta24", name: "Imperial Court Fan Dance Rehearsal", detail: "Palace dance training for Sisi's young daughter Marie Valerie" },
+                { id: "ta25", name: "Sisi's Swiss Alps Mountain Staff Inspection", detail: "Verify solid grip and tips safety on her favorite walking canes" },
+                // Batch 2 items
+                { id: "ta26", name: "Sisi's Cognac Hair Wash Preparation", detail: "Mix thirty raw egg yolks with premium spirit for cleaning" },
+                { id: "ta27", name: "Imperial Stable Pedigree Log Audit", detail: "Verify bloodlines of Sisi's newly acquired English hunters" },
+                { id: "ta28", name: "Sisi's Silk Parasol Rib Realignment", detail: "Fix metal frame deformation on her primary sun shield" },
+                { id: "ta29", name: "Habsburg Dynasty Medal Stamping Audit", detail: "Quality control check on silver 1854 commemorative issue coins" },
+                { id: "ta30", name: "Sisi's Childhood Lake Starnberg Sketching", detail: "Recreative landscape painting goals during family holidays" },
+                { id: "ta31", name: "Empress Secluded Trail Guard Dispatch", detail: "Coordinate covert security deployment along Sisi's alpine track" },
+                { id: "ta32", name: "Sisi's Worth Ballgown Storage Prep", detail: "Pack historic gowns in acid-free tissue papers boxes" },
+                { id: "ta33", name: "Imperial Court Music Playlist Selection", detail: "Curate Strauss waltz items for the Hofburg seasonal dance" },
+                { id: "ta34", name: "Sisi's Northamptonshire Horse Transport", detail: "Coordinate international shipping lanes for hunting stallions" },
+                { id: "ta35", name: "Empress Greek Tragedy Translation Review", detail: "Correct syntax errors on Sisi's handwritten transcript forms" },
+                { id: "ta36", name: "Sisi's Library Bookplate Affixation", detail: "Apply custom ex-libris marks to new poetry acquisitions" },
+                { id: "ta37", name: "Habsburg Bridal Coach Wheel Greasing", detail: "Maintenance check on royal carriages at the Wagenburg garage" },
+                { id: "ta38", name: "Sisi's Skincare Milk Bath Temperature Check", detail: "Ensure precise thermal profile for warm goat milk immersion" },
+                { id: "ta39", name: "Imperial Coronation Portrait Framing", detail: "Mount massive Budapest oil canvases into heavy gold borders" },
+                { id: "ta40", name: "Sisi's Scented Stationary Lavender Spraying", detail: "Infuse outgoing royal messaging papers with floral oils" },
+                { id: "ta41", name: "Schloss Laxenburg Honeymoon Garden Trimming", detail: "Landscaping assignment along Sisi's private wedding paths" },
+                { id: "ta42", name: "Sisi's Tight Waistline Corset Lace Check", detail: "Inspect silk laces for wear to guarantee strong compression" },
+                { id: "ta43", name: "Empress Corfu Estate Olive Harvest Plan", detail: "Agricultural oversight on Achilleion palace grounds" },
+                { id: "ta44", name: "Sisi's Swiss Alp Hotel Arrival Protocol", detail: "Coordinate low-profile checkout under her Countess travel alias" },
+                { id: "ta45", name: "Imperial Wax Seal Pattern Verification", detail: "Check micro-engraved details on Sisi's personal signet ring" },
+                { id: "ta46", name: "Sisi's Countess Shift Roster Finalization", detail: "Approve weekly attendance blocks for ladies-in-waiting" },
+                { id: "ta47", name: "Empress Sea Poetry Audio Transcription", detail: "Digitize handwritten notebook files into legible system text" },
+                { id: "ta48", name: "Sisi's Memorial Monument Ground Breaking", detail: "Supervise early construction steps for her Vienna park statue" },
+                { id: "ta49", name: "Habsburg Crypt Floral Wreath Placement", detail: "Solemn recurring assignment at Sisi's sarcophagus base" },
+                { id: "ta50", name: "Sisi's Golden Jubilee Medal Cataloging", detail: "Log final inventory of 50-year reign historical relics" }
+            ],
+            workrooms: [
+                { id: "wo1", name: "Sisi's Poetry Studio Chamber", detail: "Active operational breakout room for her creative writing goals" },
+                { id: "wo2", name: "Imperial Court Tailoring Chamber", detail: "Design team studio handling her tight-lacing corset fittings" },
+                { id: "wo3", name: "Hofburg Gymnastics Training Hall", detail: "Private workout space equipped with her signature ceiling rings" },
+                { id: "wo4", name: "Sisi's Hair Care Salon Room", detail: "The quiet dressing chamber dedicated to her long hair combing" },
+                { id: "wo5", name: "Achilleion Palace Greek Study Room", detail: "Corfu workspace where Sisi translated classical tragedies" },
+                { id: "wo6", name: "Gödöllő Equestrian Operations Room", detail: "Breakout team cell coordinating Hungarian hunting routes" },
+                { id: "wo7", name: "Sisi's Apothecary Cosmetic Lab", detail: "Mixing workspace focused on her signature cold skin creams" },
+                { id: "wo8", name: "Hermesvilla Botanical Press Studio", detail: "Quiet workspace used to preserve her Swiss wildflower finds" },
+                { id: "wo9", name: "Habsburg Monogram Embossing Forge", detail: "Engraving team suite stamping Sisi's gold crest on stationery" },
+                { id: "wo10", name: "Winterhalter Art Restoration Lab", detail: "Conservation studio workspace managing her 1865 oil portraits" },
+                { id: "wo11", name: "Sisi's Personal Correspondence Desk", detail: "Private chamber for writing notes to her sister Maria Sophie" },
+                { id: "wo12", name: "Mayerling Archival Research Cell", detail: "Historical workspace reviewing documentation post-1889 events" },
+                { id: "wo13", name: "Royal Yacht Miramar Command Cabin", detail: "Nautical layout tracking Sisi's ongoing Mediterranean tours" },
+                { id: "wo14", name: "Hungarian State Compromise Workspace", detail: "Diplomatic conference desk aligning the Austro-Hungarian treaties" },
+                { id: "wo15", name: "Sisi's Fan Language Training Suite", detail: "Secret signaling practice hall for her ladies-in-waiting" },
+                { id: "wo16", name: "Imperial Court Waltz Scoring Room", detail: "Musical composition room where Strauss arranged pieces for Sisi" },
+                { id: "wo17", name: "Sisi's Photographic Portrait Atelier", detail: "Curation darkroom holding her international beauty portrait catalogs" },
+                { id: "wo18", name: "Schönbrunn Secluded Garden Greenhouse", detail: "Horticultural workspace cultivating Sisi's favorite violets" },
+                { id: "wo19", name: "Sisi's Swiss Alpine Trekking Bureau", detail: "Route layout station planning her strenuous mountain hiking speeds" },
+                { id: "wo20", name: "Habsburg Dynastic Heraldry Studio", detail: "Design chamber tracking royal crest graphic guidelines" },
+                { id: "wo21", name: "Sisi's Anchor Tattoo Design Studio", detail: "Avant-garde body modification parlor setup during sea tour" },
+                { id: "wo22", name: "Bad Ischl Royal Engagement Suite", detail: "Historical chamber space celebrating Sisi's 1853 betrothal" },
+                { id: "wo23", name: "Sisi's Overnight Facial Mask Kitchen", detail: "Specialist food preparation zone for her veal and fruit wraps" },
+                { id: "wo24", name: "Imperial Coach Carriage Design Shop", detail: "Wagenburg restoration shop servicing Sisi's state carriages" },
+                { id: "wo25", name: "Sisi Memorial Monument Modeling Lab", detail: "Sculpting studio layout defining her permanent marble shapes" },
+                // Batch 2 items
+                { id: "wo26", name: "Sisi's Cognac Hair Care Distillery", detail: "Specialist laboratory blending spirit hair washing rinses" },
+                { id: "wo27", name: "Vienna Riding School Master Studio", detail: "Equestrian choreography room tracking royal horse steps" },
+                { id: "wo28", name: "Sisi's Silk Parasol Engineering Forge", detail: "Repair shop fixing metal ribs on her sun shielding devices" },
+                { id: "wo29", name: "Habsburg Coronation Coin Minting Mint", detail: "State numismatic production facility tracking silver tokens" },
+                { id: "wo30", name: "Sisi's Childhood Possenhofen Archive Room", detail: "Bavarian history preservation cell handling youth letters" },
+                { id: "wo31", name: "Empress Alpine Secret Escort Briefing Room", detail: "Security strategy space coordinating covert royal protection" },
+                { id: "wo32", name: "Sisi's Worth Ballgown Fitting Studio", detail: "Luxury fashion atelier designing her layered crinoline silks" },
+                { id: "wo33", name: "Imperial Court Banquet Menu Kitchen", detail: "State culinary preparation room managing minimal diet recipes" },
+                { id: "wo34", name: "Sisi's Northamptonshire Riding Stable Bureau", detail: "UK tournament logistics hub handling royal horse tracking" },
+                { id: "wo35", name: "Empress Greek Translation Checking Desk", detail: "Linguistic review workspace assessing her ancient grammar papers" },
+                { id: "wo36", name: "Sisi's Private Bookplate Binding Shop", detail: "Antique book restoration center applying custom labels" },
+                { id: "wo37", name: "Habsburg Dynastic Family Tree Mapping Vault", detail: "Genealogical drawing office processing marriage node grids" },
+                { id: "wo38", name: "Sisi's Skincare Milk Bath Thermal Control", detail: "Plumbing maintenance node managing warm luxury goat milk systems" },
+                { id: "wo39", name: "Imperial Coronation Frame Gilding Shop", detail: "Artisan workspace applying gold leaf to Sisi's state art canvases" },
+                { id: "wo40", name: "Sisi's Scented Stationary Envelope Press", detail: "Paper manufacturing shop treating royal paper with lavender" },
+                { id: "wo41", name: "Schloss Laxenburg Honeymoon Mapping Studio", detail: "Cartographic center cleaning historic imperial park blueprints" },
+                { id: "wo42", name: "Sisi's Tight Lacing Corset Weaving Loom", detail: "Specialist textile studio reinforcing silk waist lace sets" },
+                { id: "wo43", name: "Empress Corfu Estate Olive Press Room", detail: "Horticultural oil extraction workshop at Achilleion villa" },
+                { id: "wo44", name: "Sisi's Swiss Alp Hotel Secret Logistics Desk", detail: "Undercover travel planning room managing royal aliases data" },
+                { id: "wo45", name: "Imperial Signet Ring Engraving Matrix Shop", detail: "Micro-machining studio checking Sisi's crest stamp outlines" },
+                { id: "wo46", name: "Sisi's Countess Shift Scheduling Chamber", detail: "Court staffing hub managing lady-in-waiting roster lists" },
+                { id: "wo47", name: "Empress Sea Poetry Audio Mastering Suite", detail: "Acoustic recording cell digitizing her historical verses speech" },
+                { id: "wo48", name: "Sisi's Memorial Fund Accounting Room", detail: "Financial oversight workspace tracking civic hospital grants" },
+                { id: "wo49", name: "Habsburg Crypt Sarcophagus Restoration Vault", detail: "Solemn masonry studio preserving imperial burial monuments" },
+                { id: "wo50", name: "Sisi's Golden Jubilee Relic Exhibition Studio", detail: "Museum curatorial space processing 50-year reign collections" }
+            ]
+        };
+
+        let bookmarks = [];
+        let dragSrcIndex = null;
+        
+        // Pagination state tracking variables
+        let loadedItemsCount = 25;
+        let isBatchLoading = false;
+
+        function saveToLocalStorage() {
+            localStorage.setItem('widget_bookmarks', JSON.stringify(bookmarks));
+        }
+
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('widget_bookmarks');
+            if (savedData) {
+                try {
+                    bookmarks = JSON.parse(savedData);
+                } catch(e) {
+                    bookmarks = [];
+                }
+            }
+        }
+
+        function saveLastCategory(categoryValue) {
+            localStorage.setItem('widget_last_category', categoryValue);
+        }
+
+        function loadLastCategory() {
+            return localStorage.getItem('widget_last_category') || 'url';
+        }
+
+        function updateUI() {
+            saveToLocalStorage();
+            if (bookmarks.length === 0) {
+                emptyState.style.display = 'flex';
+                bookmarksList.innerHTML = '';
+            } else {
+                emptyState.style.display = 'none';
+                renderMainList(bookmarks);
+            }
+        }
+
+        function renderMainList(itemsToRender) {
+            bookmarksList.innerHTML = '';
+            itemsToRender.forEach((bookmark, index) => {
+                const li = document.createElement('li');
+                li.className = 'bookmark-item-wrapper';
+                li.setAttribute('draggable', 'true');
+                li.setAttribute('data-index', index);
+
+                const defaultIcon = bookmark.type === 'url' 
+                    ? `https://www.google.com/s2/favicons?sz=32&domain=${bookmark.url}`
+                    : `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg\' viewBox='0 0 24 24' width='16' height='16'><path d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z' fill='%2300A3C4'/></svg>`;
+
+                li.innerHTML = `
+                    <div class="bookmark-item">
+                        <div class="bookmark-favicon">
+                            <img src="${defaultIcon}" 
+                                 onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' width=\'16\' height=\'16\'><path d=\'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19( 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z\' fill=\'%23757575\'/></svg>';" 
+                                 alt="icon">
+                        </div>
+                        <div class="bookmark-details" ${bookmark.type === 'url' ? `onclick="window.open('${bookmark.url}', '_blank')"` : ''}>
+                            <div class="bookmark-display-title">${bookmark.name}</div>
+                            ${bookmark.detail ? `<div class="bookmark-display-subtitle">${bookmark.detail}</div>` : ''}
+                        </div>
+                        <button class="btn-main-remove" title="Remove bookmark">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </button>
+                    </div>
+                `;
+
+                li.querySelector('.btn-main-remove').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    bookmarks.splice(index, 1);
+                    updateUI();
+                    if (bookmarkPopupCard.style.display === 'block') {
+                        renderCategoryList(false);
+                    }
+                });
+
+                li.addEventListener('dragstart', handleDragStart);
+                li.addEventListener('dragover', handleDragOver);
+                li.addEventListener('dragleave', handleDragLeave);
+                li.addEventListener('drop', handleDrop);
+                li.addEventListener('dragend', handleDragEnd);
+
+                bookmarksList.appendChild(li);
+            });
+        }
+
+        function handleDragStart(e) {
+            dragSrcIndex = parseInt(this.getAttribute('data-index'));
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            this.classList.add('drag-over');
+            return false;
+        }
+
+        function handleDragLeave() {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.stopPropagation();
+            const targetIndex = parseInt(this.getAttribute('data-index'));
+            if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
+                const movedItem = bookmarks.splice(dragSrcIndex, 1)[0];
+                bookmarks.splice(targetIndex, 0, movedItem);
+                updateUI();
+            }
+            this.classList.remove('drag-over');
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.bookmark-item-wrapper').forEach(item => item.classList.remove('drag-over'));
+            dragSrcIndex = null;
+        }
+
+        function syncCategoryViewState(category) {
+            const selectedOptionText = categoryDropdown.options[categoryDropdown.selectedIndex].text;
+            popupSearchInput.value = '';
+            
+            // Reset pagination constraints whenever switching views
+            loadedItemsCount = 25; 
+            isBatchLoading = false;
+
+            if (category === 'url') {
+                bookmarkForm.style.display = 'block';
+                popupCategoryListSection.style.display = 'none';
+                popupSearchInput.placeholder = "Search for URL";
+                popupSearchInput.disabled = true; 
+            } else {
+                bookmarkForm.style.display = 'none';
+                popupCategoryListSection.style.display = 'block';
+                popupSearchInput.placeholder = `Search for ${selectedOptionText}`;
+                popupSearchInput.disabled = false; 
+                popupListTitle.textContent = "Add bookmarks";
+                popupScrollableList.scrollTop = 0; 
+                popupScrollableList.innerHTML = `
+                    <li class="popup-list-item popup-list-placeholder">
+                        Search across all your content to quickly bookmark items
+                    </li>
+                `;
+            }
+        }
+
+        categoryDropdown.addEventListener('change', (e) => {
+            const currentCategory = e.target.value;
+            saveLastCategory(currentCategory); 
+            syncCategoryViewState(currentCategory);
+        });
+
+        popupSearchInput.addEventListener('input', () => {
+            if (categoryDropdown.value !== 'url') {
+                loadedItemsCount = 25; // Reset count scope on fresh query structural filter execution
+                isBatchLoading = false;
+                renderCategoryList(false);
+            }
+        });
+
+        // Detect scroll completion tracking context boundaries inside the container element
+        popupScrollableList.addEventListener('scroll', () => {
+            if (categoryDropdown.value === 'url' || isBatchLoading) return;
+
+            // Only allow scrolling if a query has been typed and results exist
+            if (popupSearchInput.value.trim().length === 0) return;
+
+            const totalScrollableHeight = popupScrollableList.scrollHeight;
+            const visibleBoundaryHeight = popupScrollableList.clientHeight;
+            const currentScrollTopValue = popupScrollableList.scrollTop;
+
+            // Trigger fetch verification when layout hits bottom tolerances
+            if (currentScrollTopValue + visibleBoundaryHeight >= totalScrollableHeight - 2) {
+                const category = categoryDropdown.value;
+                const searchPattern = popupSearchInput.value.toLowerCase();
+                const rawItems = categoryItemsData[category] || [];
+                const filteredItems = rawItems.filter(item => 
+                    item.name.toLowerCase().includes(searchPattern)
+                );
+
+                if (loadedItemsCount < filteredItems.length) {
+                    isBatchLoading = true;
+                    renderCategoryList(true); // render lists incorporating loading items structural layout frame
+                }
+            }
+        });
+
+        function renderCategoryList(appendWithSpinner = false) {
+            const category = categoryDropdown.value;
+            const searchPattern = popupSearchInput.value.toLowerCase().trim();
+            
+            // If there is no search query, show the add-bookmarks intro text
+            if (searchPattern.length === 0) {
+                popupListTitle.textContent = "Add bookmarks";
+                popupScrollableList.innerHTML = `
+                    <li class="popup-list-item popup-list-placeholder">
+                        Search across all your content to quickly bookmark items
+                    </li>
+                `;
+                return;
+            }
+
+            popupListTitle.textContent = "Recent";
+            const rawItems = categoryItemsData[category] || [];
+            const filteredItems = rawItems.filter(item => 
+                item.name.toLowerCase().includes(searchPattern)
+            );
+
+            // Clean baseline rendering context if this isn't an execution expansion append loop
+            if (!appendWithSpinner && !isBatchLoading) {
+                popupScrollableList.innerHTML = '';
+            } else {
+                // Clear out prior custom loaders or indicators before printing fresh records
+                const existingSpinner = document.getElementById('popupLoadingSpinnerItem');
+                if (existingSpinner) existingSpinner.remove();
+            }
+
+            if (filteredItems.length === 0) {
+                popupScrollableList.innerHTML = `<li style="font-size:12px; color:var(--text-secondary); text-align:center; padding:10px 0;">No matching items found</li>`;
+                return;
+            }
+
+            // Segment selection range slice 
+            const executionTargetArray = filteredItems.slice(
+                appendWithSpinner ? 25 : 0, 
+                appendWithSpinner ? 50 : Math.min(loadedItemsCount, filteredItems.length)
+            );
+
+            if (appendWithSpinner) {
+                // Create custom embedded simulated loading structure frame cleanly matching styles
+                const spinnerLi = document.createElement('li');
+                spinnerLi.id = 'popupLoadingSpinnerItem';
+                spinnerLi.style.display = 'flex';
+                spinnerLi.style.alignItems = 'center';
+                spinnerLi.style.justifyContent = 'center';
+                spinnerLi.style.padding = '12px';
+                spinnerLi.style.gap = '8px';
+                spinnerLi.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 38 38" stroke="var(--primary-color)" style="animation: rotate 1s linear infinite;">
+                        <style>@keyframes rotate { 100% { transform: rotate(360deg); } }</style>
+                        <g fill="none" fill-rule="evenodd">
+                            <g transform="translate(1 1)" stroke-width="3">
+                                <circle stroke-opacity=".2" cx="18" cy="18" r="18"/>
+                                <path d="M36 18c0-9.94-8.06-18-18-18"/>
+                            </g>
+                        </g>
+                    </svg>
+                    <span style="font-size: 12px; color: var(--text-secondary);">Loading more items...</span>
+                `;
+                popupScrollableList.appendChild(spinnerLi);
+                
+                // Keep view snapped firmly to the loading placeholder element context
+                popupScrollableList.scrollTop = popupScrollableList.scrollHeight;
+
+                // Fire artificial 2-second timeout transition boundary emulation framework 
+                setTimeout(() => {
+                    const spinnerToRemove = document.getElementById('popupLoadingSpinnerItem');
+                    if (spinnerToRemove) spinnerToRemove.remove();
+
+                    appendElementsToList(executionTargetArray, category);
+                    loadedItemsCount = 50;
+                    isBatchLoading = false;
+                }, 2000);
+            } else {
+                appendElementsToList(executionTargetArray, category);
+            }
+        }
+
+        function appendElementsToList(itemsList, category) {
+            itemsList.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'popup-list-item';
+                
+                const isChecked = bookmarks.some(b => b.type === category && b.itemId === item.id);
+
+                li.innerHTML = `
+                    <input type="checkbox" class="popup-item-checkbox" ${isChecked ? 'checked' : ''} data-id="${item.id}" data-name="${item.name}" data-detail="${item.detail}">
+                    <div class="popup-item-details">
+                        <div class="popup-item-title">${item.name}</div>
+                        <div class="popup-item-subtitle">${item.detail}</div>
+                    </div>
+                `;
+
+                li.querySelector('.popup-item-checkbox').addEventListener('change', (e) => {
+                    const itemId = e.target.getAttribute('data-id');
+                    const itemName = e.target.getAttribute('data-name');
+                    const itemDetail = e.target.getAttribute('data-detail');
+                    
+                    if (e.target.checked) {
+                        bookmarks.push({
+                            type: category,
+                            itemId: itemId,
+                            name: itemName,
+                            detail: itemDetail,
+                            url: ''
+                        });
+                    } else {
+                        bookmarks = bookmarks.filter(b => !(b.type === category && b.itemId === itemId));
+                    }
+                    updateUI();
+                });
+
+                popupScrollableList.appendChild(li);
+            });
+        }
+
+        function validateUrl(input) {
+            let cleanInput = input.trim();
+            if (!cleanInput) return false;
+            if (/\s/.test(cleanInput) || cleanInput.includes('\\')) return false;
+
+            let testUrl = cleanInput;
+            if (!/^https?:\/\//i.test(testUrl)) {
+                testUrl = 'https://' + testUrl;
+            }
+
+            try {
+                const parsed = new URL(testUrl);
+                const hostname = parsed.hostname;
+                if (!hostname.includes('.')) return false;
+
+                const parts = hostname.split('.');
+                const tld = parts[parts.length - 1];
+                if (!/^[a-z]{2,}$/i.test(tld)) return false;
+                if (hostname.includes('..') || hostname.startsWith('.') || hostname.endsWith('.')) return false;
+
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function cleanUrlDisplay(input) {
+            return input.trim().replace(/^https?:\/\//i, '').replace(/\/$/, '');
+        }
+
+        // Separate function to execute URL format check and visual state updates
+        function performUrlValidation() {
+            const rawUrl = urlInput.value;
+            if (!validateUrl(rawUrl)) {
+                urlInput.classList.add('input-error');
+                urlError.style.display = 'block';
+                return false;
+            } else {
+                clearErrors();
+                return true;
+            }
+        }
+
+        function showPopup() {
+            let activeCategory;
+            
+            if (bookmarks.length === 0) {
+                activeCategory = 'assets';
+            } else {
+                activeCategory = loadLastCategory();
+            }
+
+            categoryDropdown.value = activeCategory;
+            syncCategoryViewState(activeCategory);
+
+            bookmarkPopupCard.style.display = 'block';
+            popupBackdrop.style.display = 'block';
+            
+            if (activeCategory === 'url') {
+                urlInput.focus();
+            } else {
+                popupSearchInput.focus();
+            }
+        }
+
+        function hidePopup() {
+            bookmarkPopupCard.style.display = 'none';
+            popupBackdrop.style.display = 'none';
+            bookmarkForm.reset();
+            clearErrors();
+            updateUI();
+        }
+
+        function clearErrors() {
+            urlInput.classList.remove('input-error');
+            urlError.style.display = 'none';
+        }
+
+        toggleFormBtn.addEventListener('click', () => {
+            if (bookmarkPopupCard.style.display === 'block') {
+                hidePopup();
+            } else {
+                showPopup();
+            }
+        });
+
+        cancelFormBtn.addEventListener('click', hidePopup);
+        popupBackdrop.addEventListener('click', hidePopup);
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && bookmarkPopupCard.style.display === 'block') {
+                hidePopup();
+            }
+        });
+
+        urlInput.addEventListener('input', clearErrors);
+        
+        // Trigger verification immediately when clicking outside or switching context focus
+        urlInput.addEventListener('blur', performUrlValidation);
+
+        bookmarkForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const rawUrl = urlInput.value;
+            const name = nameInput.value.trim();
+
+            // Run check on form submission attempt
+            if (!performUrlValidation()) {
+                return;
+            }
+
+            let formattedUrl = rawUrl.trim();
+            if (!/^https?:\/\//i.test(formattedUrl)) {
+                formattedUrl = 'https://' + formattedUrl;
+            }
+
+            bookmarks.push({
+                type: 'url',
+                itemId: null,
+                url: formattedUrl,
+                cleanUrl: cleanUrlDisplay(rawUrl),
+                name: name ? name : cleanUrlDisplay(rawUrl),
+                detail: cleanUrlDisplay(rawUrl)
+            });
+
+            hidePopup();
+        });
+
+        loadFromLocalStorage();
+        updateUI();
+    </script>
+</body>
+</html>

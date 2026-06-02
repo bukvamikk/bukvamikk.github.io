@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookmarks Widget Comparison</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevents outer scrollbars */
+            background-color: #EBF3F5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        /* Flex container to arrange the frames side-by-side */
+        .comparison-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Each wrapper takes exactly 50% width and full height */
+        .frame-wrapper {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Adds a subtle vertical dividing line between the views */
+        .frame-wrapper:first-child {
+            border-right: 2px solid #D1D1D1;
+        }
+
+        /* Label banner at the top of each view */
+        .frame-label {
+            background-color: #00A3C4;
+            color: #FFFFFF;
+            padding: 10px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        /* The actual frames embedding your files */
+        iframe {
+            width: 100%;
+            flex-grow: 1; /* Fills all remaining height below the label */
+            border: none;
+            background-color: #EBF3F5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="comparison-container">
+
+        <div class="frame-wrapper">
+            <div class="frame-label">Version A</div>
+            <iframe src="populated.html"></iframe>
+        </div>
+        <div class="frame-wrapper">
+            <div class="frame-label">Version B</div>
+            <iframe src="unpopulated.html"></iframe>
+        </div>
+    </div>
+
+</body>
+</html>
