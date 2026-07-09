@@ -1,6 +1,0 @@
-{
-  "name": "ConsenTeach for Couples",
-  "description": "An interactive self-reflection and assessment suite designed specifically for men to reflect on relationship power dynamics, dismantle patriarchal defaults, and build co-equal egalitarian partnerships.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
