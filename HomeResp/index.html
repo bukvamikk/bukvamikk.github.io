@@ -1,546 +1,560 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Surface</title>
-  <!-- Lucide Icons CDN -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    :root {
-      --bg-color: #f3f6f9;
-      --sidebar-bg: #e1f0f8;
-      --text-dark: #2c3e50;
-      --card-bg: #ffffff;
-      --border-radius: 12px;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Surface</title>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-color: #f3f6f9;
+            --sidebar-bg: #e1f0f8;
+            --text-dark: #2c3e50;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-    body {
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-      background-color: var(--bg-color);
-      color: var(--text-dark);
-    }
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+        }
 
-    /* --- Sidebar --- */
-    aside.sidebar {
-      width: 75px;
-      background-color: var(--sidebar-bg);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 16px 0;
-      align-items: center;
-      flex-shrink: 0;
-      height: 100%;
-      z-index: 10;
-    }
+        /* --- Sidebar --- */
+        aside.sidebar {
+            width: 75px;
+            background-color: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 16px 0;
+            align-items: center;
+            flex-shrink: 0;
+            height: 100%;
+            z-index: 10;
+        }
 
-    .nav-group {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      width: 100%;
-      align-items: center;
-    }
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            align-items: center;
+        }
 
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      color: #00779b;
-      font-size: 11px;
-      font-weight: 600;
-      gap: 4px;
-      cursor: pointer;
-      width: 100%;
-      padding: 6px 0;
-    }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #00779b;
+            font-size: 11px;
+            font-weight: 600;
+            gap: 4px;
+            cursor: pointer;
+            width: 100%;
+            padding: 6px 0;
+        }
 
-    .nav-item.active {
-      color: #005a75;
-      background-color: rgba(255, 255, 255, 0.4);
-    }
+        .nav-item.active {
+            color: #005a75;
+            background-color: rgba(255, 255, 255, 0.4);
+        }
 
-    .avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
 
-    /* --- Main Container --- */
-    main.content {
-      flex: 1;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      height: 100vh;
-      overflow-y: auto;
-      position: relative;
-    }
+        /* --- Main Container --- */
+        main.content {
+            flex: 1;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100vh;
+            overflow-y: auto;
+            position: relative;
+        }
 
-    /* --- Header Card --- */
-    .header-card {
-      height: 280px;
-      background: linear-gradient(135deg, #008eb7 0%, #0099c7 100%);
-      border-radius: var(--border-radius);
-      padding: 12px 20px;
-      color: white;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      flex-shrink: 0;
-      z-index: 20;
-    }
+        /* --- Header Card --- */
+        .header-card {
+            height: 280px;
+            background: linear-gradient(135deg, #008eb7 0%, #0099c7 100%);
+            border-radius: var(--border-radius);
+            padding: 12px 20px;
+            color: white;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+            z-index: 20;
+        }
 
-    .header-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
+        .header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .customise-btn {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: rgba(255, 255, 255, 0.85);
-      color: #333;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+        .customise-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.85);
+            color: #333;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-    .greeting-title {
-      font-size: 24px;
-      font-weight: 600;
-    }
+        .greeting-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
 
-    .date-display {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 14px;
-      opacity: 0.9;
-    }
+        .date-display {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
 
-    /* --- Search Bar Container --- */
-    .search-wrapper {
-      position: relative;
-      width: 100%;
-      max-width: 600px;
-    }
+        /* --- Search Bar Container --- */
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+        }
 
-    .search-container {
-      display: flex;
-      align-items: center;
-      background: white;
-      border-radius: 8px;
-      width: 100%;
-      padding: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      position: relative;
-      z-index: 25;
-    }
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 8px;
+            width: 100%;
+            padding: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 25;
+        }
 
-    .search-select {
-      border: none;
-      outline: none;
-      padding: 8px 12px;
-      background: transparent;
-      color: #555;
-      font-size: 13px;
-      border-right: 1px solid #e2e8f0;
-      cursor: pointer;
-    }
+        .search-select {
+            border: none;
+            outline: none;
+            padding: 8px 12px;
+            background: transparent;
+            color: #555;
+            font-size: 13px;
+            border-right: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
 
-    .search-input {
-      border: none;
-      outline: none;
-      padding: 8px 12px;
-      flex: 1;
-      font-size: 14px;
-      color: #333;
-    }
+        .search-input {
+            border: none;
+            outline: none;
+            padding: 8px 12px;
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
 
-    .search-icon {
-      color: #666;
-      margin-right: 8px;
-    }
+        .search-icon {
+            color: #666;
+            margin-right: 8px;
+        }
 
-    .advanced-btn {
-      background-color: #cbd5e1;
-      color: #475569;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      letter-spacing: 0.5px;
-    }
+        .advanced-btn {
+            background-color: #cbd5e1;
+            color: #475569;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        }
 
-    /* --- Fixed Search Results Popup (720px x 560px) --- */
-    .search-popup {
-      position: absolute;
-      top: calc(100% + 8px);
-      left: 50%;
-      transform: translateX(-50%);
-      width: 720px;  /* Fixed Width */
-      height: 560px; /* Fixed Height */
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      display: none;
-      z-index: 30;
-      color: #333;
-    }
+        /* --- Fixed Search Results Popup (720px x 560px) --- */
+        .search-popup {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 720px;
+            /* Fixed Width */
+            height: 560px;
+            /* Fixed Height */
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: none;
+            z-index: 30;
+            color: #333;
+        }
 
-    .search-popup.is-active {
-      display: block;
-    }
+        .search-popup.is-active {
+            display: block;
+        }
 
-    .popup-layout {
-      display: grid;
-      grid-template-columns: 1fr 220px;
-      gap: 20px;
-      height: 100%;
-    }
+        .popup-layout {
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            gap: 20px;
+            height: 100%;
+        }
 
-    .popup-list-column {
-      overflow-y: auto;
-      padding-right: 8px;
-    }
+        .popup-list-column {
+            overflow-y: auto;
+            padding-right: 8px;
+        }
 
-    .popup-section-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: #64748b;
-      margin-bottom: 10px;
-    }
+        .popup-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
 
-    .popup-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
+        .popup-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
 
-    .popup-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      background: #f8fafc;
-      font-size: 13px;
-    }
+        .popup-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: #f8fafc;
+            font-size: 13px;
+        }
 
-    .popup-item-icon {
-      width: 32px;
-      height: 32px;
-      background: #e0f2fe;
-      color: #0284c7;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        .popup-item-icon {
+            width: 32px;
+            height: 32px;
+            background: #e0f2fe;
+            color: #0284c7;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .popup-preview-img {
-      width: 100%;
-      height: 140px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 12px;
-    }
+        .popup-preview-img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
 
-    .preview-title {
-      font-weight: 700;
-      font-size: 15px;
-      margin-bottom: 8px;
-    }
+        .preview-title {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
 
-    .preview-meta {
-      font-size: 12px;
-      color: #64748b;
-      line-height: 1.6;
-    }
+        .preview-meta {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.6;
+        }
 
-    /* --- Widget Section --- */
-    .widgets-container {
-      flex: 1;
-      padding: 16px;
-      display: grid;
-      gap: 16px;
-      justify-items: center;
-      grid-template-columns: repeat(3, minmax(0, 600px));
-      justify-content: center;
-    }
+        /* --- Widget Section --- */
+        .widgets-container {
+            flex: 1;
+            padding: 16px;
+            display: grid;
+            gap: 16px;
+            justify-items: center;
+            grid-template-columns: repeat(3, minmax(0, 600px));
+            justify-content: center;
+        }
 
-    .widget-card {
-      background-color: var(--card-bg);
-      border-radius: var(--border-radius);
-      width: 100%;
-      height: 100%;
-      min-height: 480px; /* Minimum height set to 480px */
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-      padding: 16px;
-    }
+        .widget-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            width: 100%;
+            height: 100%;
+            min-height: 480px;
+            /* Minimum height set to 480px */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            padding: 16px;
+        }
 
-    /* --- Responsive Rules (< 1360px) --- */
-    @media (max-width: 1359.98px) {
-      .widgets-container {
-        grid-template-columns: repeat(2, minmax(0, 600px));
-      }
+        /* --- Responsive Rules (< 1360px) --- */
+        @media (max-width: 1359.98px) {
+            .header-card {
+                height: 240px;
 
-      .header-card {
-        transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
-      }
+            }
 
-      .header-content, .customise-btn {
-        transition: opacity 0.2s ease;
-      }
+            .widgets-container {
+                grid-template-columns: repeat(2, minmax(0, 600px));
+            }
 
-      .header-card.is-collapsed {
-        height: 68px;
-      }
+            .header-card {
+                transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+            }
 
-      .header-card.is-collapsed .header-content {
-        opacity: 0;
-        visibility: hidden;
-        height: 0;
-        margin: 0;
-        overflow: hidden;
-        pointer-events: none;
-      }
+            .header-content,
+            .customise-btn {
+                transition: opacity 0.2s ease;
+            }
 
-      .header-card.is-collapsed .customise-btn {
-        opacity: 0;
-        pointer-events: none;
-      }
+            .header-card.is-collapsed {
+                height: 68px;
+            }
 
-    .widget-card {
-      height: 600px;
-      max-height: 600px;
-    }
-    }
+            .header-card.is-collapsed .header-content {
+                opacity: 0;
+                visibility: hidden;
+                height: 0;
+                margin: 0;
+                overflow: hidden;
+                pointer-events: none;
+            }
 
-    @media (max-width: 768px) {
-      .search-popup {
-        width: calc(100vw - 40px);
-        height: auto;
-        max-height: 500px;
-      }
-      
-      .popup-layout {
-        grid-template-columns: 1fr;
-      }
+            .header-card.is-collapsed .customise-btn {
+                opacity: 0;
+                pointer-events: none;
+            }
 
-      .widgets-container {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+            .widget-card {
+                height: 600px;
+                max-height: 600px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-popup {
+                width: calc(100vw - 40px);
+                height: auto;
+                max-height: 500px;
+            }
+
+            .popup-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .widgets-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-  <!-- Sidebar Navigation -->
-  <aside class="sidebar">
-    <div class="nav-group">
-      <a class="nav-item active">
-        <i data-lucide="home"></i>
-        <span>Home</span>
-      </a>
-      <a class="nav-item">
-        <i data-lucide="layers"></i>
-        <span>Content</span>
-      </a>
-      <a class="nav-item">
-        <i data-lucide="check-square"></i>
-        <span>Work</span>
-      </a>
-      <a class="nav-item">
-        <i data-lucide="list-todo"></i>
-        <span>Libraries</span>
-      </a>
-      <a class="nav-item">
-        <i data-lucide="x"></i>
-        <span>Experience</span>
-      </a>
-    </div>
-
-    <div class="nav-group">
-      <a class="nav-item"><i data-lucide="bell"></i></a>
-      <a class="nav-item"><i data-lucide="settings"></i></a>
-      <a class="nav-item">
-        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" class="avatar" alt="User Profile" />
-      </a>
-      <a class="nav-item"><i data-lucide="help-circle"></i></a>
-    </div>
-  </aside>
-
-  <!-- Main View -->
-  <main class="content">
-    
-    <!-- Top Banner / Header Card -->
-    <header class="header-card" id="headerCard">
-      <button class="customise-btn">
-        <i data-lucide="sliders-horizontal" size="14"></i>
-        CUSTOMISE
-      </button>
-
-      <div class="header-content">
-        <h1 class="greeting-title">Good morning, Anna</h1>
-        <div class="date-display">
-          <i data-lucide="calendar" size="16"></i>
-          <span>August 5, 2026</span>
-        </div>
-      </div>
-
-      <!-- Search Wrapper -->
-      <div class="search-wrapper" id="searchWrapper">
-        <div class="search-container">
-          <select class="search-select">
-            <option>All</option>
-          </select>
-          <input type="text" id="searchInput" class="search-input" placeholder="Search for anything" />
-          <i data-lucide="search" size="18" class="search-icon"></i>
-          <button class="advanced-btn">ADVANCED</button>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="nav-group">
+            <a class="nav-item active">
+                <i data-lucide="home"></i>
+                <span>Home</span>
+            </a>
+            <a class="nav-item">
+                <i data-lucide="layers"></i>
+                <span>Content</span>
+            </a>
+            <a class="nav-item">
+                <i data-lucide="check-square"></i>
+                <span>Work</span>
+            </a>
+            <a class="nav-item">
+                <i data-lucide="list-todo"></i>
+                <span>Libraries</span>
+            </a>
+            <a class="nav-item">
+                <i data-lucide="x"></i>
+                <span>Experience</span>
+            </a>
         </div>
 
-        <!-- Presentation Results Popup (720px x 560px) -->
-        <div class="search-popup" id="searchPopup">
-          <div class="popup-layout">
-            <div class="popup-list-column">
-              <div class="popup-section-title">Assets (50)</div>
-              <div class="popup-list">
-                <div class="popup-item">
-                  <div class="popup-item-icon"><i data-lucide="file-text" size="18"></i></div>
-                  <span>An item name</span>
-                </div>
-                <div class="popup-item">
-                  <div class="popup-item-icon"><i data-lucide="file-text" size="18"></i></div>
-                  <span>An item name</span>
-                </div>
-                <div class="popup-item">
-                  <div class="popup-item-icon"><i data-lucide="file-text" size="18"></i></div>
-                  <span>An item name</span>
-                </div>
-                <div class="popup-item">
-                  <div class="popup-item-icon"><i data-lucide="file-text" size="18"></i></div>
-                  <span>An item name</span>
-                </div>
-              </div>
+        <div class="nav-group">
+            <a class="nav-item"><i data-lucide="bell"></i></a>
+            <a class="nav-item"><i data-lucide="settings"></i></a>
+            <a class="nav-item">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
+                    class="avatar" alt="User Profile" />
+            </a>
+            <a class="nav-item"><i data-lucide="help-circle"></i></a>
+        </div>
+    </aside>
 
-              <div class="popup-section-title">Collections & Folders (2)</div>
-              <div class="popup-list">
-                <div class="popup-item">
-                  <div class="popup-item-icon"><i data-lucide="folder" size="18"></i></div>
-                  <span>An item name</span>
-                </div>
-                <div class="popup-item">
-                  <div class="popup-item-icon"><i data-lucide="folder" size="18"></i></div>
-                  <span>An item name</span>
-                </div>
-              </div>
+    <!-- Main View -->
+    <main class="content">
 
-              <div class="popup-section-title">Content Templates (2)</div>
-              <div class="popup-list">
-                <div class="popup-item">
-                  <div class="popup-item-icon"><i data-lucide="layout-template" size="18"></i></div>
-                  <span>An item name</span>
+        <!-- Top Banner / Header Card -->
+        <header class="header-card" id="headerCard">
+            <button class="customise-btn">
+                <i data-lucide="sliders-horizontal" size="14"></i>
+                CUSTOMISE
+            </button>
+
+            <div class="header-content">
+                <h1 class="greeting-title">Good morning, Anna</h1>
+                <div class="date-display">
+                    <i data-lucide="calendar" size="16"></i>
+                    <span>August 5, 2026</span>
                 </div>
-              </div>
             </div>
 
-            <!-- Preview Column -->
-            <div>
-              <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=80" class="popup-preview-img" alt="Preview" />
-              <div class="preview-title">An item name</div>
-              <div class="preview-meta">
-                <p><strong>Workroom:</strong> My best Workroom</p>
-                <p><strong>Created:</strong> Jan 24, 2026</p>
-                <p><strong>Modified:</strong> Jan 26, 2026</p>
-                <p><strong>File Size:</strong> 576 kbyte</p>
-                <p><strong>Version:</strong> 0.1</p>
-              </div>
+            <!-- Search Wrapper -->
+            <div class="search-wrapper" id="searchWrapper">
+                <div class="search-container">
+                    <select class="search-select">
+                        <option>All</option>
+                    </select>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search for anything" />
+                    <i data-lucide="search" size="18" class="search-icon"></i>
+                    <button class="advanced-btn">ADVANCED</button>
+                </div>
+
+                <!-- Presentation Results Popup (720px x 560px) -->
+                <div class="search-popup" id="searchPopup">
+                    <div class="popup-layout">
+                        <div class="popup-list-column">
+                            <div class="popup-section-title">Assets (50)</div>
+                            <div class="popup-list">
+                                <div class="popup-item">
+                                    <div class="popup-item-icon"><i data-lucide="file-text" size="18"></i></div>
+                                    <span>An item name</span>
+                                </div>
+                                <div class="popup-item">
+                                    <div class="popup-item-icon"><i data-lucide="file-text" size="18"></i></div>
+                                    <span>An item name</span>
+                                </div>
+                                <div class="popup-item">
+                                    <div class="popup-item-icon"><i data-lucide="file-text" size="18"></i></div>
+                                    <span>An item name</span>
+                                </div>
+                                <div class="popup-item">
+                                    <div class="popup-item-icon"><i data-lucide="file-text" size="18"></i></div>
+                                    <span>An item name</span>
+                                </div>
+                            </div>
+
+                            <div class="popup-section-title">Collections & Folders (2)</div>
+                            <div class="popup-list">
+                                <div class="popup-item">
+                                    <div class="popup-item-icon"><i data-lucide="folder" size="18"></i></div>
+                                    <span>An item name</span>
+                                </div>
+                                <div class="popup-item">
+                                    <div class="popup-item-icon"><i data-lucide="folder" size="18"></i></div>
+                                    <span>An item name</span>
+                                </div>
+                            </div>
+
+                            <div class="popup-section-title">Content Templates (2)</div>
+                            <div class="popup-list">
+                                <div class="popup-item">
+                                    <div class="popup-item-icon"><i data-lucide="layout-template" size="18"></i></div>
+                                    <span>An item name</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview Column -->
+                        <div>
+                            <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=80"
+                                class="popup-preview-img" alt="Preview" />
+                            <div class="preview-title">An item name</div>
+                            <div class="preview-meta">
+                                <p><strong>Workroom:</strong> My best Workroom</p>
+                                <p><strong>Created:</strong> Jan 24, 2026</p>
+                                <p><strong>Modified:</strong> Jan 26, 2026</p>
+                                <p><strong>File Size:</strong> 576 kbyte</p>
+                                <p><strong>Version:</strong> 0.1</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-          </div>
-        </div>
+        </header>
 
-      </div>
-    </header>
+        <!-- Widgets Area -->
+        <section class="widgets-container">
+            <div class="widget-card"></div>
+            <div class="widget-card"></div>
+            <div class="widget-card"></div>
+        </section>
 
-    <!-- Widgets Area -->
-    <section class="widgets-container">
-      <div class="widget-card"></div>
-      <div class="widget-card"></div>
-      <div class="widget-card"></div>
-    </section>
+    </main>
 
-  </main>
+    <!-- Interactive Scripts -->
+    <script>
+        lucide.createIcons();
 
-  <!-- Interactive Scripts -->
-  <script>
-    lucide.createIcons();
+        const searchInput = document.getElementById('searchInput');
+        const headerCard = document.getElementById('headerCard');
+        const searchPopup = document.getElementById('searchPopup');
+        const searchWrapper = document.getElementById('searchWrapper');
 
-    const searchInput = document.getElementById('searchInput');
-    const headerCard = document.getElementById('headerCard');
-    const searchPopup = document.getElementById('searchPopup');
-    const searchWrapper = document.getElementById('searchWrapper');
+        function openSearch() {
+            if (window.innerWidth < 1360) {
+                headerCard.classList.add('is-collapsed');
+            }
+            searchPopup.classList.add('is-active');
+        }
 
-    function openSearch() {
-      if (window.innerWidth < 1360) {
-        headerCard.classList.add('is-collapsed');
-      }
-      searchPopup.classList.add('is-active');
-    }
+        function closeSearch() {
+            headerCard.classList.remove('is-collapsed');
+            searchPopup.classList.remove('is-active');
+        }
 
-    function closeSearch() {
-      headerCard.classList.remove('is-collapsed');
-      searchPopup.classList.remove('is-active');
-    }
+        searchInput.addEventListener('focus', openSearch);
+        searchInput.addEventListener('click', openSearch);
 
-    searchInput.addEventListener('focus', openSearch);
-    searchInput.addEventListener('click', openSearch);
+        document.addEventListener('click', (e) => {
+            if (!searchWrapper.contains(e.target)) {
+                closeSearch();
+            }
+        });
 
-    document.addEventListener('click', (e) => {
-      if (!searchWrapper.contains(e.target)) {
-        closeSearch();
-      }
-    });
-
-    window.addEventListener('resize', () => {
-      if (window.innerWidth >= 1360) {
-        headerCard.classList.remove('is-collapsed');
-      } else if (searchPopup.classList.contains('is-active')) {
-        headerCard.classList.add('is-collapsed');
-      }
-    });
-  </script>
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1360) {
+                headerCard.classList.remove('is-collapsed');
+            } else if (searchPopup.classList.contains('is-active')) {
+                headerCard.classList.add('is-collapsed');
+            }
+        });
+    </script>
 </body>
+
 </html>
