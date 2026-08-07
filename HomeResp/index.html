@@ -42,7 +42,7 @@
             align-items: center;
             flex-shrink: 0;
             height: 100%;
-            z-index: 10;
+            z-index: 100;
         }
 
         .nav-group {
@@ -89,16 +89,19 @@
             height: 100vh;
             overflow-y: auto;
             position: relative;
+            min-width: 0; /* Prevents flex child from overflowing parent */
         }
 
-        /* --- Header Card --- */
+        /* --- Sticky Header Card --- */
         .header-card {
             height: 280px;
             background: linear-gradient(135deg, #008eb7 0%, #0099c7 100%);
             border-radius: var(--border-radius);
             padding: 12px 20px;
             color: white;
-            position: relative;
+            position: sticky; /* Makes header sticky on scroll */
+            top: 0;           /* Sticks to the top edge of main.content */
+            z-index: 50;      /* Keeps header above scrolling widgets */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -106,7 +109,7 @@
             gap: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             flex-shrink: 0;
-            z-index: 20;
+            transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease, box-shadow 0.3s ease;
         }
 
         .header-content {
@@ -114,6 +117,7 @@
             flex-direction: column;
             align-items: center;
             gap: 10px;
+            transition: opacity 0.2s ease;
         }
 
         .customise-btn {
@@ -132,6 +136,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            transition: opacity 0.2s ease;
         }
 
         .greeting-title {
@@ -210,15 +215,13 @@
             left: 50%;
             transform: translateX(-50%);
             width: 720px;
-            /* Fixed Width */
             height: 560px;
-            /* Fixed Height */
             background: white;
             border-radius: 12px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             padding: 20px;
             display: none;
-            z-index: 30;
+            z-index: 60;
             color: #333;
         }
 
@@ -296,12 +299,14 @@
         /* --- Widget Section --- */
         .widgets-container {
             flex: 1;
-            padding: 16px;
+            width: 100%;
             display: grid;
             gap: 16px;
             justify-items: center;
             grid-template-columns: repeat(3, minmax(0, 600px));
             justify-content: center;
+            position: relative;
+            z-index: 10; /* Lower than sticky header (z-index: 50) */
         }
 
         .widget-card {
@@ -309,34 +314,25 @@
             border-radius: var(--border-radius);
             width: 100%;
             height: 100%;
-            min-height: 480px;
-            /* Minimum height set to 480px */
+            min-width: min(440px, 100%);
+            max-width: 600px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
             padding: 16px;
         }
 
-        /* --- Responsive Rules (< 1360px) --- */
+        /* --- Responsive Rules (< 1360px down to 1024px) --- */
         @media (max-width: 1359.98px) {
             .header-card {
                 height: 240px;
-
             }
 
             .widgets-container {
                 grid-template-columns: repeat(2, minmax(0, 600px));
             }
 
-            .header-card {
-                transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
-            }
-
-            .header-content,
-            .customise-btn {
-                transition: opacity 0.2s ease;
-            }
-
             .header-card.is-collapsed {
-                height: 68px;
+                height: 72px; /* Sticky bar height (56px field + 16px padding) */
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12); /* Shadow elevation when stuck */
             }
 
             .header-card.is-collapsed .header-content {
@@ -354,8 +350,9 @@
             }
 
             .widget-card {
-                height: 600px;
+                min-height: 480px;
                 max-height: 600px;
+                height: 600px;
             }
         }
 
@@ -418,7 +415,7 @@
     <!-- Main View -->
     <main class="content">
 
-        <!-- Top Banner / Header Card -->
+        <!-- Top Banner / Sticky Header Card -->
         <header class="header-card" id="headerCard">
             <button class="customise-btn">
                 <i data-lucide="sliders-horizontal" size="14"></i>
@@ -525,33 +522,61 @@
         const headerCard = document.getElementById('headerCard');
         const searchPopup = document.getElementById('searchPopup');
         const searchWrapper = document.getElementById('searchWrapper');
+        const searchContainer = document.querySelector('.search-container');
+        const mainContent = document.querySelector('main.content');
 
-        function openSearch() {
+        function collapseHeader() {
             if (window.innerWidth < 1360) {
                 headerCard.classList.add('is-collapsed');
             }
+        }
+
+        function expandHeader() {
+            if (!searchPopup.classList.contains('is-active') && mainContent.scrollTop === 0) {
+                headerCard.classList.remove('is-collapsed');
+            }
+        }
+
+        function openSearch(e) {
+            if (e) e.stopPropagation();
+            collapseHeader();
             searchPopup.classList.add('is-active');
         }
 
         function closeSearch() {
-            headerCard.classList.remove('is-collapsed');
             searchPopup.classList.remove('is-active');
+            expandHeader();
         }
 
+        // Search interactions
         searchInput.addEventListener('focus', openSearch);
-        searchInput.addEventListener('click', openSearch);
+        searchInput.addEventListener('input', openSearch);
+        searchContainer.addEventListener('click', openSearch);
 
+        // Scroll listener: collapses header into sticky 72px bar on scroll (<1360px)
+        mainContent.addEventListener('scroll', () => {
+            if (window.innerWidth < 1360) {
+                if (mainContent.scrollTop > 10) {
+                    collapseHeader();
+                } else if (!searchPopup.classList.contains('is-active')) {
+                    expandHeader();
+                }
+            }
+        });
+
+        // Click outside handler
         document.addEventListener('click', (e) => {
             if (!searchWrapper.contains(e.target)) {
                 closeSearch();
             }
         });
 
+        // Window resize handler
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 1360) {
                 headerCard.classList.remove('is-collapsed');
             } else if (searchPopup.classList.contains('is-active')) {
-                headerCard.classList.add('is-collapsed');
+                collapseHeader();
             }
         });
     </script>
