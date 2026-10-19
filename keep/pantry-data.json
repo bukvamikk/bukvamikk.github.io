@@ -1,0 +1,12 @@
+{
+  "app": "pantry-keeper",
+  "version": 1,
+  "exportedAt": "2026-10-19T08:38:49.308Z",
+  "savedAt": 1792399129054,
+  "inventory": [],
+  "shopping": [],
+  "settings": {
+    "autoAdd": true,
+    "email": ""
+  }
+}

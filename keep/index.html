@@ -1,0 +1,1244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F9F9FF">
+<title>Keep</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0&display=block">
+<style>
+/* Layout: Material 3 app shell — small top app bar, one 760px content column,
+   bottom navigation bar on phones, navigation rail from 840px. M3 tonal-spot scheme from source colour #769CDF. */
+:root{
+  --primary:#415F91; --on-primary:#FFFFFF;
+  --primary-container:#D6E3FF; --on-primary-container:#284777;
+  --secondary:#565F71; --secondary-container:#DAE2F9; --on-secondary-container:#3E4759;
+  --tertiary-container:#FAD8FD; --on-tertiary-container:#573E5C;
+  --error:#BA1A1A; --on-error:#FFFFFF; --error-container:#FFDAD6; --on-error-container:#93000A;
+  --warn-container:#FFDDB5; --on-warn-container:#2A1800;
+  --surface:#F9F9FF; --surface-lowest:#FFFFFF; --surface-low:#F3F3FA; --surface-c:#EDEDF4;
+  --surface-high:#E7E8EE; --surface-highest:#E2E2E9;
+  --on-surface:#191C20; --on-surface-variant:#44474E;
+  --outline:#74777F; --outline-variant:#C4C6D0;
+  --inverse-surface:#2E3036; --inverse-on-surface:#F0F0F7; --inverse-primary:#AAC7FF;
+  --scrim:rgba(0,0,0,.32);
+  --shadow-1:0 1px 2px rgba(0,0,0,.3),0 1px 3px 1px rgba(0,0,0,.15);
+  --shadow-3:0 1px 3px rgba(0,0,0,.3),0 4px 8px 3px rgba(0,0,0,.15);
+
+  --font:"Roboto",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --icons:"Material Symbols Rounded";
+
+  --nav-h:80px; --rail-w:88px;
+  --gutter-l:max(16px,env(safe-area-inset-left,0px));
+  --gutter-r:max(16px,env(safe-area-inset-right,0px));
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --primary:#AAC7FF; --on-primary:#0A305F;
+  --primary-container:#284777; --on-primary-container:#D6E3FF;
+  --secondary:#BEC6DC; --secondary-container:#3E4759; --on-secondary-container:#DAE2F9;
+  --tertiary-container:#573E5C; --on-tertiary-container:#FAD8FD;
+  --error:#FFB4AB; --on-error:#690005; --error-container:#93000A; --on-error-container:#FFDAD6;
+  --warn-container:#5E3A00; --on-warn-container:#FFDDB5;
+  --surface:#111318; --surface-lowest:#0C0E13; --surface-low:#191C20; --surface-c:#1D2024;
+  --surface-high:#282A2F; --surface-highest:#33353A;
+  --on-surface:#E2E2E9; --on-surface-variant:#C4C6D0;
+  --outline:#8E9099; --outline-variant:#44474E;
+  --inverse-surface:#E2E2E9; --inverse-on-surface:#2E3036; --inverse-primary:#415F91;
+  --scrim:rgba(0,0,0,.5);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --primary:#AAC7FF; --on-primary:#0A305F;
+  --primary-container:#284777; --on-primary-container:#D6E3FF;
+  --secondary:#BEC6DC; --secondary-container:#3E4759; --on-secondary-container:#DAE2F9;
+  --tertiary-container:#573E5C; --on-tertiary-container:#FAD8FD;
+  --error:#FFB4AB; --on-error:#690005; --error-container:#93000A; --on-error-container:#FFDAD6;
+  --warn-container:#5E3A00; --on-warn-container:#FFDDB5;
+  --surface:#111318; --surface-lowest:#0C0E13; --surface-low:#191C20; --surface-c:#1D2024;
+  --surface-high:#282A2F; --surface-highest:#33353A;
+  --on-surface:#E2E2E9; --on-surface-variant:#C4C6D0;
+  --outline:#8E9099; --outline-variant:#44474E;
+  --inverse-surface:#E2E2E9; --inverse-on-surface:#2E3036; --inverse-primary:#415F91;
+  --scrim:rgba(0,0,0,.5);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--surface);color:var(--on-surface);font:400 14px/20px var(--font);letter-spacing:.25px;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+/* Icons */
+.ms{font-family:var(--icons);font-weight:normal;font-style:normal;font-size:24px;line-height:1;width:1em;height:1em;overflow:hidden;
+  display:inline-block;white-space:nowrap;direction:ltr;text-transform:none;letter-spacing:normal;flex:none;user-select:none;
+  font-feature-settings:"liga";-webkit-font-smoothing:antialiased;font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 24}
+.ms.fill{font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 24}
+.ms.sm{font-size:18px}
+
+/* State layer */
+.sl{position:relative;overflow:hidden;isolation:isolate}
+.sl::after{content:"";position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity .15s;pointer-events:none;border-radius:inherit;z-index:-1}
+.sl:hover::after{opacity:.08}
+.sl:active::after{opacity:.12}
+
+/* Type scale */
+.t-headline{font-size:24px;line-height:32px;font-weight:400;letter-spacing:0}
+.t-title-l{font-size:22px;line-height:28px;font-weight:400;letter-spacing:0}
+.t-title-m{font-size:16px;line-height:24px;font-weight:500;letter-spacing:.15px}
+.t-title-s{font-size:14px;line-height:20px;font-weight:500;letter-spacing:.1px}
+.t-label-m{font-size:12px;line-height:16px;font-weight:500;letter-spacing:.5px}
+.muted{color:var(--on-surface-variant)}
+
+/* App bar */
+.appbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);
+  padding-left:var(--gutter-l);padding-right:var(--gutter-r);transition:background .2s}
+.appbar.scrolled{background:var(--surface-c)}
+.appbar-inner{max-width:760px;margin:0 auto;height:64px;display:flex;align-items:center;gap:8px}
+.appbar h1{margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.brand-mark{width:40px;height:40px;border-radius:12px;background:var(--primary-container);color:var(--on-primary-container);display:grid;place-items:center;flex:none}
+
+main{padding-left:var(--gutter-l);padding-right:var(--gutter-r);padding-block:4px calc(var(--nav-h) + 112px + var(--safe-b))}
+.col{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+
+/* Navigation bar / rail */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface-c);display:flex;justify-content:center;
+  padding-bottom:var(--safe-b);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.nav-item{flex:1;max-width:160px;height:var(--nav-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--on-surface-variant)}
+.nav-ind{position:relative;width:64px;height:32px;border-radius:16px;display:grid;place-items:center;transition:background .2s}
+.nav-item:hover .nav-ind{background:color-mix(in srgb,var(--on-surface) 8%,transparent)}
+.nav-item[aria-current="page"]{color:var(--on-surface)}
+.nav-item[aria-current="page"] .nav-ind{background:var(--secondary-container);color:var(--on-secondary-container)}
+.nav-item[aria-current="page"] .ms{font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 24}
+.nav-item[aria-current="page"] .nav-label{font-weight:700}
+.nav-label{font-size:12px;line-height:16px;font-weight:500;letter-spacing:.5px}
+.badge{position:absolute;top:0;left:36px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--error);color:var(--surface-lowest);
+  font-size:11px;line-height:16px;font-weight:500;text-align:center;font-variant-numeric:tabular-nums;color:var(--on-error)}
+
+@media (min-width:840px){
+  .nav{top:0;right:auto;width:calc(var(--rail-w) + env(safe-area-inset-left,0px));flex-direction:column;justify-content:flex-start;gap:12px;
+    padding-top:calc(88px + env(safe-area-inset-top,0px));background:var(--surface)}
+  .nav-item{flex:none;height:56px;max-width:none;width:var(--rail-w)}
+  .appbar,main{margin-left:calc(var(--rail-w) + env(safe-area-inset-left,0px))}
+  main{padding-bottom:calc(120px + var(--safe-b))}
+}
+
+/* Buttons */
+.btn{height:40px;padding:0 24px;border-radius:20px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-size:14px;font-weight:500;letter-spacing:.1px;white-space:nowrap}
+.btn .ms{font-size:18px}
+.btn.has-icon{padding-left:16px}
+.btn.filled{background:var(--primary);color:var(--on-primary)}
+.btn.tonal{background:var(--secondary-container);color:var(--on-secondary-container)}
+.btn.outlined{border:1px solid var(--outline);color:var(--primary)}
+.btn.text{padding:0 12px;color:var(--primary)}
+.btn.text.danger,.btn.outlined.danger{color:var(--error)}
+.btn.outlined.danger{border-color:var(--error)}
+.btn.filled.danger{background:var(--error);color:var(--on-error)}
+.btn:disabled{opacity:.38;pointer-events:none}
+.icon-btn{width:40px;height:40px;border-radius:20px;display:grid;place-items:center;color:var(--on-surface-variant);flex:none}
+.icon-btn.on{color:var(--primary)}
+.icon-btn:disabled{opacity:.38;pointer-events:none}
+.icon-btn.danger{color:var(--error)}
+.icon-btn.tonal{background:var(--secondary-container);color:var(--on-secondary-container)}
+
+.fab{position:fixed;z-index:7;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(var(--nav-h) + 16px + var(--safe-b));
+  height:56px;padding:0 20px 0 16px;border-radius:16px;display:flex;align-items:center;gap:12px;
+  background:var(--primary-container);color:var(--on-primary-container);box-shadow:var(--shadow-3);
+  font-size:14px;font-weight:500;letter-spacing:.1px;transition:transform .25s cubic-bezier(.2,0,0,1)}
+.fab.go{background:var(--primary);color:var(--on-primary)}
+body.has-snack .fab{transform:translateY(-64px)}
+@media (min-width:840px){ .fab{bottom:calc(24px + var(--safe-b));right:calc(24px + env(safe-area-inset-right,0px))} }
+
+/* Search bar */
+.search{height:56px;border-radius:28px;background:var(--surface-high);display:flex;align-items:center;gap:4px;padding:0 4px 0 16px}
+.search input{flex:1;min-width:0;border:0;background:none;outline:none;font-size:16px;line-height:24px;letter-spacing:.5px;height:100%}
+.search input::placeholder{color:var(--on-surface-variant)}
+.search:focus-within{outline:2px solid var(--primary);outline-offset:-2px}
+
+/* Chips */
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0;margin:0 -2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{height:32px;padding:0 16px;border-radius:8px;border:1px solid var(--outline-variant);color:var(--on-surface-variant);
+  display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500;letter-spacing:.1px;white-space:nowrap;flex:none}
+.chip .ms{font-size:18px;margin-left:-8px}
+.chip[aria-pressed="true"]{background:var(--secondary-container);color:var(--on-secondary-container);border-color:transparent}
+.chip .count{font-variant-numeric:tabular-nums;opacity:.8}
+.sort-chip{padding:0 6px 0 16px;cursor:pointer;color:var(--on-surface)}
+.sort-chip .ms:last-child{margin:0 0 0 -6px}
+.sort-chip select{appearance:none;-webkit-appearance:none;border:0;background:transparent;font:inherit;color:inherit;letter-spacing:inherit;padding:0;outline:none;cursor:pointer}
+.sort-chip select option{background:var(--surface-high);color:var(--on-surface)}
+.sort-chip:focus-within{outline:2px solid var(--primary);outline-offset:2px}
+.chip-div{width:1px;background:var(--outline-variant);flex:none;margin:4px 0}
+label.setting{cursor:pointer}
+
+.tag{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:6px;font-size:11px;line-height:16px;font-weight:500;letter-spacing:.5px;white-space:nowrap}
+.tag .ms{font-size:14px}
+.tag.low{background:var(--error-container);color:var(--on-error-container)}
+.tag.warn{background:var(--warn-container);color:var(--on-warn-container)}
+.tag.auto{background:var(--tertiary-container);color:var(--on-tertiary-container)}
+
+/* Summary */
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{background:var(--surface-low);border-radius:16px;padding:12px 16px;display:flex;flex-direction:column;gap:2px;text-align:left;min-width:0}
+.stat b{font-size:28px;line-height:36px;font-weight:400;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;line-height:16px;font-weight:500;letter-spacing:.5px;color:var(--on-surface-variant)}
+.stat.alert b{color:var(--error)}
+
+/* Banners */
+.banner{border-radius:16px;padding:12px 12px 12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.banner p{margin:0;flex:1 1 220px;min-width:0}
+.banner.info{background:var(--secondary-container);color:var(--on-secondary-container)}
+.banner.err{background:var(--error-container);color:var(--on-error-container)}
+.banner .btn.text{color:inherit}
+
+/* Lists */
+.group{display:flex;flex-direction:column;gap:4px}
+.group-h{display:flex;align-items:center;gap:8px;padding:8px 4px 4px;color:var(--primary)}
+.group-h .n{color:var(--on-surface-variant);font-weight:400}
+.list{list-style:none;margin:0;padding:4px 0;background:var(--surface-low);border-radius:16px;overflow:hidden}
+.row{display:flex;align-items:center;gap:4px;padding:0 8px 0 0;min-height:72px}
+.row + .row,.srow + .srow{border-top:1px solid var(--outline-variant)}
+.row-main{flex:1;min-width:0;display:flex;align-items:center;gap:16px;padding:8px 8px 8px 16px;text-align:left;align-self:stretch;border-radius:0 12px 12px 0}
+.avatar{width:40px;height:40px;border-radius:20px;font-size:16px;font-weight:500;background:var(--primary-container);color:var(--on-primary-container);display:grid;place-items:center;flex:none}
+.row-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.row-title{font-size:16px;line-height:24px;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-sub{color:var(--on-surface-variant);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.stepper{display:flex;align-items:center;flex:none}
+.qty{min-width:48px;text-align:center;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;line-height:20px}
+.qty small{display:block;font-size:11px;line-height:14px;font-weight:400;color:var(--on-surface-variant);letter-spacing:.4px}
+.qty.zero{color:var(--error)}
+@media (max-width:440px){ .avatar{display:none} .row-main{padding-left:16px} .row .icon-btn{width:36px} .qty{min-width:40px} }
+
+/* Shopping rows */
+.srow{display:flex;align-items:center;gap:4px;padding:0 8px;min-height:56px}
+.srow-main{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;padding:8px 4px;text-align:left;align-self:stretch;justify-content:center;border-radius:8px}
+.srow.done .row-title{text-decoration:line-through;color:var(--on-surface-variant)}
+.check{width:48px;height:48px;border-radius:24px;display:grid;place-items:center;flex:none;cursor:pointer}
+.check input{position:absolute;opacity:0;width:1px;height:1px}
+.check .box{width:18px;height:18px;border-radius:2px;border:2px solid var(--on-surface-variant);display:grid;place-items:center;transition:background .15s,border-color .15s}
+.check .box .ms{font-size:16px;color:var(--on-primary);opacity:0;font-variation-settings:"FILL" 0,"wght" 600,"GRAD" 0,"opsz" 20}
+.check input:checked + .box{background:var(--primary);border-color:var(--primary)}
+.check input:checked + .box .ms{opacity:1}
+.check input:focus-visible + .box{outline:2px solid var(--primary);outline-offset:6px}
+
+.quickadd{display:flex;gap:8px;align-items:center}
+.quickadd .search{flex:1}
+
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.toolbar .spacer{flex:1}
+
+.empty{text-align:center;padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--on-surface-variant)}
+.empty > .ms{font-size:48px;color:var(--primary)}
+.empty p{margin:0;max-width:36ch}
+
+/* Settings */
+.card{background:var(--surface-low);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h2{margin:0}
+.card p{margin:0;max-width:65ch}
+.setting{display:flex;align-items:center;gap:16px}
+.setting > div{flex:1;min-width:0}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.switch{position:relative;width:52px;height:32px;flex:none;cursor:pointer}
+.switch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.switch .track{position:absolute;inset:0;border-radius:16px;background:var(--surface-highest);border:2px solid var(--outline);transition:background .2s,border-color .2s}
+.switch .thumb{position:absolute;top:8px;left:8px;width:16px;height:16px;border-radius:50%;background:var(--outline);transition:all .2s cubic-bezier(.2,0,0,1)}
+.switch input:checked ~ .track{background:var(--primary);border-color:var(--primary)}
+.switch input:checked ~ .thumb{left:24px;top:4px;width:24px;height:24px;background:var(--on-primary)}
+.switch input:focus-visible ~ .track{outline:2px solid var(--primary);outline-offset:2px}
+textarea.backup{width:100%;min-height:120px;resize:vertical;border-radius:4px;border:1px solid var(--outline);background:transparent;padding:12px;
+  font:12px/16px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--on-surface)}
+textarea.backup:focus{outline:2px solid var(--primary);outline-offset:-1px;border-color:transparent}
+.file-btn{position:relative}
+.file-btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.card .field{max-width:420px}
+.card .field label{background:var(--surface-low)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-variant-numeric:tabular-nums}
+.kv dt{color:var(--on-surface-variant)} .kv dd{margin:0}
+
+/* Dialogs */
+dialog{border:0;padding:0;border-radius:28px;background:var(--surface-high);color:var(--on-surface);
+  width:min(560px,calc(100vw - 32px));max-height:calc(100dvh - 48px);box-shadow:var(--shadow-3)}
+dialog::backdrop{background:var(--scrim)}
+dialog[open]{animation:dlg .2s cubic-bezier(.2,0,0,1)}
+@keyframes dlg{from{opacity:0;transform:translateY(12px) scale(.98)}}
+.dlg-body{padding:24px;display:flex;flex-direction:column;gap:16px;overflow:auto;max-height:calc(100dvh - 48px)}
+.dlg-body h2{margin:0}
+.dlg-body p{margin:0;color:var(--on-surface-variant)}
+.dlg-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;padding-top:8px;flex-wrap:wrap}
+.dlg-actions .spacer{flex:1}
+
+/* Outlined text fields */
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.fields .full{grid-column:1/-1}
+@media (max-width:440px){ .fields{grid-template-columns:minmax(0,1fr)} .fields .half-keep{grid-column:auto} }
+.field{position:relative;min-width:0}
+.field input,.field select,.field textarea{width:100%;height:56px;border-radius:4px;border:1px solid var(--outline);background:transparent;
+  padding:16px;font-size:16px;line-height:24px;letter-spacing:.5px;outline:none;appearance:none;-webkit-appearance:none}
+.field textarea{height:auto;min-height:80px;resize:vertical}
+.field select{padding-right:40px;background:transparent}
+.field .caret{position:absolute;right:12px;top:16px;pointer-events:none;color:var(--on-surface-variant)}
+.field label{position:absolute;left:12px;top:16px;padding:0 4px;color:var(--on-surface-variant);font-size:16px;line-height:24px;letter-spacing:.5px;
+  pointer-events:none;transition:all .15s cubic-bezier(.2,0,0,1);background:var(--surface-high);max-width:calc(100% - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.field input:focus,.field select:focus,.field textarea:focus{border:2px solid var(--primary);padding:15px}
+.field select:focus{padding-right:39px}
+.field input:focus + label,.field input:not(:placeholder-shown) + label,
+.field textarea:focus + label,.field textarea:not(:placeholder-shown) + label,
+.field.fixed label{top:-8px;font-size:12px;line-height:16px}
+.field input:focus + label,.field textarea:focus + label,.field select:focus + label{color:var(--primary)}
+.field .help{display:block;padding:4px 16px 0;font-size:12px;line-height:16px;color:var(--on-surface-variant)}
+.field.invalid input{border-color:var(--error)}
+.field.invalid label,.field.invalid .help{color:var(--error)}
+.field input[type=date]{min-height:56px}
+.field input::-webkit-calendar-picker-indicator{opacity:.7;cursor:pointer}
+
+/* Snackbar */
+.snack{position:fixed;z-index:20;left:var(--gutter-l);right:var(--gutter-r);bottom:calc(var(--nav-h) + 12px + var(--safe-b));
+  margin:0 auto;max-width:560px;min-height:48px;border-radius:4px;background:var(--inverse-surface);color:var(--inverse-on-surface);
+  display:flex;align-items:center;gap:8px;padding:6px 8px 6px 16px;box-shadow:var(--shadow-3);
+  transform:translateY(16px);opacity:0;pointer-events:none;transition:all .2s cubic-bezier(.2,0,0,1)}
+.snack.show{transform:none;opacity:1;pointer-events:auto}
+.snack p{margin:0;flex:1;min-width:0}
+.snack .btn.text{color:var(--inverse-primary)}
+.snack .icon-btn{color:var(--inverse-on-surface)}
+@media (min-width:840px){ .snack{left:calc(var(--rail-w) + 24px);right:auto;bottom:calc(24px + var(--safe-b));margin:0;width:min(560px,calc(100vw - var(--rail-w) - 240px))} }
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+<style>body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+
+
+<header class="appbar" id="appbar">
+  <div class="appbar-inner">
+    <div class="brand">
+      <span class="brand-mark"><span class="ms fill">kitchen</span></span>
+      <h1 class="t-title-l" id="pageTitle">Inventory</h1>
+    </div>
+    <span class="muted t-label-m" id="saveState" aria-live="polite"></span>
+  </div>
+</header>
+
+<main>
+  <div class="col" id="view"></div>
+</main>
+
+<nav class="nav" aria-label="Sections">
+  <button class="nav-item" data-tab="inventory">
+    <span class="nav-ind sl"><span class="ms">kitchen</span></span><span class="nav-label">Inventory</span>
+  </button>
+  <button class="nav-item" data-tab="freezer">
+    <span class="nav-ind sl"><span class="ms">ac_unit</span></span><span class="nav-label">Freezer</span>
+  </button>
+  <button class="nav-item" data-tab="shopping">
+    <span class="nav-ind sl"><span class="ms">shopping_cart</span><span class="badge" id="shopBadge" hidden></span></span><span class="nav-label">Shopping</span>
+  </button>
+  <button class="nav-item" data-tab="settings">
+    <span class="nav-ind sl"><span class="ms">settings</span></span><span class="nav-label">Settings</span>
+  </button>
+</nav>
+
+<button class="fab sl" id="fab" hidden><span class="ms" id="fabIcon">add</span><span id="fabLabel">Add item</span></button>
+
+<div class="snack" id="snack" role="status" aria-live="polite">
+  <p id="snackText"></p>
+  <button class="btn text sl" id="snackUndo" hidden>Undo</button>
+  <button class="icon-btn sl" id="snackClose" aria-label="Dismiss"><span class="ms">close</span></button>
+</div>
+
+<!-- Add / edit item -->
+<dialog id="itemDlg" aria-labelledby="itemDlgTitle">
+  <form class="dlg-body" id="itemForm" novalidate>
+    <h2 class="t-headline" id="itemDlgTitle">Add item</h2>
+    <div class="fields">
+      <div class="field full" id="nameField">
+        <input id="f-name" placeholder=" " autocomplete="off" list="nameList" required>
+        <label for="f-name">Name</label>
+        <span class="help" id="nameHelp" hidden>Enter a name for the item.</span>
+      </div>
+      <div class="field">
+        <input id="f-qty" type="number" inputmode="decimal" min="0" step="any" placeholder=" ">
+        <label for="f-qty">Quantity</label>
+      </div>
+      <div class="field fixed">
+        <select id="f-unit"></select><label for="f-unit">Unit</label><span class="ms caret">arrow_drop_down</span>
+      </div>
+      <div class="field inv-only full">
+        <input id="f-min" type="number" inputmode="decimal" min="0" step="any" placeholder=" ">
+        <label for="f-min">Keep at least</label>
+        <span class="help">Goes on the list below this</span>
+      </div>
+      <div class="field fixed inv-only full">
+        <input id="f-exp" type="date"><label for="f-exp">Best before (optional)</label>
+      </div>
+      <label class="setting full inv-only" for="f-frozen">
+        <div><div class="t-title-s">Keep in freezer</div><div class="muted">Shows on the Freezer tab instead of Inventory</div></div>
+        <span class="switch"><input type="checkbox" id="f-frozen"><span class="track"></span><span class="thumb"></span></span>
+      </label>
+      <div class="field inv-only full">
+        <textarea id="f-notes" placeholder=" " rows="2"></textarea>
+        <label for="f-notes">Notes (optional)</label>
+      </div>
+    </div>
+    <div class="dlg-actions">
+      <button type="button" class="btn text danger sl" id="itemDelete">Delete</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn text sl" data-close>Cancel</button>
+      <button type="submit" class="btn filled sl">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Confirm -->
+<dialog id="confirmDlg" aria-labelledby="confirmTitle">
+  <div class="dlg-body">
+    <h2 class="t-headline" id="confirmTitle"></h2>
+    <p id="confirmText"></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn text sl" data-close>Cancel</button>
+      <button type="button" class="btn filled danger sl" id="confirmOk">Confirm</button>
+    </div>
+  </div>
+</dialog>
+
+<datalist id="nameList"></datalist>
+
+<script>
+(() => {
+"use strict";
+
+/* ---------- Constants ---------- */
+const KEY = "pantry-keeper-v1";
+const UI_KEY = "pantry-keeper-ui";
+const UNITS = ["pcs","portions","pack","g","kg","ml","L","bottle","can","jar","box","bag","roll","bunch"];
+const SORTS = {name: "Name A–Z", amount: "Lowest stock", expiry: "Use by date"};
+const SOON_DAYS = 3;
+
+/* ---------- Helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const round = n => Math.round(n * 100) / 100;
+const fmtQ = n => Number(n).toLocaleString(undefined, {maximumFractionDigits: 2});
+const iso = d => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+const inDays = n => { const d = new Date(); d.setDate(d.getDate() + n); return iso(d); };
+const daysUntil = s => {
+  if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
+  const [y,m,d] = s.split("-").map(Number);
+  const t = new Date(y, m-1, d), now = new Date(); now.setHours(0,0,0,0);
+  return Math.round((t - now) / 86400000);
+};
+const fmtDate = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString(undefined,{day:"numeric",month:"short"}); };
+const num = (v, def) => { const n = parseFloat(String(v).replace(",", ".")); return isNaN(n) ? def : Math.max(0, round(n)); };
+const norm = s => String(s || "").trim().toLowerCase();
+const stepFor = unit => (unit === "g" || unit === "ml") ? 100 : 1;
+const plural = (n, w) => n + " " + w + (n === 1 ? "" : "s");
+
+/* ---------- Storage ---------- */
+let storageOk = true;
+try { const k = "__pk_test"; localStorage.setItem(k, "1"); localStorage.removeItem(k); } catch (e) { storageOk = false; }
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist().catch(() => {}); } catch (e) {}
+
+function normalize(d) {
+  const inv = (Array.isArray(d.inventory) ? d.inventory : []).filter(i => i && i.name).map(i => ({
+    id: String(i.id || uid()), name: String(i.name), qty: num(i.qty, 0), unit: String(i.unit || "pcs"),
+    frozen: i.frozen != null ? !!i.frozen : i.location === "Freezer", min: num(i.min, 0),
+    expiry: daysUntil(i.expiry) === null ? "" : i.expiry, notes: String(i.notes || "")
+  }));
+  const shop = (Array.isArray(d.shopping) ? d.shopping : []).filter(s => s && s.name).map(s => ({
+    id: String(s.id || uid()), name: String(s.name), qty: num(s.qty, 1), unit: String(s.unit || "pcs"),
+    invId: s.invId ? String(s.invId) : null, auto: !!s.auto, checked: !!s.checked
+  }));
+  return { version: 1, inventory: inv, shopping: shop,
+    settings: { autoAdd: !(d.settings && d.settings.autoAdd === false), email: String((d.settings && d.settings.email) || "") },
+    examples: !!d.examples, savedAt: d.savedAt || null };
+}
+
+function sample() {
+  const I = (name, qty, unit, category, location, min, exp, notes) =>
+    ({id: uid(), name, qty, unit, frozen: location === "Freezer", min, expiry: exp === null ? "" : inDays(exp), notes: notes || ""});
+  const inventory = [
+    I("Milk", 1, "L", "Dairy & eggs", "Fridge", 2, 3),
+    I("Eggs", 8, "pcs", "Dairy & eggs", "Fridge", 6, 12),
+    I("Greek yogurt", 2, "pcs", "Dairy & eggs", "Fridge", 0, -1),
+    I("Tomatoes", 4, "pcs", "Produce", "Fridge", 0, 2),
+    I("Spaghetti", 3, "pack", "Pantry staples", "Pantry", 2, null),
+    I("Basmati rice", 1.5, "kg", "Pantry staples", "Pantry", 1, null),
+    I("Olive oil", 1, "bottle", "Pantry staples", "Pantry", 1, null, "Extra virgin, 750 ml"),
+    I("Coffee beans", 500, "g", "Drinks", "Pantry", 250, null),
+    I("Sparkling water", 4, "bottle", "Drinks", "Pantry", 6, null),
+    I("Frozen peas", 1, "bag", "Frozen", "Freezer", 1, 90),
+    I("Bolognese sauce", 4, "portions", "Leftovers", "Freezer", 0, null, "Frozen in September"),
+    I("Chicken breasts", 2, "pcs", "Meat & fish", "Freezer", 0, 60),
+    I("Dish soap", 0, "bottle", "Cleaning", "Utility cupboard", 1, null),
+    I("Toilet paper", 6, "roll", "Toiletries", "Bathroom", 4, null)
+  ];
+  const s = { version: 1, inventory, settings: { autoAdd: true }, examples: true, savedAt: null,
+    shopping: [
+      {id: uid(), name: "Bananas", qty: 6, unit: "pcs", invId: null, auto: false, checked: false},
+      {id: uid(), name: "Sourdough bread", qty: 1, unit: "pcs", invId: null, auto: false, checked: true}
+    ]};
+  return s;
+}
+
+function load() {
+  if (storageOk) {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) { const d = JSON.parse(raw); if (d && Array.isArray(d.inventory)) return normalize(d); }
+    } catch (e) {}
+  }
+  const s = sample();
+  s.inventory.forEach(i => syncAuto(i, s));
+  return s;
+}
+
+let state;
+let lastSaveFailed = false;
+function save() {
+  state.savedAt = Date.now();
+  if (fileHandle && fileStatus === "connected") scheduleFileWrite();
+  if (!storageOk) return;
+  try { localStorage.setItem(KEY, JSON.stringify(state)); lastSaveFailed = false; }
+  catch (e) { lastSaveFailed = true; }
+}
+const snapshot = () => JSON.stringify(state);
+
+/* ---------- UI state ---------- */
+const ui = { tab: "inventory", query: "", filter: "all", sort: "name" };
+try { const u = JSON.parse(localStorage.getItem(UI_KEY) || "{}"); if (u.tab) ui.tab = u.tab; if (u.filter) ui.filter = u.filter; if (u.sort && SORTS[u.sort]) ui.sort = u.sort; } catch (e) {}
+if (ui.filter.startsWith("loc:")) ui.filter = "all";
+const h = (location.hash || "").slice(1);
+if (["inventory","freezer","shopping","settings"].includes(h)) ui.tab = h;
+const saveUi = () => { try { localStorage.setItem(UI_KEY, JSON.stringify({tab: ui.tab, filter: ui.filter, sort: ui.sort})); } catch (e) {} };
+
+/* ---------- Domain logic ---------- */
+const isLow = i => i.min > 0 && i.qty < i.min;
+const expState = i => { const d = daysUntil(i.expiry); if (d === null) return null; if (d < 0) return "expired"; if (d <= SOON_DAYS) return "soon"; return "ok"; };
+const openEntryFor = (invId, st = state) => st.shopping.find(s => s.invId === invId && !s.checked);
+
+function syncAuto(item, st = state) {
+  const entry = openEntryFor(item.id, st);
+  if (isLow(item) && st.settings.autoAdd) {
+    const need = round(item.min - item.qty);
+    if (!entry) st.shopping.push({id: uid(), name: item.name, qty: need, unit: item.unit, invId: item.id, auto: true, checked: false});
+    else if (entry.auto) { entry.qty = need; entry.name = item.name; entry.unit = item.unit; }
+  } else if (!isLow(item) && entry && entry.auto) {
+    st.shopping.splice(st.shopping.indexOf(entry), 1);
+  }
+}
+
+function commit(msg, undoSnap) {
+  save(); render();
+  if (msg) snack(msg, undoSnap);
+}
+
+/* ---------- Rendering ---------- */
+const view = $("#view");
+
+function render() {
+  document.querySelectorAll(".nav-item").forEach(b => b.setAttribute("aria-current", b.dataset.tab === ui.tab ? "page" : "false"));
+  $("#pageTitle").textContent = {inventory: "Inventory", freezer: "Freezer", shopping: "Shopping list", settings: "Settings"}[ui.tab];
+  const open = state.shopping.filter(s => !s.checked).length;
+  const badge = $("#shopBadge"); badge.hidden = !open; badge.textContent = open > 99 ? "99+" : open;
+  updateSaveLabel();
+  refreshDatalists();
+  if (ui.tab === "inventory" || ui.tab === "freezer") renderInventory(ui.tab);
+  else if (ui.tab === "shopping") renderShopping();
+  else renderSettings();
+  renderFab();
+}
+
+function storageBanner() {
+  const fb = fileBanner();
+  if (fileStatus === "connected" || (storageOk && !lastSaveFailed)) return fb;
+  return fb + `<div class="banner err"><span class="ms">warning</span><p>${!storageOk
+    ? "This browser is blocking storage, so changes will be lost when you close the page. Create a data file or email yourself a copy in Settings before you leave."
+    : "The last change could not be saved because browser storage is full. Create a data file in Settings."}</p></div>`;
+}
+
+function renderInventory(scope) {
+  const frz = scope === "freezer";
+  const inv = state.inventory.filter(i => !!i.frozen === frz);
+  const lowN = inv.filter(isLow).length;
+  const expN = inv.filter(i => ["soon","expired"].includes(expState(i))).length;
+
+  const q = norm(ui.query);
+  let items = inv.filter(i => !q || [i.name, i.notes].some(f => norm(f).includes(q)));
+  if (ui.filter === "low") items = items.filter(isLow);
+  else if (ui.filter === "expiring") items = items.filter(i => ["soon","expired"].includes(expState(i)));
+
+  const chip = (key, label, count, icon) => {
+    const on = ui.filter === key;
+    return `<button class="chip sl" data-action="filter" data-filter="${esc(key)}" aria-pressed="${on}">${on ? '<span class="ms">check</span>' : (icon ? `<span class="ms">${icon}</span>` : "")}${esc(label)}${count != null ? ` <span class="count">${count}</span>` : ""}</button>`;
+  };
+
+  let html = storageBanner();
+  if (state.examples) html += `<div class="banner info"><span class="ms">lightbulb</span><p>These are example items so you can try things out. Clear them when you're ready to add your own.</p><button class="btn text sl" data-action="clear-examples">Clear examples</button></div>`;
+
+  html += `<div class="summary">
+    <button class="stat sl" data-action="filter" data-filter="all"><b>${inv.length}</b><span>${frz ? "In the freezer" : "Items in stock"}</span></button>
+    <button class="stat sl ${lowN ? "alert" : ""}" data-action="filter" data-filter="low"><b>${lowN}</b><span>Running low</span></button>
+    <button class="stat sl ${expN ? "alert" : ""}" data-action="filter" data-filter="expiring"><b>${expN}</b><span>Use soon</span></button>
+  </div>`;
+
+  html += `<label class="search" for="invSearch"><span class="ms muted">search</span>
+    <input id="invSearch" type="search" placeholder="${frz ? "Search your freezer" : "Search your inventory"}" value="${esc(ui.query)}" autocomplete="off">
+    ${ui.query ? '<button class="icon-btn sl" data-action="clear-search" aria-label="Clear search"><span class="ms">close</span></button>' : ""}</label>`;
+
+  html += `<div class="chips" role="toolbar" aria-label="Sort and filter"><label class="chip sort-chip sl" for="sortSel"><span class="ms">sort</span><select id="sortSel" aria-label="Sort by">${Object.entries(SORTS).map(([k, v]) => `<option value="${k}" ${ui.sort === k ? "selected" : ""}>${v}</option>`).join("")}</select><span class="ms">arrow_drop_down</span></label><span class="chip-div"></span>${chip("all","All")}${chip("low","Low stock",lowN)}${chip("expiring","Use soon",expN)}</div>`;
+
+  if (!inv.length) {
+    html += frz
+      ? `<div class="empty"><span class="ms">ac_unit</span><div class="t-title-m" style="color:var(--on-surface)">Your freezer is empty</div><p>Add frozen food and leftovers here. Count them in portions so you know how many meals you have.</p><button class="btn filled has-icon sl" data-action="add-frz"><span class="ms">add</span>Add to freezer</button></div>`
+      : `<div class="empty"><span class="ms">inventory_2</span><div class="t-title-m" style="color:var(--on-surface)">Your inventory is empty</div><p>Add what's in your fridge and cupboards. Set a minimum and it goes on your shopping list automatically when you run low.</p><button class="btn filled has-icon sl" data-action="add-inv"><span class="ms">add</span>Add your first item</button></div>`;
+  } else if (!items.length) {
+    html += `<div class="empty"><span class="ms">search_off</span><p>No items match${ui.query ? ` “${esc(ui.query)}”` : " this filter"}.</p><button class="btn text sl" data-action="reset-filters">Show all items</button></div>`;
+  } else {
+    html += `<ul class="list">${sortItems(items).map(invRow).join("")}</ul>`;
+  }
+  setView(html);
+}
+
+function sortItems(items) {
+  const byName = (a, b) => a.name.localeCompare(b.name);
+  const list = items.slice();
+  if (ui.sort === "amount") return list.sort((a, b) => (isLow(b) - isLow(a)) || (isLow(a) ? a.qty / a.min - b.qty / b.min : a.qty - b.qty) || byName(a, b));
+  if (ui.sort === "expiry") return list.sort((a, b) => {
+    const da = daysUntil(a.expiry), db = daysUntil(b.expiry);
+    if (da === null && db === null) return byName(a, b);
+    if (da === null) return 1; if (db === null) return -1;
+    return da - db || byName(a, b);
+  });
+  return list.sort(byName);
+}
+
+function invRow(i) {
+  const tags = [];
+  if (isLow(i)) tags.push(`<span class="tag low"><span class="ms">trending_down</span>Low · keep ${fmtQ(i.min)}</span>`);
+  const es = expState(i), d = daysUntil(i.expiry);
+  if (es === "expired") tags.push(`<span class="tag low"><span class="ms">event_busy</span>Expired ${d === -1 ? "yesterday" : (-d) + " days ago"}</span>`);
+  else if (es === "soon") tags.push(`<span class="tag warn"><span class="ms">schedule</span>${d === 0 ? "Use today" : d === 1 ? "Use by tomorrow" : `Use within ${d} days`}</span>`);
+  const sub = [es === "ok" ? "Best before " + fmtDate(i.expiry) : "", i.notes].filter(Boolean).join(" · ");
+  const onList = !!openEntryFor(i.id);
+  return `<li class="row">
+    <button class="row-main sl" data-action="edit-inv" data-id="${esc(i.id)}" aria-label="Edit ${esc(i.name)}">
+      <span class="avatar" aria-hidden="true">${esc((i.name.trim()[0] || "?").toUpperCase())}</span>
+      <span class="row-text"><span class="row-title">${esc(i.name)}</span>${sub ? `<span class="row-sub">${esc(sub)}</span>` : ""}${tags.length ? `<span class="row-tags">${tags.join("")}</span>` : ""}</span>
+    </button>
+    <div class="stepper">
+      ${i.qty <= 0
+        ? `<button class="icon-btn danger sl" data-action="del-inv" data-id="${esc(i.id)}" aria-label="Delete ${esc(i.name)}" title="Delete item"><span class="ms">delete</span></button>`
+        : `<button class="icon-btn sl" data-action="dec" data-id="${esc(i.id)}" aria-label="Use some ${esc(i.name)}"><span class="ms">remove</span></button>`}
+      <span class="qty ${i.qty <= 0 ? "zero" : ""}">${fmtQ(i.qty)}<small>${esc(i.unit)}</small></span>
+      <button class="icon-btn sl" data-action="inc" data-id="${esc(i.id)}" aria-label="Add more ${esc(i.name)}"><span class="ms">add</span></button>
+    </div>
+    <button class="icon-btn sl ${onList ? "on" : ""}" data-action="tolist" data-id="${esc(i.id)}" aria-label="${onList ? "On shopping list. Remove from list" : "Add to shopping list"}" title="${onList ? "On your shopping list" : "Add to shopping list"}"><span class="ms ${onList ? "fill" : ""}">${onList ? "shopping_cart" : "add_shopping_cart"}</span></button>
+  </li>`;
+}
+
+function renderShopping() {
+  const toBuy = state.shopping.filter(s => !s.checked);
+  const inCart = state.shopping.filter(s => s.checked);
+  const missingLow = state.inventory.filter(i => isLow(i) && !openEntryFor(i.id));
+
+  let html = storageBanner();
+  html += `<form class="quickadd" id="quickAdd" autocomplete="off">
+    <label class="search" for="qaInput" style="flex:1"><span class="ms muted">add_shopping_cart</span>
+      <input id="qaInput" list="nameList" placeholder="Add to list, e.g. 2 avocados" enterkeyhint="done"></label>
+    <button class="icon-btn tonal sl" type="submit" aria-label="Add to list" style="width:56px;height:56px;border-radius:16px"><span class="ms">add</span></button>
+  </form>`;
+
+  if (missingLow.length || inCart.length) {
+    html += `<div class="toolbar">`;
+    if (missingLow.length) html += `<button class="btn tonal has-icon sl" data-action="add-low"><span class="ms">playlist_add</span>Add ${plural(missingLow.length, "low-stock item")}</button>`;
+    html += `<span class="spacer"></span>`;
+    if (inCart.length) html += `<button class="btn text sl" data-action="uncheck-all">Uncheck all</button>`;
+    html += `</div>`;
+  }
+
+  if (!state.shopping.length) {
+    html += `<div class="empty"><span class="ms">done_all</span><div class="t-title-m" style="color:var(--on-surface)">Nothing to buy</div><p>Type above to add something. Items you're running low on are added automatically.</p></div>`;
+  } else {
+    if (toBuy.length) {
+      html += `<section class="group"><div class="group-h t-title-s"><span class="ms sm">checklist</span>To buy <span class="n">${toBuy.length}</span></div>
+        <ul class="list">${toBuy.slice().sort((a,b) => a.name.localeCompare(b.name)).map(shopRow).join("")}</ul></section>`;
+    } else {
+      html += `<div class="banner info"><span class="ms">task_alt</span><p>Everything is in your cart. Tap <b>Put away</b> to add it to your inventory.</p></div>`;
+    }
+    if (inCart.length) {
+      html += `<section class="group"><div class="group-h t-title-s"><span class="ms sm">shopping_basket</span>In your cart <span class="n">${inCart.length}</span></div>
+        <ul class="list">${inCart.map(shopRow).join("")}</ul></section>`;
+    }
+  }
+  setView(html);
+}
+
+function shopRow(s) {
+  const linked = s.invId && state.inventory.find(i => i.id === s.invId);
+  const sub = [fmtQ(s.qty) + " " + s.unit, linked ? `${fmtQ(linked.qty)} ${linked.unit} at home` : ""].filter(Boolean).join(" · ");
+  return `<li class="srow ${s.checked ? "done" : ""}">
+    <label class="check sl"><input type="checkbox" data-action="check" data-id="${esc(s.id)}" ${s.checked ? "checked" : ""} aria-label="${esc(s.name)} in cart"><span class="box"><span class="ms">check</span></span></label>
+    <button class="srow-main sl" data-action="edit-shop" data-id="${esc(s.id)}" aria-label="Edit ${esc(s.name)}">
+      <span class="row-title">${esc(s.name)}</span>
+      <span class="row-sub">${esc(sub)}</span>
+      ${s.auto && !s.checked ? '<span class="row-tags"><span class="tag auto"><span class="ms">bolt</span>Added because you\'re low</span></span>' : ""}
+    </button>
+    <button class="icon-btn sl" data-action="del-shop" data-id="${esc(s.id)}" aria-label="Remove ${esc(s.name)} from list"><span class="ms">close</span></button>
+  </li>`;
+}
+
+const framed = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
+
+function renderSettings() {
+  const saved = state.savedAt ? new Date(state.savedAt).toLocaleString(undefined, {dateStyle: "medium", timeStyle: "short"}) : "Not yet";
+  const bytes = new Blob([JSON.stringify(state)]).size;
+  let html = storageBanner();
+  html += `<section class="card">
+    <h2 class="t-title-m">Shopping</h2>
+    <div class="setting"><div><div class="t-title-s">Add low-stock items automatically</div><div class="muted">When an item drops below its minimum, it goes on your shopping list. It comes off again if you restock before shopping.</div></div>
+      <label class="switch"><input type="checkbox" id="autoAdd" ${state.settings.autoAdd ? "checked" : ""} aria-label="Add low-stock items automatically"><span class="track"></span><span class="thumb"></span></label></div>
+  </section>`;
+
+  html += dataFileCard(saved, bytes);
+
+  html += framed
+    ? `<section class="card"><h2 class="t-title-m">Email a copy</h2><p class="muted">Emailing your data works in the downloaded app, opened in Chrome or Edge.</p></section>`
+    : `<section class="card">
+    <h2 class="t-title-m">Email a copy</h2>
+    <p class="muted">Sends your data as a file attachment, so you keep a dated copy in your inbox. Your mail app opens and you press Send. To restore a copy later, save the attachment and open it under Data file.</p>
+    <div class="field">
+      <input id="emailAddr" type="email" inputmode="email" autocomplete="email" placeholder=" " value="${esc(state.settings.email)}">
+      <label for="emailAddr">Send to</label>
+    </div>
+    <div class="btn-row"><button class="btn filled has-icon sl" data-action="email-data"><span class="ms">forward_to_inbox</span>Email my data</button></div>
+  </section>`;
+
+  html += `<section class="card">
+    <h2 class="t-title-m">Start over</h2>
+    <div class="setting"><div class="muted">Delete every item in your inventory and shopping list from this browser.</div>
+      <button class="btn outlined danger sl" data-action="wipe">Delete all data</button></div>
+  </section>`;
+  setView(html);
+}
+
+function setView(html) {
+  const active = document.activeElement && document.activeElement.id;
+  const pos = active && document.activeElement.selectionStart;
+  view.innerHTML = html;
+  if (active) {
+    const el = document.getElementById(active);
+    if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA")) { el.focus(); try { if (pos != null) el.setSelectionRange(pos, pos); } catch (e) {} }
+  }
+}
+
+function renderFab() {
+  const fab = $("#fab");
+  const cart = state.shopping.filter(s => s.checked).length;
+  fab.classList.remove("go");
+  if (ui.tab === "inventory") { fab.hidden = false; $("#fabIcon").textContent = "add"; $("#fabLabel").textContent = "Add item"; fab.dataset.action = "add-inv"; }
+  else if (ui.tab === "freezer") { fab.hidden = false; $("#fabIcon").textContent = "add"; $("#fabLabel").textContent = "Add to freezer"; fab.dataset.action = "add-frz"; }
+  else if (ui.tab === "shopping" && cart) { fab.hidden = false; fab.classList.add("go"); $("#fabIcon").textContent = "shopping_cart_checkout"; $("#fabLabel").textContent = `Put away ${cart}`; fab.dataset.action = "finish"; }
+  else if (ui.tab === "shopping") { fab.hidden = false; $("#fabIcon").textContent = "add"; $("#fabLabel").textContent = "Add item"; fab.dataset.action = "add-shop"; }
+  else fab.hidden = true;
+}
+
+function refreshDatalists() {
+  const names = [...new Set(state.inventory.map(i => i.name))].sort();
+  $("#nameList").innerHTML = names.map(c => `<option value="${esc(c)}">`).join("");
+}
+
+/* ---------- Snackbar ---------- */
+let snackTimer, snackUndo = null;
+function snack(msg, undoSnap) {
+  $("#snackText").textContent = msg;
+  snackUndo = undoSnap || null;
+  $("#snackUndo").hidden = !snackUndo;
+  $("#snack").classList.add("show"); document.body.classList.add("has-snack");
+  clearTimeout(snackTimer);
+  snackTimer = setTimeout(hideSnack, snackUndo ? 6000 : 3500);
+}
+function hideSnack() { $("#snack").classList.remove("show"); document.body.classList.remove("has-snack"); snackUndo = null; }
+$("#snackClose").addEventListener("click", hideSnack);
+$("#snackUndo").addEventListener("click", () => {
+  if (!snackUndo) return;
+  state = normalize(JSON.parse(snackUndo)); hideSnack(); save(); render(); snack("Undone");
+});
+
+/* ---------- Confirm dialog ---------- */
+let confirmFn = null;
+function confirmAction(title, text, okLabel, fn) {
+  $("#confirmTitle").textContent = title; $("#confirmText").textContent = text; $("#confirmOk").textContent = okLabel;
+  confirmFn = fn; $("#confirmDlg").showModal();
+}
+$("#confirmOk").addEventListener("click", () => { $("#confirmDlg").close(); const f = confirmFn; confirmFn = null; f && f(); });
+
+/* ---------- Item dialog ---------- */
+const dlg = $("#itemDlg");
+let editing = null; // {kind:'inv'|'shop', id}
+
+function openItem(kind, id, preset) {
+  editing = {kind, id: id || null};
+  const src = id ? (kind === "inv" ? state.inventory : state.shopping).find(x => x.id === id) : null;
+  const d = Object.assign({name: "", qty: 1, unit: "pcs", frozen: false, min: 0, expiry: "", notes: ""}, preset || {}, src || {});
+  $("#itemDlgTitle").textContent = id ? (kind === "inv" ? "Edit item" : "Edit list item")
+    : kind === "shop" ? "Add to shopping list" : (d.frozen ? "Add to freezer" : "Add item");
+  $("#f-name").value = d.name; $("#f-qty").value = d.qty;
+  $("#f-frozen").checked = !!d.frozen; $("#f-min").value = d.min || ""; $("#f-exp").value = d.expiry || ""; $("#f-notes").value = d.notes || "";
+  const units = UNITS.includes(d.unit) ? UNITS : UNITS.concat(d.unit);
+  $("#f-unit").innerHTML = units.map(u => `<option ${u === d.unit ? "selected" : ""}>${esc(u)}</option>`).join("");
+  dlg.querySelectorAll(".inv-only").forEach(el => el.hidden = kind !== "inv");
+  $("#itemDelete").hidden = !id;
+  $("#nameField").classList.remove("invalid"); $("#nameHelp").hidden = true;
+  dlg.showModal();
+  if (!id) setTimeout(() => $("#f-name").focus(), 30);
+}
+
+// Pick up unit/category/location from an existing inventory item when typing a known name
+$("#f-name").addEventListener("change", () => {
+  if (!editing || editing.id) return;
+  const match = state.inventory.find(i => norm(i.name) === norm($("#f-name").value));
+  if (!match) return;
+  $("#f-unit").value = UNITS.includes(match.unit) ? match.unit : $("#f-unit").value;
+});
+
+$("#itemForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = $("#f-name").value.trim();
+  if (!name) { $("#nameField").classList.add("invalid"); $("#nameHelp").hidden = false; $("#f-name").focus(); return; }
+  const base = {name, qty: num($("#f-qty").value, editing.kind === "inv" ? 0 : 1), unit: $("#f-unit").value};
+  const snap = snapshot();
+  let msg;
+  if (editing.kind === "inv") {
+    Object.assign(base, {frozen: $("#f-frozen").checked, min: num($("#f-min").value, 0),
+      expiry: $("#f-exp").value || "", notes: $("#f-notes").value.trim()});
+    let item = editing.id && state.inventory.find(i => i.id === editing.id);
+    if (item) { Object.assign(item, base); msg = `Saved ${name}`; }
+    else {
+      const dup = state.inventory.find(i => norm(i.name) === norm(name) && i.unit === base.unit && !!i.frozen === base.frozen);
+      if (dup) { dup.qty = round(dup.qty + base.qty); Object.assign(dup, {min: base.min || dup.min, expiry: base.expiry || dup.expiry}); item = dup; msg = `Added ${fmtQ(base.qty)} ${base.unit} to ${dup.name}`; }
+      else { item = Object.assign({id: uid()}, base); state.inventory.push(item); msg = `Added ${name}`; }
+    }
+    state.shopping.forEach(s => { if (s.invId === item.id && !s.auto) { s.name = item.name; } });
+    syncAuto(item);
+    if (ui.tab !== "shopping" && (ui.tab === "freezer") !== !!item.frozen) msg += item.frozen ? ". It's now on the Freezer tab" : ". It's now on the Inventory tab";
+  } else {
+    let s = editing.id && state.shopping.find(x => x.id === editing.id);
+    if (s) { Object.assign(s, base); if (s.auto) s.auto = false; msg = `Saved ${name}`; }
+    else { addToList(base); msg = `Added ${name} to the list`; }
+  }
+  dlg.close(); commit(msg, snap);
+});
+$("#itemDelete").addEventListener("click", () => {
+  if (!editing || !editing.id) return;
+  dlg.close();
+  editing.kind === "inv" ? deleteInv(editing.id) : deleteShop(editing.id);
+});
+document.querySelectorAll("dialog [data-close]").forEach(b => b.addEventListener("click", () => b.closest("dialog").close()));
+document.querySelectorAll("dialog").forEach(d => d.addEventListener("click", e => { if (e.target === d) d.close(); }));
+
+/* ---------- Actions ---------- */
+function addToList(base) {
+  const inv = state.inventory.find(i => norm(i.name) === norm(base.name));
+  const existing = state.shopping.find(s => !s.checked && norm(s.name) === norm(base.name));
+  if (existing) { existing.qty = round(existing.qty + base.qty); existing.auto = false; return existing; }
+  const s = {id: uid(), name: inv ? inv.name : base.name, qty: base.qty, unit: base.unit || (inv && inv.unit) || "pcs",
+    invId: inv ? inv.id : null, auto: false, checked: false};
+  state.shopping.push(s); return s;
+}
+
+function deleteInv(id) {
+  const i = state.inventory.find(x => x.id === id); if (!i) return;
+  const snap = snapshot();
+  state.inventory = state.inventory.filter(x => x.id !== id);
+  state.shopping = state.shopping.filter(s => !(s.invId === id && s.auto && !s.checked));
+  state.shopping.forEach(s => { if (s.invId === id) s.invId = null; });
+  commit(`Deleted ${i.name}`, snap);
+}
+function deleteShop(id) {
+  const s = state.shopping.find(x => x.id === id); if (!s) return;
+  const snap = snapshot();
+  state.shopping = state.shopping.filter(x => x.id !== id);
+  commit(`Removed ${s.name} from the list`, snap);
+}
+
+function finishShopping() {
+  const done = state.shopping.filter(s => s.checked); if (!done.length) return;
+  const snap = snapshot();
+  let created = 0;
+  for (const s of done) {
+    let inv = (s.invId && state.inventory.find(i => i.id === s.invId)) || state.inventory.find(i => norm(i.name) === norm(s.name));
+    if (inv) inv.qty = round(inv.qty + (s.qty || 1));
+    else {
+      state.inventory.push({id: uid(), name: s.name, qty: s.qty || 1, unit: s.unit || "pcs",
+        frozen: false, min: 0, expiry: "", notes: ""});
+      created++;
+    }
+  }
+  state.shopping = state.shopping.filter(s => !s.checked);
+  state.inventory.forEach(i => syncAuto(i));
+  commit(`Put away ${plural(done.length, "item")}${created ? ` (${created} new in inventory)` : ""}`, snap);
+}
+
+function exportJson() {
+  return JSON.stringify({app: "pantry-keeper", version: 1, exportedAt: new Date().toISOString(), savedAt: state.savedAt,
+    inventory: state.inventory, shopping: state.shopping, settings: state.settings}, null, 2);
+}
+
+function downloadFile(name, text) {
+  const url = URL.createObjectURL(new Blob([text], {type: "application/json"}));
+  const a = document.createElement("a"); a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+function emailData() {
+  const input = $("#emailAddr");
+  const to = (input ? input.value : state.settings.email || "").trim();
+  if (to !== state.settings.email) { state.settings.email = to; save(); }
+  if (to && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) { snack("Check the email address. It should look like name@example.com."); input && input.focus(); return; }
+  const date = iso(new Date());
+  const name = `pantry-data-${date}.json`;
+  const subject = `Pantry Keeper data ${date}`;
+  const summary = `${plural(state.inventory.filter(i => !i.frozen).length, "item")} in inventory, ${plural(state.inventory.filter(i => i.frozen).length, "item")} in the freezer, ${state.shopping.length} on the shopping list.`;
+  const restoreHint = "To restore it: save the attachment next to Pantry Keeper, then choose Settings > Data file > Use a different file.";
+  const json = exportJson();
+
+  const mailFallback = () => {
+    try { downloadFile(name, json); } catch (e) {}
+    const body = `${summary}\n\nThe data file ${name} was saved to your Downloads folder. Attach it to this email before sending.\n\n${restoreHint}`;
+    location.href = `mailto:${to.replace(/[^\w.@+-]/g, "")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    snack(`${name} is in your Downloads. Attach it to the new email.`);
+  };
+
+  let file = null;
+  try { file = new File([json], name, {type: "application/json"}); } catch (e) {}
+  if (file && navigator.canShare && navigator.canShare({files: [file]})) {
+    if (to && navigator.clipboard) navigator.clipboard.writeText(to).catch(() => {});
+    navigator.share({files: [file], title: subject, text: `${subject}\n${summary}\n${restoreHint}`})
+      .then(() => snack("Check your mail app and press Send."))
+      .catch(e => { if (!e || e.name !== "AbortError") mailFallback(); });
+    snack(to ? `Choose Mail or Outlook. ${to} is copied, so paste it into To.` : "Choose Mail or Outlook to send the file.");
+    return;
+  }
+  mailFallback();
+}
+
+document.addEventListener("click", e => {
+  const nav = e.target.closest(".nav-item");
+  if (nav) { ui.tab = nav.dataset.tab; ui.query = ""; saveUi(); hideSnack(); render(); window.scrollTo(0, 0); return; }
+  const el = e.target.closest("[data-action]");
+  if (!el || el.tagName === "INPUT") return;
+  const id = el.dataset.id;
+  const item = id && state.inventory.find(i => i.id === id);
+  switch (el.dataset.action) {
+    case "filter": ui.filter = el.dataset.filter; saveUi(); render(); break;
+    case "reset-filters": ui.filter = "all"; ui.query = ""; saveUi(); render(); break;
+    case "clear-search": e.preventDefault(); ui.query = ""; render(); $("#invSearch") && $("#invSearch").focus(); break;
+    case "add-inv": openItem("inv"); break;
+    case "add-frz": openItem("inv", null, {frozen: true, unit: "portions"}); break;
+    case "add-shop": openItem("shop"); break;
+    case "edit-inv": openItem("inv", id); break;
+    case "edit-shop": openItem("shop", id); break;
+    case "inc": case "dec": {
+      if (!item) break;
+      const step = stepFor(item.unit);
+      item.qty = round(Math.max(0, item.qty + (el.dataset.action === "inc" ? step : -step)));
+      const before = !!openEntryFor(item.id);
+      syncAuto(item);
+      const after = openEntryFor(item.id);
+      commit(!before && after ? `${item.name} is low, so it's on your shopping list` : undefined);
+      break;
+    }
+    case "tolist": {
+      if (!item) break;
+      const snap = snapshot();
+      const entry = openEntryFor(item.id);
+      if (entry) { state.shopping.splice(state.shopping.indexOf(entry), 1); commit(`Removed ${item.name} from the list`, snap); }
+      else {
+        state.shopping.push({id: uid(), name: item.name, qty: isLow(item) ? round(item.min - item.qty) : 1, unit: item.unit, invId: item.id, auto: false, checked: false});
+        commit(`Added ${item.name} to the list`, snap);
+      }
+      break;
+    }
+    case "file-create": runFile(createDataFile); break;
+    case "file-open": runFile(openDataFile); break;
+    case "file-reconnect": runFile(reconnectFile); break;
+    case "file-disconnect": disconnectFile(); break;
+    case "go-settings": ui.tab = "settings"; saveUi(); render(); window.scrollTo(0, 0); break;
+    case "del-inv": deleteInv(id); break;
+    case "del-shop": deleteShop(id); break;
+    case "add-low": {
+      const snap = snapshot(); let n = 0;
+      state.inventory.filter(i => isLow(i) && !openEntryFor(i.id)).forEach(i => {
+        state.shopping.push({id: uid(), name: i.name, qty: round(i.min - i.qty), unit: i.unit, invId: i.id, auto: true, checked: false}); n++;
+      });
+      commit(`Added ${plural(n, "item")} to the list`, snap); break;
+    }
+    case "uncheck-all": { const snap = snapshot(); state.shopping.forEach(s => s.checked = false); commit("Unchecked all items", snap); break; }
+    case "finish": finishShopping(); break;
+    case "clear-examples": {
+      const snap = snapshot();
+      state = normalize({inventory: [], shopping: [], settings: state.settings, examples: false});
+      commit("Examples cleared. Tap Add item to add your own.", snap); break;
+    }
+    case "email-data": emailData(); break;
+    case "wipe":
+      confirmAction("Delete all data?", "This removes every item in your inventory and shopping list from this browser. Email yourself a copy first if you might want it back.",
+        "Delete all", () => { const snap = snapshot(); state = normalize({inventory: [], shopping: [], settings: state.settings}); commit("All data deleted", snap); });
+      break;
+  }
+});
+
+
+document.addEventListener("change", e => {
+  const t = e.target;
+  if (t.dataset && t.dataset.action === "check") {
+    const s = state.shopping.find(x => x.id === t.dataset.id);
+    if (s) { s.checked = t.checked; commit(); }
+  } else if (t.id === "sortSel") {
+    ui.sort = t.value; saveUi(); render();
+  } else if (t.id === "autoAdd") {
+    state.settings.autoAdd = t.checked;
+    if (t.checked) state.inventory.forEach(i => syncAuto(i));
+    commit(t.checked ? "Low-stock items will be added automatically" : "Automatic adding is off");
+  } else if (t.id === "emailAddr") {
+    state.settings.email = t.value.trim(); save();
+  }
+});
+
+document.addEventListener("input", e => {
+  if (e.target.id === "invSearch") { ui.query = e.target.value; render(); }
+  if (e.target.id === "f-name") { $("#nameField").classList.remove("invalid"); $("#nameHelp").hidden = true; }
+});
+
+document.addEventListener("submit", e => {
+  if (e.target.id !== "quickAdd") return;
+  e.preventDefault();
+  const input = $("#qaInput"); let text = input.value.trim(); if (!text) return;
+  let qty = 1; const m = text.match(/^(\d+(?:[.,]\d+)?)\s*x?\s+(.+)$/i);
+  if (m) { qty = num(m[1], 1) || 1; text = m[2].trim(); }
+  const inv = state.inventory.find(i => norm(i.name) === norm(text));
+  const snap = snapshot();
+  addToList({name: text, qty, unit: inv ? inv.unit : "pcs"});
+  commit(`Added ${text} to the list`, snap);
+  const again = $("#qaInput"); again.value = ""; again.focus();
+});
+
+window.addEventListener("scroll", () => $("#appbar").classList.toggle("scrolled", window.scrollY > 4), {passive: true});
+
+// Keep several open tabs in sync
+window.addEventListener("storage", e => {
+  if (e.key !== KEY || !e.newValue) return;
+  try { state = normalize(JSON.parse(e.newValue)); render(); } catch (err) {}
+});
+
+/* ---------- Data file (File System Access API, Chrome / Edge) ---------- */
+const fileApi = !framed && "showSaveFilePicker" in window && "showOpenFilePicker" in window && "indexedDB" in window;
+const FILE_TYPES = [{description: "Pantry Keeper data", accept: {"application/json": [".json"]}}];
+let fileHandle = null;
+let fileStatus = "none"; // none | connected | needs-permission | error
+let fileErrorMsg = "";
+let lastFileWrite = null, writeTimer = null, pendingWrite = false, writeChain = Promise.resolve();
+
+function idb(mode, fn) {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open("pantry-keeper", 1);
+    req.onupgradeneeded = () => req.result.createObjectStore("kv");
+    req.onerror = () => reject(req.error);
+    req.onsuccess = () => {
+      const db = req.result, tx = db.transaction("kv", mode), r = fn(tx.objectStore("kv"));
+      tx.oncomplete = () => { db.close(); resolve(r && r.result); };
+      tx.onerror = () => { db.close(); reject(tx.error); };
+    };
+  });
+}
+const idbGet = k => idb("readonly", s => s.get(k));
+const idbSet = (k, v) => idb("readwrite", s => s.put(v, k));
+const idbDel = k => idb("readwrite", s => s.delete(k));
+
+function updateSaveLabel() {
+  $("#saveState").textContent = fileStatus === "connected" ? (pendingWrite ? "Saving…" : "Saved to file")
+    : fileStatus === "error" ? "File not saved"
+    : (!storageOk || lastSaveFailed) ? "Not saved" : (state.savedAt ? "Saved in browser" : "");
+}
+
+function scheduleFileWrite() {
+  pendingWrite = true; updateSaveLabel();
+  clearTimeout(writeTimer);
+  writeTimer = setTimeout(() => { writeTimer = null; writeChain = writeChain.then(writeFileNow); }, 250);
+}
+
+async function writeFileNow() {
+  if (!fileHandle) { pendingWrite = false; return; }
+  try {
+    const w = await fileHandle.createWritable();
+    await w.write(exportJson());
+    await w.close();
+    lastFileWrite = Date.now();
+    if (!writeTimer) pendingWrite = false;
+    updateSaveLabel();
+  } catch (e) {
+    pendingWrite = false;
+    if (e && e.name === "NotAllowedError") fileStatus = "needs-permission";
+    else { fileStatus = "error"; fileErrorMsg = `Couldn't save to ${fileHandle.name}. It may have been moved, renamed or deleted. Your changes are still saved in this browser.`; }
+    render();
+  }
+}
+
+function parsePantry(text) {
+  try { const d = JSON.parse(text); if (d && Array.isArray(d.inventory)) return normalize(Object.assign({}, d, {examples: false})); } catch (e) {}
+  return null;
+}
+
+async function connect(h) {
+  fileHandle = h; fileStatus = "connected"; fileErrorMsg = "";
+  await idbSet("file", h);
+}
+
+// Read the remembered file and keep whichever copy (file or browser) was changed last
+async function syncFromFile() {
+  let text;
+  try { text = await (await fileHandle.getFile()).text(); }
+  catch (e) {
+    fileStatus = "error";
+    fileErrorMsg = `Couldn't find ${fileHandle.name}. It may have been moved, renamed or deleted. Open it from its new place, or create a new data file.`;
+    render(); return;
+  }
+  const fromFile = text.trim() ? parsePantry(text) : null;
+  if (text.trim() && !fromFile) {
+    fileStatus = "error"; fileErrorMsg = `${fileHandle.name} isn't a Pantry Keeper data file, so the app won't write to it. Choose your data file or create a new one.`;
+    render(); return;
+  }
+  fileStatus = "connected"; fileErrorMsg = "";
+  if (fromFile && (fromFile.savedAt || 0) >= (state.savedAt || 0)) {
+    state = fromFile;
+    try { if (storageOk) localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  } else {
+    scheduleFileWrite();
+  }
+  render();
+}
+
+async function createDataFile() {
+  const h = await window.showSaveFilePicker({suggestedName: "pantry-data.json", types: FILE_TYPES, id: "pantry-data", startIn: "documents"});
+  await connect(h);
+  save(); render();
+  snack(`Saving to ${h.name} after every change`);
+}
+
+async function openDataFile() {
+  const [h] = await window.showOpenFilePicker({types: FILE_TYPES, multiple: false, id: "pantry-data", startIn: "documents"});
+  if ((await h.requestPermission({mode: "readwrite"})) !== "granted") { snack("The app needs permission to save to that file. Try again and choose Save changes or Allow."); return; }
+  const text = await (await h.getFile()).text();
+  if (text.trim()) {
+    const fromFile = parsePantry(text);
+    if (!fromFile) { snack("That file isn't a Pantry Keeper data file. Choose a different file."); return; }
+    await connect(h);
+    state = fromFile;
+    try { if (storageOk) localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    render();
+    snack(`Loaded ${plural(state.inventory.length, "item")} from ${h.name}`);
+  } else {
+    await connect(h);
+    save(); render();
+    snack(`Saving to ${h.name} after every change`);
+  }
+}
+
+async function reconnectFile() {
+  if (!fileHandle) return openDataFile();
+  const p = await fileHandle.requestPermission({mode: "readwrite"});
+  if (p === "granted") { await syncFromFile(); if (fileStatus === "connected") snack(`Reconnected to ${fileHandle.name}`); }
+  else snack("Permission wasn't given, so changes are only saved in this browser for now.");
+}
+
+function disconnectFile() {
+  idbDel("file").catch(() => {});
+  fileHandle = null; fileStatus = "none"; fileErrorMsg = "";
+  render();
+  snack("Stopped saving to the file. Your data is still saved in this browser.");
+}
+
+function runFile(fn) {
+  fn().catch(e => {
+    if (e && e.name === "AbortError") return; // picker cancelled
+    fileStatus = fileHandle ? "error" : "none";
+    fileErrorMsg = "Something went wrong with the data file (" + (e && e.message ? e.message : "unknown error") + "). Your changes are still saved in this browser.";
+    render();
+    if (!fileHandle) snack("Couldn't set up the data file. Try again.");
+  });
+}
+
+async function initDataFile() {
+  if (!fileApi) return;
+  try {
+    const h = await idbGet("file");
+    if (!h) return;
+    fileHandle = h;
+    const p = await h.queryPermission({mode: "readwrite"});
+    if (p === "granted") await syncFromFile();
+    else { fileStatus = "needs-permission"; render(); }
+  } catch (e) {}
+}
+
+function fileBanner() {
+  if (!fileApi) return "";
+  const name = fileHandle ? esc(fileHandle.name) : "";
+  if (fileStatus === "needs-permission") return `<div class="banner info"><span class="ms">link</span><p>Click Reconnect so the app can keep saving to <b>${name}</b>. Until then, changes are saved in this browser only.</p><button class="btn text sl" data-action="file-reconnect">Reconnect</button></div>`;
+  if (fileStatus === "error") return `<div class="banner err"><span class="ms">error</span><p>${esc(fileErrorMsg)}</p><button class="btn text sl" data-action="go-settings">Fix in Settings</button></div>`;
+  if (fileStatus === "none" && ui.tab === "inventory") return `<div class="banner info"><span class="ms">save</span><p>Your data is only saved in this browser. Create a data file next to the app to keep it safe.</p><button class="btn text sl" data-action="file-create">Create data file</button></div>`;
+  return "";
+}
+
+function dataFileCard(saved, bytes) {
+  const name = fileHandle ? esc(fileHandle.name) : "";
+  let body, btns = "";
+  if (!fileApi) {
+    body = framed
+      ? "Saving to a file on your computer works in the downloaded app file, opened in Chrome or Edge. Here, your data is saved in this browser only."
+      : "This browser can't save to a file. Open the app in Chrome or Edge to keep your data in a file next to it. Until then it's saved in this browser only, so email yourself a copy now and then.";
+  } else if (fileStatus === "connected") {
+    body = `Every change is saved to <b>${name}</b>${lastFileWrite ? `, last at ${new Date(lastFileWrite).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"})}` : ""}. A copy is also kept in this browser.`;
+    btns = `<button class="btn outlined has-icon sl" data-action="file-open"><span class="ms">folder_open</span>Use a different file</button><button class="btn text sl" data-action="file-disconnect">Stop saving to file</button>`;
+  } else if (fileStatus === "needs-permission") {
+    body = `Your data file is <b>${name}</b>. The browser asks for your OK before the app can save to it again.`;
+    btns = `<button class="btn filled has-icon sl" data-action="file-reconnect"><span class="ms">link</span>Reconnect</button><button class="btn text sl" data-action="file-disconnect">Stop saving to file</button>`;
+  } else if (fileStatus === "error") {
+    body = esc(fileErrorMsg);
+    btns = `<button class="btn filled has-icon sl" data-action="file-reconnect"><span class="ms">refresh</span>Try again</button><button class="btn outlined sl" data-action="file-open">Open data file</button><button class="btn text sl" data-action="file-create">Create new file</button>`;
+  } else {
+    body = "Your data is saved in this browser only. Create a data file, for example <b>pantry-data.json</b> in the same folder as this app, and every change is written to it automatically. If you already have one, open it instead.";
+    btns = `<button class="btn filled has-icon sl" data-action="file-create"><span class="ms">note_add</span>Create data file</button><button class="btn outlined has-icon sl" data-action="file-open"><span class="ms">folder_open</span>Open existing file</button>`;
+  }
+  return `<section class="card">
+    <h2 class="t-title-m">Data file</h2>
+    <p>${body}</p>
+    ${btns ? `<div class="btn-row">${btns}</div>` : ""}
+    <dl class="kv"><dt>Last change</dt><dd>${esc(saved)}</dd>
+      <dt>Contents</dt><dd>${plural(state.inventory.length, "item")} in stock, ${state.shopping.length} on the list (${(bytes/1024).toFixed(1)} KB)</dd></dl>
+  </section>`;
+}
+
+window.addEventListener("beforeunload", e => { if (pendingWrite) { e.preventDefault(); e.returnValue = ""; } });
+
+/* ---------- Boot ---------- */
+state = load();
+if (!state.savedAt) save();
+render();
+initDataFile();
+})();
+</script>
+
+</body>
+</html>
