@@ -419,11 +419,19 @@ dialog[open]{animation:dlg .2s cubic-bezier(.2,0,0,1)}
 <datalist id="nameList"></datalist>
 
 <script>
+/* =====================================================================
+   YOUR DATA LINK: the app reads and writes all its data here.
+   To use a different Pantry basket, replace the link and upload again.
+   ===================================================================== */
+const PANTRY_DATA_URL = "https://getpantry.cloud/apiv1/pantry/63fdac94-d3f2-400d-ad0e-ff1ad4c95742/basket/keep";
+</script>
+<script>
 (() => {
 "use strict";
 
 /* ---------- Constants ---------- */
 const DATA_FILE = "pantry-data.json";
+const DATA_URL = PANTRY_DATA_URL;
 const UNITS = ["pcs","portions","pack","g","kg","ml","L","bottle","can","jar","box","bag","roll","bunch"];
 const SORTS = {name: "Name A–Z", amount: "Lowest stock", expiry: "Use by date"};
 const SOON_DAYS = 3;
@@ -465,10 +473,10 @@ function normalize(d) {
 }
 
 let state = normalize({});
-let dirty = false;           // changes not yet written to pantry-data.json
-let loadStatus = "loading";  // loading | loaded | missing | invalid | gh-error
+let dirty = false;           // changes not yet saved to Pantry
+let loadStatus = "loading";  // loading | loaded | invalid | load-error
 let loadedAt = null;
-function save() { state.savedAt = Date.now(); dirty = true; if (gh && loadStatus === "loaded") scheduleSync(); }
+function save() { state.savedAt = Date.now(); dirty = true; if (loadStatus === "loaded") scheduleSync(); }
 const snapshot = () => JSON.stringify(state);
 
 /* ---------- UI state (memory only, nothing stored in the browser) ---------- */
@@ -508,7 +516,7 @@ function render() {
   const badge = $("#shopBadge"); badge.hidden = !open; badge.textContent = open > 99 ? "99+" : open;
   updateSaveLabel();
   refreshDatalists();
-  if (loadStatus === "loading") { setView(`<div class="empty"><span class="ms">hourglass_empty</span><p>Loading ${DATA_FILE}…</p></div>`); renderFab(); return; }
+  if (loadStatus === "loading") { setView(`<div class="empty"><span class="ms">hourglass_empty</span><p>Loading your data…</p></div>`); renderFab(); return; }
   if (ui.tab === "inventory" || ui.tab === "freezer") renderInventory(ui.tab);
   else if (ui.tab === "shopping") renderShopping();
   else renderSettings();
@@ -516,11 +524,9 @@ function render() {
 }
 
 function storageBanner() {
-  if (loadStatus === "loading") return "";
-  if (loadStatus === "gh-error") return `<div class="banner err"><span class="ms">error</span><p>${esc(syncError)}</p><button class="btn text sl" data-action="reload-data">Try again</button></div>`;
-  if (gh && syncState === "error") return `<div class="banner err"><span class="ms">sync_problem</span><p>${esc(syncError)}</p><button class="btn text sl" data-action="sync-now">Retry</button></div>`;
-  if (loadStatus === "invalid") return `<div class="banner err"><span class="ms">error</span><p><b>${DATA_FILE}</b> isn't valid JSON, so it couldn't be loaded. Fix the file on GitHub, then try again.</p><button class="btn text sl" data-action="reload-data">Try again</button></div>`;
-  if (!gh && ui.tab !== "settings") return `<div class="banner ${loadStatus === "missing" ? "err" : "info"}"><span class="ms">${loadStatus === "missing" ? "error" : "cloud_off"}</span><p>${loadStatus === "missing" ? `Couldn't load <b>${DATA_FILE}</b> next to this page. ` : ""}Changes aren't saved yet. Connect your GitHub repository once, and every change is written to ${DATA_FILE} automatically.</p><button class="btn text sl" data-action="go-settings">Connect</button></div>`;
+  if (loadStatus === "load-error") return `<div class="banner err"><span class="ms">cloud_off</span><p>${esc(syncError)}</p><button class="btn text sl" data-action="reload-data">Try again</button></div>`;
+  if (loadStatus === "invalid") return `<div class="banner err"><span class="ms">error</span><p>The data in your Pantry basket isn't valid, so it couldn't be loaded.</p><button class="btn text sl" data-action="reload-data">Try again</button></div>`;
+  if (syncState === "error") return `<div class="banner err"><span class="ms">sync_problem</span><p>${esc(syncError)}</p><button class="btn text sl" data-action="sync-now">Retry</button></div>`;
   return "";
 }
 
@@ -673,7 +679,7 @@ function renderSettings() {
     ? `<section class="card"><h2 class="t-title-m">Email a copy</h2><p class="muted">Emailing your data works in the downloaded app, opened in Chrome or Edge.</p></section>`
     : `<section class="card">
     <h2 class="t-title-m">Email a copy</h2>
-    <p class="muted">Sends your data as a file attachment, so you keep a dated copy in your inbox. Your mail app opens and you press Send. To restore a copy later, upload it to your repository as pantry-data.json.</p>
+    <p class="muted">Sends your data as a file attachment, so you keep a dated copy in your inbox. Your mail app opens and you press Send. Keep it as a backup of your Pantry data.</p>
     <div class="field">
       <input id="emailAddr" type="email" inputmode="email" autocomplete="email" placeholder=" " value="${esc(state.settings.email)}">
       <label for="emailAddr">Send to</label>
@@ -867,7 +873,7 @@ function emailData() {
   const name = `pantry-data-${date}.json`;
   const subject = `Pantry Keeper data ${date}`;
   const summary = `${plural(state.inventory.filter(i => !i.frozen).length, "item")} in inventory, ${plural(state.inventory.filter(i => i.frozen).length, "item")} in the freezer, ${state.shopping.length} on the shopping list.`;
-  const restoreHint = "To restore it: upload the attachment to your GitHub repository as pantry-data.json, replacing the old file.";
+  const restoreHint = "This is a backup copy of the data saved in Pantry.";
   const json = exportJson();
 
   const mailFallback = () => {
@@ -929,8 +935,6 @@ document.addEventListener("click", e => {
     }
     case "reload-data": reloadData(); break;
     case "sync-now": syncNow(); break;
-    case "gh-connect": doConnect(); break;
-    case "gh-disconnect": disconnectGitHub(); break;
     case "go-settings": ui.tab = "settings"; saveUi(); render(); window.scrollTo(0, 0); break;
     case "del-inv": deleteInv(id); break;
     case "del-shop": deleteShop(id); break;
@@ -950,7 +954,7 @@ document.addEventListener("click", e => {
     }
     case "email-data": emailData(); break;
     case "wipe":
-      confirmAction("Delete all data?", "This removes every item in your inventory and shopping list. This is saved to GitHub right away.",
+      confirmAction("Delete all data?", "This removes every item in your inventory and shopping list. This is saved right away.",
         "Delete all", () => { const snap = snapshot(); state = normalize({inventory: [], shopping: [], settings: state.settings}); commit("All data deleted", snap); });
       break;
   }
@@ -993,115 +997,34 @@ document.addEventListener("submit", e => {
 
 window.addEventListener("scroll", () => $("#appbar").classList.toggle("scrolled", window.scrollY > 4), {passive: true});
 
-/* ---------- Storage: pantry-data.json in your GitHub repository ---------- */
-// GitHub Pages only serves files, so the app writes through the GitHub API.
-// Only the connection (token + repository) is kept in this browser; all data lives in pantry-data.json.
-const GH_KEY = "pantry-keeper-github";
-let gh = null; // {token, owner, repo, branch, path}
-try { gh = JSON.parse(localStorage.getItem(GH_KEY) || "null"); } catch (e) { gh = null; }
-let ghSha = null;            // version id of pantry-data.json on GitHub
+/* ---------- Storage: your Pantry basket (getpantry.cloud) ---------- */
+// Reads and writes the whole app data as one JSON object at DATA_URL. Nothing is stored in the browser.
 let syncState = "idle";      // idle | saving | saved | error
 let syncError = "";
 let lastSync = null;
 let syncTimer = null, syncChain = Promise.resolve();
 
-function guessLocation() {
-  const host = location.hostname.match(/^([a-z0-9-]+)\.github\.io$/i);
-  if (!host) return [];
-  const owner = host[1];
-  const dirs = location.pathname.split("/").filter(Boolean);
-  if (dirs.length && /\.[a-z0-9]+$/i.test(dirs[dirs.length - 1])) dirs.pop(); // drop the .html file name
-  const cands = [];
-  if (dirs.length) cands.push({owner, repo: dirs[0], dir: dirs.slice(1).join("/")});   // project site: owner.github.io/repo/...
-  cands.push({owner, repo: `${owner}.github.io`, dir: dirs.join("/")});                 // user site: owner.github.io/...
-  return cands;
-}
-const joinPath = (dir, f) => dir ? `${dir}/${f}` : f;
-const contentsUrl = c => `/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${c.path.split("/").map(encodeURIComponent).join("/")}`;
-
-async function ghApi(method, url, body, token) {
-  const headers = {"Authorization": `Bearer ${token || gh.token}`, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"};
-  if (body) headers["Content-Type"] = "application/json";
-  const res = await fetch(`https://api.github.com${url}`, {method, headers, cache: "no-store", body: body ? JSON.stringify(body) : undefined});
-  let data = null;
-  try { data = await res.json(); } catch (e) {}
-  return {status: res.status, ok: res.ok, data};
-}
-
-const b64encode = str => {
-  const bytes = new TextEncoder().encode(str); let bin = "";
-  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
-  return btoa(bin);
-};
-const b64decode = b64 => {
-  const bin = atob(String(b64).replace(/\s/g, "")); const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  return new TextDecoder().decode(bytes);
-};
-
-function ghErrorText(r) {
-  if (r.status === 401) return "GitHub didn't accept the token. It may have expired or been copied incompletely. Disconnect in Settings and connect again with a new token.";
-  if (r.status === 403) return "The token isn't allowed to change this repository. Give it Contents: Read and write access to the repository.";
-  if (r.status === 404) return "GitHub couldn't find the repository or file. Check the repository and file path in Settings.";
-  if (r.status === 409 || r.status === 422) return "The file changed on GitHub while you were editing. Reload to get the latest version.";
-  return `GitHub returned an error (${r.status}). Try again in a moment.`;
-}
-
-async function connectGitHub(token, repoInput, pathInput, branchInput) {
-  token = token.trim();
-  if (!token) throw new Error("Paste your GitHub token first.");
-  let cands;
-  if (repoInput.trim()) {
-    const [o, r] = repoInput.trim().replace(/^https?:\/\/github\.com\//i, "").replace(/\/+$/, "").split("/");
-    if (!o || !r) throw new Error("Write the repository as owner/name, for example mikki/pantry.");
-    cands = [{owner: o, repo: r.replace(/\.git$/, ""), dir: ""}];
-  } else {
-    cands = guessLocation();
-    if (!cands.length) throw new Error("Enter the repository as owner/name, for example mikki/pantry.");
-  }
-  for (const c of cands) {
-    const r = await ghApi("GET", `/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}`, null, token);
-    if (r.status === 401) throw new Error("GitHub didn't accept the token. Check that you copied all of it and that it hasn't expired.");
-    if (!r.ok) continue;
-    const branches = branchInput.trim() ? [branchInput.trim()] : [...new Set([r.data.default_branch, "gh-pages"])];
-    const paths = pathInput.trim() ? [pathInput.trim().replace(/^\/+/, "")]
-      : [joinPath(c.dir, DATA_FILE), joinPath(["docs", c.dir].filter(Boolean).join("/"), DATA_FILE)];
-    for (const branch of branches) for (const path of paths) {
-      const f = await ghApi("GET", contentsUrl({...c, path}) + `?ref=${encodeURIComponent(branch)}`, null, token);
-      if (f.ok) return {token, owner: c.owner, repo: c.repo, branch, path, created: false};
-    }
-    return {token, owner: c.owner, repo: c.repo, branch: branches[0], path: paths[0], created: true};
-  }
-  throw new Error("Couldn't find the repository. Enter it as owner/name, and check that the token has access to it.");
-}
-
-async function loadFromGitHub() {
-  const r = await ghApi("GET", contentsUrl(gh) + `?ref=${encodeURIComponent(gh.branch)}`);
-  if (r.status === 404) { ghSha = null; return {}; }           // not created yet: starts empty
-  if (!r.ok) throw Object.assign(new Error(ghErrorText(r)), {gh: true});
-  ghSha = r.data.sha;
-  const text = b64decode(r.data.content || "");
-  return text.trim() ? JSON.parse(text) : {};
-}
-
 async function loadData() {
   loadStatus = "loading"; render();
   try {
+    const res = await fetch(DATA_URL, {cache: "no-store"});
+    const text = await res.text();
     let d;
-    if (gh) d = await loadFromGitHub();
-    else {
-      const res = await fetch(`${DATA_FILE}?t=${Date.now()}`, {cache: "no-store"});
-      if (!res.ok) throw new Error("not found");
-      const text = await res.text();
+    if (res.ok) {
       d = text.trim() ? JSON.parse(text) : {};
+    } else if (res.status === 400 && /does not exist/i.test(text)) {
+      d = {};                                   // basket not created yet: starts empty, created on first save
+    } else {
+      throw Object.assign(new Error(res.status === 429
+        ? "Pantry is busy (too many requests). Wait a few seconds and try again."
+        : `Pantry didn't return your data (error ${res.status}). Check the link at the top of pantry-keeper.html.`), {known: true});
     }
     if (!d || typeof d !== "object" || Array.isArray(d)) throw new SyntaxError("not an object");
     state = normalize(Object.assign({}, d, {examples: false}));
-    loadStatus = "loaded"; loadedAt = Date.now(); dirty = false; syncState = gh ? "saved" : "idle"; syncError = "";
+    loadStatus = "loaded"; loadedAt = Date.now(); dirty = false; syncState = "saved"; syncError = "";
   } catch (e) {
     if (e instanceof SyntaxError) loadStatus = "invalid";
-    else if (gh) { loadStatus = "gh-error"; syncError = e.gh ? e.message : "Couldn't reach GitHub. Check your internet connection, then try again."; }
-    else loadStatus = "missing";
+    else { loadStatus = "load-error"; syncError = e.known ? e.message : "Couldn't reach Pantry. Check your internet connection, then try again."; }
   }
   render();
 }
@@ -1109,128 +1032,70 @@ async function loadData() {
 function scheduleSync() {
   syncState = "saving"; updateSaveLabel();
   clearTimeout(syncTimer);
-  syncTimer = setTimeout(() => { syncTimer = null; syncChain = syncChain.then(() => pushToGitHub()); }, 1500);
+  syncTimer = setTimeout(() => { syncTimer = null; syncChain = syncChain.then(() => pushData()); }, 1200);
 }
 
 function syncNow() {
   clearTimeout(syncTimer); syncTimer = null;
-  syncChain = syncChain.then(() => pushToGitHub());
+  syncChain = syncChain.then(() => pushData());
 }
 
-async function pushToGitHub(retry) {
-  if (!gh) return;
+async function pushData(attempt = 0) {
   if (!dirty) { if (!syncTimer && syncState !== "error") { syncState = "saved"; updateSaveLabel(); } return; }
-  const body = {message: `Update pantry data ${new Date().toISOString().slice(0, 16).replace("T", " ")}`, content: b64encode(exportJson()), branch: gh.branch};
-  if (ghSha) body.sha = ghSha;
   dirty = false;
-  let r;
-  try { r = await ghApi("PUT", contentsUrl(gh), body); }
-  catch (e) {
+  let res;
+  try {
+    // POST creates the basket, or replaces it completely with this data
+    res = await fetch(DATA_URL, {method: "POST", headers: {"Content-Type": "application/json"}, body: exportJson()});
+  } catch (e) {
     dirty = true; syncState = "error";
-    syncError = "Couldn't reach GitHub, so the last change isn't saved yet. Check your connection and click Retry.";
+    syncError = "Couldn't reach Pantry, so the last change isn't saved yet. Check your connection and click Retry.";
     render(); return;
   }
-  if (r.ok) {
-    ghSha = r.data && r.data.content ? r.data.content.sha : ghSha;
+  if (res.ok) {
     lastSync = Date.now(); syncError = "";
     if (!syncTimer && !dirty) syncState = "saved";
-    if (syncState === "error") syncState = "saved";
+    if (syncState === "error") syncState = dirty ? "saving" : "saved";
     render(); return;
   }
   dirty = true;
-  if ((r.status === 409 || r.status === 422) && !retry) {
-    // The file changed on GitHub (another device, or an edit on github.com): take its new version id and save over it
-    const cur = await ghApi("GET", contentsUrl(gh) + `?ref=${encodeURIComponent(gh.branch)}`);
-    if (cur.ok) { ghSha = cur.data.sha; return pushToGitHub(true); }
-    if (cur.status === 404) { ghSha = null; return pushToGitHub(true); }
+  if (res.status === 429 && attempt < 3) {      // too many requests: wait and try again
+    await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
+    return pushData(attempt + 1);
   }
-  syncState = "error"; syncError = ghErrorText(r); render();
-}
-
-async function doConnect() {
-  const btn = $("#ghConnectBtn"); if (btn) btn.disabled = true;
-  try {
-    const c = await connectGitHub($("#ghToken").value, $("#ghRepo").value, $("#ghPath").value, $("#ghBranch").value);
-    gh = {token: c.token, owner: c.owner, repo: c.repo, branch: c.branch, path: c.path};
-    try { localStorage.setItem(GH_KEY, JSON.stringify(gh)); } catch (e) {}
-    if (c.created || (dirty && loadStatus === "loaded")) {
-      // Keep what's on screen and write it to GitHub (creates the file if needed)
-      const cur = await ghApi("GET", contentsUrl(gh) + `?ref=${encodeURIComponent(gh.branch)}`);
-      ghSha = cur.ok ? cur.data.sha : null;
-      loadStatus = "loaded"; dirty = true; syncNow(); render();
-      snack(c.created ? `Connected. Creating ${gh.path} in ${gh.owner}/${gh.repo}.` : `Connected to ${gh.owner}/${gh.repo}. Saving your changes.`);
-    } else {
-      await loadData();
-      snack(`Connected to ${gh.owner}/${gh.repo}. Changes now save automatically.`);
-    }
-  } catch (e) {
-    snack(e && e.message && !/fetch/i.test(e.message) ? e.message : "Couldn't reach GitHub. Check your internet connection.");
-    if (btn) btn.disabled = false;
-  }
-}
-
-function disconnectGitHub() {
-  confirmAction("Disconnect from GitHub?", "The token is removed from this browser. Your data stays in pantry-data.json on GitHub, but new changes won't be saved until you connect again.",
-    "Disconnect", () => {
-      try { localStorage.removeItem(GH_KEY); } catch (e) {}
-      gh = null; ghSha = null; syncState = "idle"; syncError = ""; lastSync = null;
-      loadData(); snack("Disconnected from GitHub");
-    });
+  syncState = "error";
+  syncError = `Pantry didn't accept the change (error ${res.status}), so it isn't saved yet. Click Retry.`;
+  render();
 }
 
 function reloadData() {
   if (!dirty) { loadData(); return; }
-  confirmAction("Discard unsaved changes?", `Reloading reads ${DATA_FILE} again, and changes that aren't saved yet are lost.`, "Reload", loadData);
+  confirmAction("Discard unsaved changes?", "Reloading reads your data from Pantry again, and changes that aren't saved yet are lost.", "Reload", loadData);
 }
 
 function updateSaveLabel() {
   let t = "";
   if (loadStatus === "loading") t = "Loading…";
-  else if (!gh) t = dirty ? "Not saved" : "";
-  else if (syncState === "error" || loadStatus === "gh-error") t = "Not saved";
+  else if (syncState === "error" || loadStatus === "load-error" || loadStatus === "invalid") t = "Not saved";
   else if (syncState === "saving" || dirty) t = "Saving…";
-  else if (syncState === "saved") t = "Saved to GitHub";
+  else if (syncState === "saved") t = "Saved";
   $("#saveState").textContent = t;
 }
 
 function dataFileCard(bytes) {
-  if (gh) {
-    const time = lastSync ? new Date(lastSync).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"}) : "";
-    return `<section class="card">
-      <h2 class="t-title-m">Save to GitHub</h2>
-      <p>Every change is saved to <b>${esc(gh.path)}</b> in <b>${esc(gh.owner)}/${esc(gh.repo)}</b> (${esc(gh.branch)} branch)${time ? `, last at ${time}` : ""}. The app always reads the latest version straight from GitHub. Your github.io page shows the new file a minute or two later.</p>
-      <dl class="kv"><dt>Status</dt><dd>${syncState === "error" || loadStatus === "gh-error" ? "Not saved" : (syncState === "saving" || dirty) ? "Saving…" : "All changes saved"}</dd>
-        <dt>Contents</dt><dd>${plural(state.inventory.length, "item")} in stock, ${state.shopping.length} on the list (${(bytes/1024).toFixed(1)} KB)</dd></dl>
-      <div class="btn-row">
-        <button class="btn outlined has-icon sl" data-action="reload-data"><span class="ms">refresh</span>Reload from GitHub</button>
-        <button class="btn text danger sl" data-action="gh-disconnect">Disconnect</button>
-      </div>
-    </section>`;
-  }
-  const guess = guessLocation();
-  const hint = guess.length ? `Leave empty to find it automatically (probably ${esc(guess[0].owner)}/${esc(guess[0].repo)})` : "For example mikki/pantry";
+  const time = lastSync ? new Date(lastSync).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"}) : "";
   return `<section class="card">
-    <h2 class="t-title-m">Save to GitHub</h2>
-    <p class="muted">GitHub Pages only shows files, it can't save them. So the app saves through GitHub itself: give it a token that can edit your site's repository, once, and every change is written to <b>${DATA_FILE}</b> automatically.</p>
-    <ol class="steps">
-      <li>On GitHub, open <b>Settings › Developer settings › Personal access tokens › Fine-grained tokens</b> and click <b>Generate new token</b> (<a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">open the page</a>).</li>
-      <li>Under <b>Repository access</b>, choose <b>Only select repositories</b> and pick the repository of this site.</li>
-      <li>Under <b>Permissions › Repository permissions</b>, set <b>Contents</b> to <b>Read and write</b>.</li>
-      <li>Click <b>Generate token</b>, copy it (it starts with <b>github_pat_</b>) and paste it below.</li>
-    </ol>
-    <div class="fields">
-      <div class="field full"><input id="ghToken" type="password" autocomplete="off" spellcheck="false" placeholder=" "><label for="ghToken">GitHub token</label>
-        <span class="help">Kept in this browser only. Never put it in a file in your repository.</span></div>
-      <div class="field full"><input id="ghRepo" autocomplete="off" spellcheck="false" placeholder=" "><label for="ghRepo">Repository (optional)</label><span class="help">${hint}</span></div>
-      <div class="field"><input id="ghPath" autocomplete="off" spellcheck="false" placeholder=" "><label for="ghPath">File path (optional)</label><span class="help">Found automatically</span></div>
-      <div class="field"><input id="ghBranch" autocomplete="off" spellcheck="false" placeholder=" "><label for="ghBranch">Branch (optional)</label><span class="help">Found automatically</span></div>
-    </div>
-    <div class="btn-row"><button class="btn filled has-icon sl" id="ghConnectBtn" data-action="gh-connect"><span class="ms">link</span>Connect</button></div>
+    <h2 class="t-title-m">Where your data is saved</h2>
+    <p>Every change is saved automatically to your Pantry basket${time ? `, last at ${time}` : ""}. Nothing is stored in this browser, so every device that opens this page sees the same data.</p>
+    <dl class="kv"><dt>Status</dt><dd>${syncState === "error" || loadStatus === "load-error" ? "Not saved" : (syncState === "saving" || dirty) ? "Saving…" : "All changes saved"}</dd>
+      <dt>Contents</dt><dd>${plural(state.inventory.length, "item")} in stock, ${state.shopping.length} on the list (${(bytes/1024).toFixed(1)} KB)</dd></dl>
+    <p class="muted">Pantry deletes data that isn't used for a long time. Opening the app now and then keeps it, and emailing yourself a copy below gives you a backup.</p>
+    <div class="btn-row"><button class="btn outlined has-icon sl" data-action="reload-data"><span class="ms">refresh</span>Reload</button></div>
   </section>`;
 }
 
 window.addEventListener("beforeunload", e => { if (dirty || syncState === "saving") { e.preventDefault(); e.returnValue = ""; } });
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && gh && syncTimer) syncNow(); });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && syncTimer) syncNow(); });
 
 /* ---------- Boot ---------- */
 render();
