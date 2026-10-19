@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F9F9FF">
-<title>Keep</title>
+<title>Pantry Keeper</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -103,6 +103,7 @@ button{cursor:pointer;background:none;border:0;padding:0}
   padding-left:var(--gutter-l);padding-right:var(--gutter-r);transition:background .2s}
 .appbar.scrolled{background:var(--surface-c)}
 .appbar-inner{max-width:760px;margin:0 auto;height:64px;display:flex;align-items:center;gap:8px}
+@media (max-width:440px){ #saveState{display:none} }
 .appbar h1{margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brand{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
 .brand-mark{width:40px;height:40px;border-radius:12px;background:var(--primary-container);color:var(--on-primary-container);display:grid;place-items:center;flex:none}
@@ -327,6 +328,7 @@ dialog[open]{animation:dlg .2s cubic-bezier(.2,0,0,1)}
       <h1 class="t-title-l" id="pageTitle">Inventory</h1>
     </div>
     <span class="muted t-label-m" id="saveState" aria-live="polite"></span>
+    <button class="btn tonal has-icon sl" id="saveBtn" data-action="save-file" hidden><span class="ms">download</span>Save</button>
   </div>
 </header>
 
@@ -419,8 +421,7 @@ dialog[open]{animation:dlg .2s cubic-bezier(.2,0,0,1)}
 "use strict";
 
 /* ---------- Constants ---------- */
-const KEY = "pantry-keeper-v1";
-const UI_KEY = "pantry-keeper-ui";
+const DATA_FILE = "pantry-data.json";
 const UNITS = ["pcs","portions","pack","g","kg","ml","L","bottle","can","jar","box","bag","roll","bunch"];
 const SORTS = {name: "Name A–Z", amount: "Lowest stock", expiry: "Use by date"};
 const SOON_DAYS = 3;
@@ -445,11 +446,7 @@ const norm = s => String(s || "").trim().toLowerCase();
 const stepFor = unit => (unit === "g" || unit === "ml") ? 100 : 1;
 const plural = (n, w) => n + " " + w + (n === 1 ? "" : "s");
 
-/* ---------- Storage ---------- */
-let storageOk = true;
-try { const k = "__pk_test"; localStorage.setItem(k, "1"); localStorage.removeItem(k); } catch (e) { storageOk = false; }
-try { navigator.storage && navigator.storage.persist && navigator.storage.persist().catch(() => {}); } catch (e) {}
-
+/* ---------- Data: always pantry-data.json next to this page ---------- */
 function normalize(d) {
   const inv = (Array.isArray(d.inventory) ? d.inventory : []).filter(i => i && i.name).map(i => ({
     id: String(i.id || uid()), name: String(i.name), qty: num(i.qty, 0), unit: String(i.unit || "pcs"),
@@ -465,63 +462,18 @@ function normalize(d) {
     examples: !!d.examples, savedAt: d.savedAt || null };
 }
 
-function sample() {
-  const I = (name, qty, unit, category, location, min, exp, notes) =>
-    ({id: uid(), name, qty, unit, frozen: location === "Freezer", min, expiry: exp === null ? "" : inDays(exp), notes: notes || ""});
-  const inventory = [
-    I("Milk", 1, "L", "Dairy & eggs", "Fridge", 2, 3),
-    I("Eggs", 8, "pcs", "Dairy & eggs", "Fridge", 6, 12),
-    I("Greek yogurt", 2, "pcs", "Dairy & eggs", "Fridge", 0, -1),
-    I("Tomatoes", 4, "pcs", "Produce", "Fridge", 0, 2),
-    I("Spaghetti", 3, "pack", "Pantry staples", "Pantry", 2, null),
-    I("Basmati rice", 1.5, "kg", "Pantry staples", "Pantry", 1, null),
-    I("Olive oil", 1, "bottle", "Pantry staples", "Pantry", 1, null, "Extra virgin, 750 ml"),
-    I("Coffee beans", 500, "g", "Drinks", "Pantry", 250, null),
-    I("Sparkling water", 4, "bottle", "Drinks", "Pantry", 6, null),
-    I("Frozen peas", 1, "bag", "Frozen", "Freezer", 1, 90),
-    I("Bolognese sauce", 4, "portions", "Leftovers", "Freezer", 0, null, "Frozen in September"),
-    I("Chicken breasts", 2, "pcs", "Meat & fish", "Freezer", 0, 60),
-    I("Dish soap", 0, "bottle", "Cleaning", "Utility cupboard", 1, null),
-    I("Toilet paper", 6, "roll", "Toiletries", "Bathroom", 4, null)
-  ];
-  const s = { version: 1, inventory, settings: { autoAdd: true }, examples: true, savedAt: null,
-    shopping: [
-      {id: uid(), name: "Bananas", qty: 6, unit: "pcs", invId: null, auto: false, checked: false},
-      {id: uid(), name: "Sourdough bread", qty: 1, unit: "pcs", invId: null, auto: false, checked: true}
-    ]};
-  return s;
-}
-
-function load() {
-  if (storageOk) {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) { const d = JSON.parse(raw); if (d && Array.isArray(d.inventory)) return normalize(d); }
-    } catch (e) {}
-  }
-  const s = sample();
-  s.inventory.forEach(i => syncAuto(i, s));
-  return s;
-}
-
-let state;
-let lastSaveFailed = false;
-function save() {
-  state.savedAt = Date.now();
-  if (fileHandle && fileStatus === "connected") scheduleFileWrite();
-  if (!storageOk) return;
-  try { localStorage.setItem(KEY, JSON.stringify(state)); lastSaveFailed = false; }
-  catch (e) { lastSaveFailed = true; }
-}
+let state = normalize({});
+let dirty = false;           // changes not yet saved into pantry-data.json
+let loadStatus = "loading";  // loading | loaded | missing | invalid | local
+let loadedAt = null;
+function save() { state.savedAt = Date.now(); dirty = true; }
 const snapshot = () => JSON.stringify(state);
 
-/* ---------- UI state ---------- */
+/* ---------- UI state (memory only, nothing stored in the browser) ---------- */
 const ui = { tab: "inventory", query: "", filter: "all", sort: "name" };
-try { const u = JSON.parse(localStorage.getItem(UI_KEY) || "{}"); if (u.tab) ui.tab = u.tab; if (u.filter) ui.filter = u.filter; if (u.sort && SORTS[u.sort]) ui.sort = u.sort; } catch (e) {}
-if (ui.filter.startsWith("loc:")) ui.filter = "all";
 const h = (location.hash || "").slice(1);
 if (["inventory","freezer","shopping","settings"].includes(h)) ui.tab = h;
-const saveUi = () => { try { localStorage.setItem(UI_KEY, JSON.stringify({tab: ui.tab, filter: ui.filter, sort: ui.sort})); } catch (e) {} };
+const saveUi = () => {};
 
 /* ---------- Domain logic ---------- */
 const isLow = i => i.min > 0 && i.qty < i.min;
@@ -554,6 +506,7 @@ function render() {
   const badge = $("#shopBadge"); badge.hidden = !open; badge.textContent = open > 99 ? "99+" : open;
   updateSaveLabel();
   refreshDatalists();
+  if (loadStatus === "loading") { setView(`<div class="empty"><span class="ms">hourglass_empty</span><p>Loading ${DATA_FILE}…</p></div>`); renderFab(); return; }
   if (ui.tab === "inventory" || ui.tab === "freezer") renderInventory(ui.tab);
   else if (ui.tab === "shopping") renderShopping();
   else renderSettings();
@@ -561,11 +514,11 @@ function render() {
 }
 
 function storageBanner() {
-  const fb = fileBanner();
-  if (fileStatus === "connected" || (storageOk && !lastSaveFailed)) return fb;
-  return fb + `<div class="banner err"><span class="ms">warning</span><p>${!storageOk
-    ? "This browser is blocking storage, so changes will be lost when you close the page. Create a data file or email yourself a copy in Settings before you leave."
-    : "The last change could not be saved because browser storage is full. Create a data file in Settings."}</p></div>`;
+  if (loadStatus === "missing") return `<div class="banner err"><span class="ms">error</span><p>Couldn't load <b>${DATA_FILE}</b> from the folder this page is in. ${location.protocol === "file:"
+    ? "Browsers block a page opened straight from your disk from reading files, so open the app through its web address."
+    : "Upload it next to this page, or add items here and click Save to download a new one."}</p><button class="btn text sl" data-action="reload-data">Try again</button></div>`;
+  if (loadStatus === "invalid") return `<div class="banner err"><span class="ms">error</span><p><b>${DATA_FILE}</b> isn't valid JSON, so it couldn't be loaded. Fix or replace the file, then try again.</p><button class="btn text sl" data-action="reload-data">Try again</button></div>`;
+  return "";
 }
 
 function renderInventory(scope) {
@@ -711,7 +664,7 @@ function renderSettings() {
       <label class="switch"><input type="checkbox" id="autoAdd" ${state.settings.autoAdd ? "checked" : ""} aria-label="Add low-stock items automatically"><span class="track"></span><span class="thumb"></span></label></div>
   </section>`;
 
-  html += dataFileCard(saved, bytes);
+  html += dataFileCard(bytes);
 
   html += framed
     ? `<section class="card"><h2 class="t-title-m">Email a copy</h2><p class="muted">Emailing your data works in the downloaded app, opened in Chrome or Edge.</p></section>`
@@ -727,7 +680,7 @@ function renderSettings() {
 
   html += `<section class="card">
     <h2 class="t-title-m">Start over</h2>
-    <div class="setting"><div class="muted">Delete every item in your inventory and shopping list from this browser.</div>
+    <div class="setting"><div class="muted">Delete every item in your inventory and shopping list. Click Save afterwards to update the file.</div>
       <button class="btn outlined danger sl" data-action="wipe">Delete all data</button></div>
   </section>`;
   setView(html);
@@ -971,10 +924,8 @@ document.addEventListener("click", e => {
       }
       break;
     }
-    case "file-create": runFile(createDataFile); break;
-    case "file-open": runFile(openDataFile); break;
-    case "file-reconnect": runFile(reconnectFile); break;
-    case "file-disconnect": disconnectFile(); break;
+    case "save-file": saveFile(); break;
+    case "reload-data": reloadData(); break;
     case "go-settings": ui.tab = "settings"; saveUi(); render(); window.scrollTo(0, 0); break;
     case "del-inv": deleteInv(id); break;
     case "del-shop": deleteShop(id); break;
@@ -994,7 +945,7 @@ document.addEventListener("click", e => {
     }
     case "email-data": emailData(); break;
     case "wipe":
-      confirmAction("Delete all data?", "This removes every item in your inventory and shopping list from this browser. Email yourself a copy first if you might want it back.",
+      confirmAction("Delete all data?", "This removes every item in your inventory and shopping list. The file on your server only changes when you save and upload it.",
         "Delete all", () => { const snap = snapshot(); state = normalize({inventory: [], shopping: [], settings: state.settings}); commit("All data deleted", snap); });
       break;
   }
@@ -1012,6 +963,8 @@ document.addEventListener("change", e => {
     state.settings.autoAdd = t.checked;
     if (t.checked) state.inventory.forEach(i => syncAuto(i));
     commit(t.checked ? "Low-stock items will be added automatically" : "Automatic adding is off");
+  } else if (t.id === "openLocal" && t.files && t.files[0]) {
+    openLocalFile(t.files[0]); t.value = "";
   } else if (t.id === "emailAddr") {
     state.settings.email = t.value.trim(); save();
   }
@@ -1037,206 +990,81 @@ document.addEventListener("submit", e => {
 
 window.addEventListener("scroll", () => $("#appbar").classList.toggle("scrolled", window.scrollY > 4), {passive: true});
 
-// Keep several open tabs in sync
-window.addEventListener("storage", e => {
-  if (e.key !== KEY || !e.newValue) return;
-  try { state = normalize(JSON.parse(e.newValue)); render(); } catch (err) {}
-});
-
-/* ---------- Data file (File System Access API, Chrome / Edge) ---------- */
-const fileApi = !framed && "showSaveFilePicker" in window && "showOpenFilePicker" in window && "indexedDB" in window;
-const FILE_TYPES = [{description: "Pantry Keeper data", accept: {"application/json": [".json"]}}];
-let fileHandle = null;
-let fileStatus = "none"; // none | connected | needs-permission | error
-let fileErrorMsg = "";
-let lastFileWrite = null, writeTimer = null, pendingWrite = false, writeChain = Promise.resolve();
-
-function idb(mode, fn) {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open("pantry-keeper", 1);
-    req.onupgradeneeded = () => req.result.createObjectStore("kv");
-    req.onerror = () => reject(req.error);
-    req.onsuccess = () => {
-      const db = req.result, tx = db.transaction("kv", mode), r = fn(tx.objectStore("kv"));
-      tx.oncomplete = () => { db.close(); resolve(r && r.result); };
-      tx.onerror = () => { db.close(); reject(tx.error); };
-    };
-  });
+/* ---------- Load and save pantry-data.json ---------- */
+async function loadData() {
+  loadStatus = "loading"; render();
+  try {
+    const res = await fetch(`${DATA_FILE}?t=${Date.now()}`, {cache: "no-store"});
+    if (!res.ok) throw new Error("not found");
+    const text = await res.text();
+    let d = {};
+    if (text.trim()) {
+      try { d = JSON.parse(text); } catch (e) { loadStatus = "invalid"; render(); return; }
+    }
+    if (!d || typeof d !== "object" || Array.isArray(d)) { loadStatus = "invalid"; render(); return; }
+    state = normalize(Object.assign({}, d, {examples: false}));
+    loadStatus = "loaded"; loadedAt = Date.now(); dirty = false;
+  } catch (e) {
+    loadStatus = "missing";
+  }
+  render();
 }
-const idbGet = k => idb("readonly", s => s.get(k));
-const idbSet = (k, v) => idb("readwrite", s => s.put(v, k));
-const idbDel = k => idb("readwrite", s => s.delete(k));
+
+function saveFile() {
+  try {
+    downloadFile(DATA_FILE, exportJson());
+    dirty = false; render();
+    snack(`${DATA_FILE} downloaded. Upload it next to the app to replace the old file.`);
+  } catch (e) { snack("Couldn't create the file. Try again."); }
+}
+
+function reloadData() {
+  if (!dirty) { loadData(); return; }
+  confirmAction("Discard unsaved changes?", `Reloading reads ${DATA_FILE} again, and changes you haven't saved are lost.`, "Reload", loadData);
+}
+
+function openLocalFile(file) {
+  const r = new FileReader();
+  r.onload = () => {
+    let d;
+    try { d = JSON.parse(String(r.result || "{}") || "{}"); } catch (e) { snack(`That file isn't valid JSON. Choose ${DATA_FILE}.`); return; }
+    if (!d || typeof d !== "object" || Array.isArray(d)) { snack(`That isn't a Pantry Keeper file. Choose ${DATA_FILE}.`); return; }
+    state = normalize(Object.assign({}, d, {examples: false}));
+    loadStatus = "local"; loadedAt = Date.now(); dirty = false;
+    render(); snack(`Opened ${file.name}`);
+  };
+  r.onerror = () => snack("Couldn't read that file. Try again.");
+  r.readAsText(file);
+}
 
 function updateSaveLabel() {
-  $("#saveState").textContent = fileStatus === "connected" ? (pendingWrite ? "Saving…" : "Saved to file")
-    : fileStatus === "error" ? "File not saved"
-    : (!storageOk || lastSaveFailed) ? "Not saved" : (state.savedAt ? "Saved in browser" : "");
+  $("#saveState").textContent = loadStatus === "loading" ? "Loading…" : dirty ? "Unsaved changes" : (loadStatus === "loaded" || loadStatus === "local") ? "Up to date" : "";
+  $("#saveBtn").hidden = !dirty;
 }
 
-function scheduleFileWrite() {
-  pendingWrite = true; updateSaveLabel();
-  clearTimeout(writeTimer);
-  writeTimer = setTimeout(() => { writeTimer = null; writeChain = writeChain.then(writeFileNow); }, 250);
-}
-
-async function writeFileNow() {
-  if (!fileHandle) { pendingWrite = false; return; }
-  try {
-    const w = await fileHandle.createWritable();
-    await w.write(exportJson());
-    await w.close();
-    lastFileWrite = Date.now();
-    if (!writeTimer) pendingWrite = false;
-    updateSaveLabel();
-  } catch (e) {
-    pendingWrite = false;
-    if (e && e.name === "NotAllowedError") fileStatus = "needs-permission";
-    else { fileStatus = "error"; fileErrorMsg = `Couldn't save to ${fileHandle.name}. It may have been moved, renamed or deleted. Your changes are still saved in this browser.`; }
-    render();
-  }
-}
-
-function parsePantry(text) {
-  try { const d = JSON.parse(text); if (d && Array.isArray(d.inventory)) return normalize(Object.assign({}, d, {examples: false})); } catch (e) {}
-  return null;
-}
-
-async function connect(h) {
-  fileHandle = h; fileStatus = "connected"; fileErrorMsg = "";
-  await idbSet("file", h);
-}
-
-// Read the remembered file and keep whichever copy (file or browser) was changed last
-async function syncFromFile() {
-  let text;
-  try { text = await (await fileHandle.getFile()).text(); }
-  catch (e) {
-    fileStatus = "error";
-    fileErrorMsg = `Couldn't find ${fileHandle.name}. It may have been moved, renamed or deleted. Open it from its new place, or create a new data file.`;
-    render(); return;
-  }
-  const fromFile = text.trim() ? parsePantry(text) : null;
-  if (text.trim() && !fromFile) {
-    fileStatus = "error"; fileErrorMsg = `${fileHandle.name} isn't a Pantry Keeper data file, so the app won't write to it. Choose your data file or create a new one.`;
-    render(); return;
-  }
-  fileStatus = "connected"; fileErrorMsg = "";
-  if (fromFile && (fromFile.savedAt || 0) >= (state.savedAt || 0)) {
-    state = fromFile;
-    try { if (storageOk) localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
-  } else {
-    scheduleFileWrite();
-  }
-  render();
-}
-
-async function createDataFile() {
-  const h = await window.showSaveFilePicker({suggestedName: "pantry-data.json", types: FILE_TYPES, id: "pantry-data", startIn: "documents"});
-  await connect(h);
-  save(); render();
-  snack(`Saving to ${h.name} after every change`);
-}
-
-async function openDataFile() {
-  const [h] = await window.showOpenFilePicker({types: FILE_TYPES, multiple: false, id: "pantry-data", startIn: "documents"});
-  if ((await h.requestPermission({mode: "readwrite"})) !== "granted") { snack("The app needs permission to save to that file. Try again and choose Save changes or Allow."); return; }
-  const text = await (await h.getFile()).text();
-  if (text.trim()) {
-    const fromFile = parsePantry(text);
-    if (!fromFile) { snack("That file isn't a Pantry Keeper data file. Choose a different file."); return; }
-    await connect(h);
-    state = fromFile;
-    try { if (storageOk) localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
-    render();
-    snack(`Loaded ${plural(state.inventory.length, "item")} from ${h.name}`);
-  } else {
-    await connect(h);
-    save(); render();
-    snack(`Saving to ${h.name} after every change`);
-  }
-}
-
-async function reconnectFile() {
-  if (!fileHandle) return openDataFile();
-  const p = await fileHandle.requestPermission({mode: "readwrite"});
-  if (p === "granted") { await syncFromFile(); if (fileStatus === "connected") snack(`Reconnected to ${fileHandle.name}`); }
-  else snack("Permission wasn't given, so changes are only saved in this browser for now.");
-}
-
-function disconnectFile() {
-  idbDel("file").catch(() => {});
-  fileHandle = null; fileStatus = "none"; fileErrorMsg = "";
-  render();
-  snack("Stopped saving to the file. Your data is still saved in this browser.");
-}
-
-function runFile(fn) {
-  fn().catch(e => {
-    if (e && e.name === "AbortError") return; // picker cancelled
-    fileStatus = fileHandle ? "error" : "none";
-    fileErrorMsg = "Something went wrong with the data file (" + (e && e.message ? e.message : "unknown error") + "). Your changes are still saved in this browser.";
-    render();
-    if (!fileHandle) snack("Couldn't set up the data file. Try again.");
-  });
-}
-
-async function initDataFile() {
-  if (!fileApi) return;
-  try {
-    const h = await idbGet("file");
-    if (!h) return;
-    fileHandle = h;
-    const p = await h.queryPermission({mode: "readwrite"});
-    if (p === "granted") await syncFromFile();
-    else { fileStatus = "needs-permission"; render(); }
-  } catch (e) {}
-}
-
-function fileBanner() {
-  if (!fileApi) return "";
-  const name = fileHandle ? esc(fileHandle.name) : "";
-  if (fileStatus === "needs-permission") return `<div class="banner info"><span class="ms">link</span><p>Click Reconnect so the app can keep saving to <b>${name}</b>. Until then, changes are saved in this browser only.</p><button class="btn text sl" data-action="file-reconnect">Reconnect</button></div>`;
-  if (fileStatus === "error") return `<div class="banner err"><span class="ms">error</span><p>${esc(fileErrorMsg)}</p><button class="btn text sl" data-action="go-settings">Fix in Settings</button></div>`;
-  if (fileStatus === "none" && ui.tab === "inventory") return `<div class="banner info"><span class="ms">save</span><p>Your data is only saved in this browser. Create a data file next to the app to keep it safe.</p><button class="btn text sl" data-action="file-create">Create data file</button></div>`;
-  return "";
-}
-
-function dataFileCard(saved, bytes) {
-  const name = fileHandle ? esc(fileHandle.name) : "";
-  let body, btns = "";
-  if (!fileApi) {
-    body = framed
-      ? "Saving to a file on your computer works in the downloaded app file, opened in Chrome or Edge. Here, your data is saved in this browser only."
-      : "This browser can't save to a file. Open the app in Chrome or Edge to keep your data in a file next to it. Until then it's saved in this browser only, so email yourself a copy now and then.";
-  } else if (fileStatus === "connected") {
-    body = `Every change is saved to <b>${name}</b>${lastFileWrite ? `, last at ${new Date(lastFileWrite).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"})}` : ""}. A copy is also kept in this browser.`;
-    btns = `<button class="btn outlined has-icon sl" data-action="file-open"><span class="ms">folder_open</span>Use a different file</button><button class="btn text sl" data-action="file-disconnect">Stop saving to file</button>`;
-  } else if (fileStatus === "needs-permission") {
-    body = `Your data file is <b>${name}</b>. The browser asks for your OK before the app can save to it again.`;
-    btns = `<button class="btn filled has-icon sl" data-action="file-reconnect"><span class="ms">link</span>Reconnect</button><button class="btn text sl" data-action="file-disconnect">Stop saving to file</button>`;
-  } else if (fileStatus === "error") {
-    body = esc(fileErrorMsg);
-    btns = `<button class="btn filled has-icon sl" data-action="file-reconnect"><span class="ms">refresh</span>Try again</button><button class="btn outlined sl" data-action="file-open">Open data file</button><button class="btn text sl" data-action="file-create">Create new file</button>`;
-  } else {
-    body = "Your data is saved in this browser only. Create a data file, for example <b>pantry-data.json</b> in the same folder as this app, and every change is written to it automatically. If you already have one, open it instead.";
-    btns = `<button class="btn filled has-icon sl" data-action="file-create"><span class="ms">note_add</span>Create data file</button><button class="btn outlined has-icon sl" data-action="file-open"><span class="ms">folder_open</span>Open existing file</button>`;
-  }
+function dataFileCard(bytes) {
+  const time = loadedAt ? new Date(loadedAt).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"}) : "";
+  const status = {loading: "Loading…", loaded: `Loaded from the server at ${time}`, local: `Opened from this computer at ${time}`,
+    missing: "Not found next to this page", invalid: "Not valid JSON"}[loadStatus];
   return `<section class="card">
     <h2 class="t-title-m">Data file</h2>
-    <p>${body}</p>
-    ${btns ? `<div class="btn-row">${btns}</div>` : ""}
-    <dl class="kv"><dt>Last change</dt><dd>${esc(saved)}</dd>
+    <p class="muted">The app reads <b>${DATA_FILE}</b> from the same folder as this page every time it opens. Nothing is kept in the browser. A web page can't write to your server, so to keep changes, click <b>Save</b> and upload the downloaded file to replace the old one.</p>
+    <dl class="kv"><dt>File</dt><dd>${esc(status)}</dd>
+      <dt>Changes</dt><dd>${dirty ? "Not saved yet" : "All saved"}</dd>
       <dt>Contents</dt><dd>${plural(state.inventory.length, "item")} in stock, ${state.shopping.length} on the list (${(bytes/1024).toFixed(1)} KB)</dd></dl>
+    <div class="btn-row">
+      <button class="btn filled has-icon sl" data-action="save-file"><span class="ms">download</span>Download ${DATA_FILE}</button>
+      <button class="btn outlined has-icon sl" data-action="reload-data"><span class="ms">refresh</span>Reload from server</button>
+      <span class="btn text has-icon sl file-btn"><span class="ms">upload_file</span>Open from this computer<input type="file" id="openLocal" accept=".json,application/json" aria-label="Open ${DATA_FILE} from this computer"></span>
+    </div>
   </section>`;
 }
 
-window.addEventListener("beforeunload", e => { if (pendingWrite) { e.preventDefault(); e.returnValue = ""; } });
+window.addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
 
 /* ---------- Boot ---------- */
-state = load();
-if (!state.savedAt) save();
 render();
-initDataFile();
+loadData();
 })();
 </script>
 
