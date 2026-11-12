@@ -1,0 +1,24 @@
+# bukva.design
+
+> Bukva Miklós (Miklós Bukva) egyéni UX/UI designer és frontend fejlesztő. Weboldalakat, webshopokat és applikációkat tervez és fejleszt magánszemélyeknek és kis- és középvállalkozásoknak Magyarországon, akadálymentesen (WCAG 2.2 AA). Online dolgozik, magyarul és angolul.
+
+## Szolgáltatások és induló árak
+- Egyoldalas landing: 190 000 Ft-tól
+- Bemutatkozó weboldal: 350 000 Ft-tól
+- Ügyfélszerző céges oldal: 650 000 Ft-tól
+- Webshop: 850 000 Ft-tól
+- UX audit: 200 000 Ft-tól
+- App design és prototípus: 600 000 Ft-tól
+- Akadálymentesítési gyorsaudit (WCAG 2.2, EAA): 150 000 Ft-tól
+- Felelős AI integráció: 300 000 Ft-tól
+
+## Oldalak
+- [Szolgáltatások és árak](https://bukva.design/szolgaltatasok.html)
+- [Munkáim](https://bukva.design/munkaim.html)
+- [Rólam](https://bukva.design/rolam.html)
+- [Kapcsolat](https://bukva.design/kapcsolat.html)
+- [English version](https://bukva.design/en/)
+
+## Kapcsolat
+- E-mail: hello@bukva.design
+- LinkedIn: https://www.linkedin.com/in/miklos-bukva
