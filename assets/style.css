@@ -4,20 +4,20 @@
    All colours are tokens; contrast verified for WCAG 2.2 AA (most pairs AAA). */
 
 :root {
-  --bg: #0e141b;
-  --surface: #151d27;
-  --ink: #e7ecf2;
-  --muted: #a3b0be;
-  --line: #2a3644;
-  --accent: #93aeff;
-  --accent-hover: #b5c8ff;
-  --accent-ink: #0b1220;
-  --accent-soft: #1a2540;
-  --mark: #ffd84d;
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --ink: #121c26;
+  --muted: #4a5866;
+  --line: #d5dce4;
+  --accent: #1d48c9;
+  --accent-hover: #163aa6;
+  --accent-ink: #ffffff;
+  --accent-soft: #e6ecfc;
+  --mark: #ffe066;
   --mark-ink: #121c26;
-  --ok: #7fd49c;
-  --error: #ff9c92;
-  --focus: #93aeff;
+  --ok: #1d6b3a;
+  --error: #b42318;
+  --focus: #1d48c9;
 
   --font-display: "Bricolage Grotesque", "Bricolage Grotesque Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible Next Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -36,25 +36,25 @@
   --space-xl: clamp(3.5rem, 2.5rem + 4vw, 6.5rem);
   --measure: 65ch;
   --container: 72rem;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
-:root[data-theme="light"] {
-  --bg: #f5f7fa;
-  --surface: #ffffff;
-  --ink: #121c26;
-  --muted: #4a5866;
-  --line: #d5dce4;
-  --accent: #1d48c9;
-  --accent-hover: #163aa6;
-  --accent-ink: #ffffff;
-  --accent-soft: #e6ecfc;
-  --mark: #ffe066;
+:root[data-theme="dark"] {
+  --bg: #0e141b;
+  --surface: #151d27;
+  --ink: #e7ecf2;
+  --muted: #a3b0be;
+  --line: #2a3644;
+  --accent: #93aeff;
+  --accent-hover: #b5c8ff;
+  --accent-ink: #0b1220;
+  --accent-soft: #1a2540;
+  --mark: #ffd84d;
   --mark-ink: #121c26;
-  --ok: #1d6b3a;
-  --error: #b42318;
-  --focus: #1d48c9;
-  color-scheme: light;
+  --ok: #7fd49c;
+  --error: #ff9c92;
+  --focus: #93aeff;
+  color-scheme: dark;
 }
 
 

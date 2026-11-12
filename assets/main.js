@@ -36,7 +36,7 @@
   var themeBtn = document.querySelector("[data-theme-toggle]");
   function isDark() {
     var t = root.getAttribute("data-theme");
-    return t !== "light"; // dark is the default
+    return t === "dark"; // light is the default
   }
   function syncThemeBtn() {
     if (!themeBtn) return;
