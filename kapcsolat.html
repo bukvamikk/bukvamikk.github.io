@@ -1,173 +1,137 @@
 <!doctype html>
-<html lang="hu" dir="ltr">
+<html lang="hu" class="pv-checking" data-salt="vqMQoPIQuSUtDerNVGYYwg==" data-it="600000">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Kapcsolat – ingyenes konzultáció | bukva.design</title>
-<meta name="description" content="Írd meg, miben segíthetek. 1 munkanapon belül válaszolok, és egyeztetünk egy ingyenes, 30 perces konzultációt online vagy személyesen.">
-<meta name="robots" content="index, follow, max-image-preview:large">
-<link rel="canonical" href="https://bukva.design/kapcsolat.html">
-<link rel="alternate" hreflang="hu" href="https://bukva.design/kapcsolat.html">
-<link rel="alternate" hreflang="en" href="https://bukva.design/en/contact.html">
-<link rel="alternate" hreflang="x-default" href="https://bukva.design/kapcsolat.html">
-<meta name="theme-color" content="#f5f7fa">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="bukva.design">
-<meta property="og:title" content="Kapcsolat – ingyenes konzultáció | bukva.design">
-<meta property="og:description" content="Írd meg, miben segíthetek. 1 munkanapon belül válaszolok, és egyeztetünk egy ingyenes, 30 perces konzultációt online vagy személyesen.">
-<meta property="og:url" content="https://bukva.design/kapcsolat.html">
-<meta property="og:image" content="https://bukva.design/assets/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="bukva.design – UX/UI design">
-<meta property="og:locale" content="hu_HU">
-<meta property="og:locale:alternate" content="en_GB">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="referrer" content="no-referrer">
+<title>Jelszó szükséges – bukva.design</title>
 <script>(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('bukva-theme');if(t)d.setAttribute('data-theme',t)}catch(e){}})();</script>
-<link rel="preload" href="assets/fonts/atkinson-hyperlegible-next-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="assets/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/fonts.css">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<script src="assets/main.js" defer></script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Főoldal", "item": "https://bukva.design/"}, {"@type": "ListItem", "position": 2, "name": "Kapcsolat", "item": "https://bukva.design/kapcsolat.html"}]}</script>
+<style>
+html.pv-checking .pv { visibility: hidden; }
+.pv { min-height: 100vh; display: grid; place-items: center; padding: 1.25rem; }
+.pv-card { width: 100%; max-width: 30rem; display: grid; gap: 1.25rem; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 16px; padding: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
+.pv-card h1 { font-size: var(--step-2); line-height: 1.2; margin: 0; }
+.pv-card p { margin: 0; }
+.pv-card .brand { justify-self: start; }
+.pv-row { display: flex; gap: 0.5rem; }
+.pv-row input { flex: 1; min-width: 0; width: 100%; min-height: 48px; padding: 0.7rem 0.85rem; border: 2px solid var(--muted);
+  border-radius: 8px; background: var(--bg); color: var(--ink); font: 400 1.0625rem/1.4 var(--font-body); }
+.pv-row input:focus-visible { border-color: var(--focus); outline-offset: 1px; }
+.pv-toggle { flex: none; min-width: 48px; min-height: 48px; display: grid; place-items: center; border: 2px solid var(--muted);
+  border-radius: 8px; background: var(--bg); color: var(--ink); cursor: pointer; }
+.pv-toggle[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.pv-toggle svg { width: 1.4rem; height: 1.4rem; }
+.pv-toggle .slash { display: none; }
+.pv-toggle[aria-pressed="true"] .slash { display: inline; }
+.pv-card-form { display: grid; gap: 1.25rem; }
+.pv-card .btn { justify-self: start; }
+.pv-card .btn[aria-disabled="true"] { cursor: progress; }
+@media (forced-colors: active) { .pv-toggle[aria-pressed="true"] { outline: 3px solid Highlight; } }
+</style>
+<noscript><style>html.pv-checking .pv { visibility: visible; } #pv-form { display: none; }</style></noscript>
 </head>
 <body>
-<a class="skip-link" href="#main">Ugrás a tartalomra</a>
-<header class="site-header">
-  <div class="wrap header-row">
-    <a class="brand" href="index.html">bukva<span class="dot">.</span><span class="tld">design</span></a>
-    <nav id="site-nav" class="site-nav" aria-label="Fő navigáció">
-      <ul class="nav-list"><li><a href="szolgaltatasok.html">Szolgáltatások</a></li><li><a href="munkaim.html">Munkáim</a></li><li><a href="rolam.html">Rólam</a></li><li class="nav-cta"><a class="btn btn-primary btn-small" href="kapcsolat.html" aria-current="page">Ingyenes konzultáció</a></li><li class="nav-lang"><a href="en/contact.html" hreflang="en" lang="en">English version</a></li></ul>
-    </nav>
-    <div class="header-tools">
-      <a class="lang-link" href="en/contact.html" hreflang="en" lang="en"><span aria-hidden="true">EN</span><span class="visually-hidden">English version</span></a>
-      <a class="btn btn-primary btn-small header-cta" href="kapcsolat.html" aria-current="page">Kapcsolat</a>
-      <button type="button" class="icon-btn" data-theme-toggle aria-pressed="false" aria-label="Sötét mód"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
-      <button type="button" class="icon-btn menu-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Menü megnyitása"><svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg hidden class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    </div>
-  </div>
-</header>
-<main id="main" tabindex="-1">
-
-<header class="wrap page-head">
-  <nav class="breadcrumb" aria-label="Morzsamenü"><ol><li><a href="index.html">Főoldal</a></li><li><span aria-current="page">Kapcsolat</span></li></ol></nav>
-  <h1>Kapcsolat</h1>
-  <p class="lead">Írd meg röviden, miben segíthetek. 1 munkanapon belül válaszolok, és egyeztetünk egy ingyenes, 30 perces online konzultációt.</p>
-</header>
-
-<div class="wrap two-col">
-  <div>
-    <!-- Az űrlap bekötése: data-endpoint="https://formspree.io/f/XXXX" (vagy Netlify Forms / saját végpont). Üresen előnézeti módban fut. -->
-    <form id="contact-form" class="form" novalidate data-endpoint="" aria-describedby="form-req-note">
-      <div id="error-summary" class="error-summary" tabindex="-1" role="alert" hidden>
-        <h2>Javítandó mezők</h2>
-        <ul></ul>
-      </div>
-      <p id="form-req-note" class="hint">A csillaggal (<span class="req" aria-hidden="true">*</span>) jelölt mezők kitöltése kötelező.</p>
-
-      <div class="field-row">
-        <div class="field">
-          <label for="f-name">Név <span class="req" aria-hidden="true">*</span></label>
-          <input type="text" id="f-name" name="name" autocomplete="name" required data-validate data-msg-required="Add meg a neved.">
-          <p id="f-name-error" class="error-msg" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16h.01"/></svg><span class="t"></span></p>
-        </div>
-        <div class="field">
-          <label for="f-email">E-mail-cím <span class="req" aria-hidden="true">*</span></label>
-          <input type="email" id="f-email" name="email" autocomplete="email" inputmode="email" required aria-describedby="f-email-hint" data-validate data-msg-required="Add meg az e-mail-címed." data-msg-format="Az e-mail-cím formátuma nem megfelelő, például: nev@pelda.hu">
-          <p id="f-email-hint" class="hint">Erre a címre válaszolok.</p>
-          <p id="f-email-error" class="error-msg" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16h.01"/></svg><span class="t"></span></p>
-        </div>
-      </div>
-
+<main class="pv" id="main">
+  <div class="pv-card">
+    <p class="brand" aria-hidden="true">bukva<span class="dot">.</span><span class="tld">design</span></p>
+    <h1>Az oldal jelenleg jelszóval védett</h1>
+    <p>A bukva.design fejlesztés alatt áll, és csak meghívott látogatók érhetik el.</p>
+    <noscript><p><strong>Az oldal megnyitásához engedélyezd a JavaScriptet a böngésződben.</strong></p></noscript>
+    <form id="pv-form" class="pv-card-form" novalidate>
       <div class="field">
-        <label for="f-phone">Telefonszám <span class="hint">(nem kötelező)</span></label>
-        <input type="tel" id="f-phone" name="phone" autocomplete="tel" inputmode="tel">
-      </div>
-
-      <fieldset>
-        <legend>Miben segíthetek?</legend>
-        <div class="chips">
-          <label><input type="checkbox" name="topic" value="Weboldal"> Weboldal</label>
-          <label><input type="checkbox" name="topic" value="Webshop"> Webshop</label>
-          <label><input type="checkbox" name="topic" value="UX/UI design"> UX/UI design</label>
-          <label><input type="checkbox" name="topic" value="Applikáció"> Applikáció</label>
-          <label><input type="checkbox" name="topic" value="Akadálymentesítés"> Akadálymentesítés</label>
-          <label><input type="checkbox" name="topic" value="AI integráció"> AI integráció</label>
+        <label for="pv-pw">Jelszó</label>
+        <div class="pv-row">
+          <input type="password" id="pv-pw" name="password" autocomplete="current-password" autocapitalize="off" spellcheck="false" autofocus>
+          <button type="button" class="pv-toggle" id="pv-toggle" aria-pressed="false" aria-controls="pv-pw" aria-label="Jelszó megjelenítése"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M4 4l16 16"/></svg></button>
         </div>
-      </fieldset>
-
-      <div class="field">
-        <label for="f-budget">Tervezett keret</label>
-        <select id="f-budget" name="budget">
-          <option>Még nem tudom</option>
-          <option>300 000 Ft alatt</option>
-          <option>300 000 – 700 000 Ft</option>
-          <option>700 000 – 1 500 000 Ft</option>
-          <option>1 500 000 Ft felett</option>
-        </select>
+        <p id="pv-error" class="error-msg" role="alert" hidden><span id="pv-error-text"></span></p>
       </div>
-
-      <div class="field">
-        <label for="f-message">Üzenet <span class="req" aria-hidden="true">*</span></label>
-        <textarea id="f-message" name="message" required minlength="20" aria-describedby="f-message-hint" data-validate data-msg-required="Írd le röviden, miben segíthetek." data-msg-format="Írj legalább 20 karaktert, hogy pontosan értsem, mire van szükséged."></textarea>
-        <p id="f-message-hint" class="hint">Például: mi a vállalkozásod, mit szeretnél elérni, és van-e határidő.</p>
-        <p id="f-message-error" class="error-msg" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16h.01"/></svg><span class="t"></span></p>
+      <div class="check">
+        <input type="checkbox" id="pv-remember" aria-describedby="pv-remember-hint">
+        <div><label for="pv-remember">Emlékezz rám ezen az eszközön</label><p class="hint" id="pv-remember-hint">Csak a saját eszközödön kapcsold be.</p></div>
       </div>
-
-      <div class="hp" aria-hidden="true">
-        <label for="f-website">Ezt a mezőt hagyd üresen</label>
-        <input type="text" id="f-website" name="website" tabindex="-1" autocomplete="off">
-      </div>
-
-      <div class="submit-row"><button class="btn btn-primary" type="submit">Üzenet küldése</button><p class="hint">Az adataidat csak a megkeresésed megválaszolására használom. Részletek az <a href="adatvedelem.html">adatkezelési tájékoztatóban</a>.</p></div>
-      <p id="form-status" class="form-status" tabindex="-1" role="status" hidden></p>
+      <button type="submit" class="btn btn-primary" id="pv-submit">Belépés</button>
     </form>
   </div>
-
-  <aside class="contact-aside" aria-label="További elérhetőségek">
-    <div class="card">
-      <h2 class="eyebrow">Inkább e-mailben?</h2>
-      <div class="copy-row">
-        <a id="email-addr" class="addr" href="mailto:hello@bukva.design">hello@bukva.design</a>
-        <button type="button" class="icon-btn" data-copy="hello@bukva.design" data-copy-target="#email-addr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span class="label">Másolás</span></button>
-      </div>
-      <p id="copy-live" class="visually-hidden" aria-live="polite"></p>
-    </div>
-    <div class="card">
-      <h2 class="eyebrow">Mi történik ezután?</h2>
-      <ol>
-        <li>1 munkanapon belül válaszolok.</li>
-        <li>Egyeztetünk egy 30 perces beszélgetést online vagy személyesen.</li>
-        <li>Írásos, fix árú ajánlatot küldök.</li>
-      </ol>
-    </div>
-    <div class="card">
-      <h2 class="eyebrow">Közösségi média</h2>
-      <p><a href="https://www.linkedin.com/in/miklos-bukva" rel="me noopener">LinkedIn-profilom</a></p>
-    </div>
-  </aside>
-</div>
-
 </main>
-<footer class="site-footer">
-  <div class="wrap">
-    <div class="footer-grid">
-      <div>
-        <a class="brand" href="index.html">bukva<span class="dot">.</span><span class="tld">design</span></a>
-        <p style="color: var(--muted); margin-top: 0.5rem">UX/UI design, weboldalak és applikációk magánszemélyeknek és KKV-knak. Akadálymentesen, gyorsan, érthetően.</p>
-      </div>
-      <nav aria-labelledby="f-pages"><h2 id="f-pages">Oldalak</h2><ul><li><a href="index.html">Főoldal</a></li><li><a href="szolgaltatasok.html">Szolgáltatások és árak</a></li><li><a href="munkaim.html">Munkáim</a></li><li><a href="rolam.html">Rólam</a></li><li><a href="kapcsolat.html">Kapcsolat</a></li></ul></nav>
-      <div><h2>Kapcsolat</h2><ul>
-        <li><a href="mailto:hello@bukva.design">hello@bukva.design</a></li>
-        <li><a href="https://www.linkedin.com/in/miklos-bukva" rel="me noopener">LinkedIn</a></li>
-      </ul></div>
-    </div>
-    <div class="footer-bottom">
-      <p>© <span data-year>2026</span> Bukva Miklós · bukva.design</p>
-      <p><a href="akadalymentesseg.html">Akadálymentességi nyilatkozat</a> · <a href="adatvedelem.html">Adatkezelés</a></p>
-      <p class="a11y-stamp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>WCAG 2.2 AA szerint készült</p>
-    </div>
-  </div>
-</footer>
+<script type="application/json" id="pv-text">{"title": "Jelszó szükséges – bukva.design", "h1": "Az oldal jelenleg jelszóval védett", "lead": "A bukva.design fejlesztés alatt áll, és csak meghívott látogatók érhetik el.", "label": "Jelszó", "show": "Jelszó megjelenítése", "remember": "Emlékezz rám ezen az eszközön", "remember_hint": "Csak a saját eszközödön kapcsold be.", "submit": "Belépés", "busy": "Ellenőrzés…", "error": "Hibás jelszó. Ellenőrizd a kis- és nagybetűket, és próbáld újra.", "empty": "Add meg a jelszót.", "nojs": "Az oldal megnyitásához engedélyezd a JavaScriptet a böngésződben.", "unsupported": "A böngésződ nem támogatja a szükséges titkosítást. Próbáld meg egy friss böngészővel."}</script>
+<script type="text/plain" id="pv-payload">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</script>
+<script>
+(function () {
+  var KEY = "bukva-private-key", T = JSON.parse(document.getElementById("pv-text").textContent);
+  var root = document.documentElement, form = document.getElementById("pv-form"),
+      input = document.getElementById("pv-pw"), err = document.getElementById("pv-error"),
+      errText = document.getElementById("pv-error-text"), btn = document.getElementById("pv-submit"),
+      remember = document.getElementById("pv-remember"), toggle = document.getElementById("pv-toggle");
+  var SALT = root.getAttribute("data-salt"), IT = +root.getAttribute("data-it");
+  function b64(s) { var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+  function enc(u) { var s = ""; for (var i = 0; i < u.length; i++) s += String.fromCharCode(u[i]); return btoa(s); }
+  function store(k, v) { try { v === null ? (localStorage.removeItem(KEY), sessionStorage.removeItem(KEY)) : k.setItem(KEY, v); } catch (e) {} }
+  function stored() { try { return localStorage.getItem(KEY) || sessionStorage.getItem(KEY); } catch (e) { return null; } }
+
+  function decrypt(raw) {
+    var buf = b64(document.getElementById("pv-payload").textContent.trim());
+    return crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["decrypt"])
+      .then(function (k) { return crypto.subtle.decrypt({ name: "AES-GCM", iv: buf.slice(0, 12) }, k, buf.slice(12)); })
+      .then(function (pt) { return new TextDecoder().decode(pt); });
+  }
+  function derive(pw) {
+    return crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveBits"])
+      .then(function (k) { return crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: b64(SALT), iterations: IT }, k, 256); })
+      .then(function (bits) { return new Uint8Array(bits); });
+  }
+  function show(page) {
+    // document.open() is ignored while this page is still parsing, so wait for it to finish.
+    if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", function () { show(page); }); return; }
+    var hash = location.hash;
+    document.open(); document.write(page); document.close();
+    if (hash) setTimeout(function () { var t = document.getElementById(decodeURIComponent(hash.slice(1))); if (t) t.scrollIntoView(); }, 50);
+  }
+  function fail(msg) {
+    root.classList.remove("pv-checking");
+    errText.textContent = msg; err.hidden = false;
+    input.setAttribute("aria-invalid", "true"); input.setAttribute("aria-describedby", "pv-error");
+    btn.removeAttribute("aria-disabled"); btn.textContent = T.submit; form.removeAttribute("aria-busy");
+    input.focus(); input.select();
+  }
+
+  if (!window.crypto || !crypto.subtle) { root.classList.remove("pv-checking"); fail(T.unsupported); return; }
+
+  // Already unlocked earlier in this tab/device: open the page straight away.
+  var saved = stored();
+  if (saved && saved.indexOf(SALT + ":") === 0) {
+    decrypt(b64(saved.slice(SALT.length + 1))).then(show, function () { store(null, null); root.classList.remove("pv-checking"); });
+  } else {
+    root.classList.remove("pv-checking");
+    input.focus();
+  }
+
+  toggle.addEventListener("click", function () {
+    var on = toggle.getAttribute("aria-pressed") !== "true";
+    toggle.setAttribute("aria-pressed", on); input.type = on ? "text" : "password";
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (form.getAttribute("aria-busy") === "true") return;
+    if (!input.value) { fail(T.empty); return; }
+    err.hidden = true; input.removeAttribute("aria-invalid"); input.removeAttribute("aria-describedby");
+    form.setAttribute("aria-busy", "true"); btn.setAttribute("aria-disabled", "true"); btn.textContent = T.busy;
+    var raw;
+    derive(input.value)
+      .then(function (k) { raw = k; return decrypt(k); })
+      .then(function (page) {
+        store(null, null);
+        store(remember.checked ? localStorage : sessionStorage, SALT + ":" + enc(raw));
+        show(page);
+      }, function () { fail(T.error); });
+  });
+})();
+</script>
 </body>
 </html>

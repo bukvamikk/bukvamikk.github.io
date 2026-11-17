@@ -1,4 +1,3 @@
+# Private site: no crawling, no indexing.
 User-agent: *
-Allow: /
-
-Sitemap: https://bukva.design/sitemap.xml
+Disallow: /
